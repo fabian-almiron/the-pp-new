@@ -5,11 +5,11 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 export function SiteHeader() {
   const navLinks = [
-    { href: "#", label: "meet dara" },
-    { href: "/academy", label: "academy" },
-    { href: "/blog", label: "blog" },
-    { href: "#", label: "blooming buttercream™" },
-    { href: "/shop", label: "shop" },
+    { href: "#", label: "meet dara", id: "meet-dara" },
+    { href: "/academy", label: "academy", id: "academy" },
+    { href: "/blog", label: "blog", id: "blog" },
+    { href: "#", label: "blooming buttercream™", id: "blooming-buttercream" },
+    { href: "/shop", label: "shop", id: "shop" },
   ];
 
   return (
@@ -21,7 +21,7 @@ export function SiteHeader() {
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
-              key={link.href}
+              key={link.id}
               href={link.href}
               className="text-sm font-medium uppercase tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -53,7 +53,7 @@ export function SiteHeader() {
               <nav className="flex flex-col gap-6 pt-8">
                 {navLinks.map((link) => (
                   <Link
-                    key={link.href}
+                    key={link.id}
                     href={link.href}
                     className="text-lg font-medium uppercase tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
                   >
