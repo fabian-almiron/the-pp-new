@@ -207,19 +207,29 @@ Always provide unique keys when rendering lists:
 
 ## 🌐 Deployment
 
-### Vercel (Recommended)
+### Vercel Integration ✅
 
-1. Push your code to GitHub
-2. Connect repository to [Vercel](https://vercel.com)
-3. Deploy automatically on every push to main branch
+This project is **already connected to Vercel** and configured for automatic deployment:
 
-### Manual Deployment
+- **Automatic Deployment**: Every push to the `main` branch triggers a new deployment
+- **Live Site**: Automatically deployed and accessible via Vercel URL
+- **Build Status**: Monitor deployments in the [Vercel Dashboard](https://vercel.com/dashboard)
+- **Team Access**: All repo collaborators can push changes that will auto-deploy
+
+#### Deployment Workflow
 
 ```bash
-# Build the application
-pnpm build
+# Make your changes
+git add .
+git commit -m "feat: your amazing changes"
+git push origin main          # 🚀 Auto-deploys to Vercel!
+```
 
-# Start production server
+#### Local Production Testing
+
+```bash
+# Test production build locally
+pnpm build
 pnpm start
 ```
 
@@ -246,7 +256,7 @@ Use conventional commits:
 For questions or issues:
 - Check existing [GitHub Issues](https://github.com/your-repo/issues)
 - Create a new issue with detailed description
-- Contact the development team
+- Contact the fabian
 
 ## 📄 License
 
@@ -256,4 +266,4 @@ This project is private and proprietary to The Piped Peony Bakery.
 
 **Happy coding! 🚀**
 
-Made with ❤️ by the development team
+Made with ❤️ by the Josh & Fabian development team
