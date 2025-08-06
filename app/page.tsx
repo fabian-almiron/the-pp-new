@@ -38,13 +38,13 @@ function HeroSection() {
           <div className="flex items-center justify-center">
             <div className="relative w-full max-w-md h-[500px] md:h-[600px]">
               <div className="absolute inset-0 overflow-hidden rounded-t-[200px]">
-                <Image
-                  src="/placeholder.svg?width=600&height=700"
-                  alt="Beautifully decorated cake with buttercream flowers"
-                  layout="fill"
-                  objectFit="cover"
-                  className="h-full w-full"
-                />
+                              <Image
+                src="/placeholder.svg?width=600&height=700"
+                alt="Beautifully decorated cake with buttercream flowers"
+                fill
+                style={{ objectFit: 'cover' }}
+                className="h-full w-full"
+              />
               </div>
             </div>
           </div>
@@ -182,8 +182,8 @@ function CtaSection() {
       <Image
         src="/placeholder.svg?width=1920&height=600"
         alt="Background of buttercream flowers"
-        layout="fill"
-        objectFit="cover"
+        fill
+        style={{ objectFit: 'cover' }}
         className="z-0"
       />
       <div className="absolute inset-0 bg-black/40 z-0"></div>
