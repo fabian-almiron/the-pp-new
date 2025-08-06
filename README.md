@@ -211,8 +211,8 @@ Always provide unique keys when rendering lists:
 
 This project is **already connected to Vercel** and configured for automatic deployment:
 
+- **Live Site**: [https://piped-peony-new-stack.vercel.app/](https://piped-peony-new-stack.vercel.app/)
 - **Automatic Deployment**: Every push to the `main` branch triggers a new deployment
-- **Live Site**: Automatically deployed and accessible via Vercel URL
 - **Build Status**: Monitor deployments in the [Vercel Dashboard](https://vercel.com/dashboard)
 - **Team Access**: All repo collaborators can push changes that will auto-deploy
 
