@@ -30,7 +30,7 @@ function HeroSection() {
               The Piped Peony Academy is for everyone! We'll learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.
             </p>
             <div className="w-fit">
-              <Button size="lg" variant="outline" className="rounded-md border-2 border-gray-400 px-8 py-6 text-lg font-semibold text-gray-700 hover:bg-gray-100">
+              <Button size="lg" variant="dark" className="px-8 py-6 text-lg">
                 Sign up for 7 free days
               </Button>
             </div>
@@ -91,7 +91,7 @@ function AboutSection() {
             <p>That's why I started the Piped Peony Academy. I wanted to build a path for anyone who had a desire and will to learn the craft. Most importantly, I wanted to price it to be affordable, and I wanted to be there to offer guidance and support.</p>
           </div>
           <div className="mt-8">
-            <Button size="lg" variant="outline" className="rounded-md border-2 border-gray-400 px-8 py-6 text-lg font-semibold text-gray-700 hover:bg-gray-100">
+            <Button size="lg" variant="dark" className="px-8 py-6 text-lg">
               Learn More
             </Button>
           </div>
@@ -150,7 +150,7 @@ function LatestVideosSection() {
             </div>
           ))}
         </div>
-        <Button size="lg" variant="outline" className="rounded-md border-2 border-gray-400 px-8 py-6 text-lg font-semibold text-gray-700 hover:bg-gray-100">
+        <Button size="lg" variant="dark" className="px-8 py-6 text-lg">
           Learn More
         </Button>
       </div>
@@ -191,7 +191,7 @@ function CtaSection() {
         <h2 className="font-serif text-4xl md:text-6xl mb-6">
           Join The Piped Peony<br />Academy Community!
         </h2>
-        <Button size="lg" variant="outline" className="bg-transparent border-2 border-white text-white rounded-md px-8 py-6 text-lg font-semibold hover:bg-white hover:text-black">
+        <Button size="lg" variant="light" className="px-8 py-6 text-lg">
           Sign up today
         </Button>
       </div>
