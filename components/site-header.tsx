@@ -30,21 +30,21 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" size="icon">
+          <Button variant="clean" size="icon">
             <ShoppingCart className="h-5 w-5 text-gray-700" />
             <span className="sr-only">Shopping Cart</span>
           </Button>
-          <Button variant="outline" className="rounded-md border-gray-400 text-gray-700 hover:bg-gray-100">
+          <Button variant="clean">
             Sign up
           </Button>
-          <Button variant="outline" className="rounded-md border-gray-400 text-gray-700 hover:bg-gray-100">
+          <Button variant="clean">
             Login
           </Button>
         </div>
         <div className="md:hidden">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon">
+              <Button variant="clean" size="icon">
                 <Menu className="h-6 w-6 text-gray-700" />
                 <span className="sr-only">Toggle menu</span>
               </Button>
@@ -61,10 +61,10 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <div className="flex flex-col gap-4 pt-4">
-                   <Button variant="outline" className="rounded-md border-gray-400 text-gray-700 hover:bg-gray-100">
+                   <Button variant="clean">
                     Sign up
                   </Button>
-                  <Button variant="outline" className="rounded-md border-gray-400 text-gray-700 hover:bg-gray-100">
+                  <Button variant="clean">
                     Login
                   </Button>
                 </div>

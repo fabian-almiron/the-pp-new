@@ -16,6 +16,7 @@ const buttonVariants = cva(
         ghost: "button-ghost",
         link: "button-link",
         light: "button-light", // Add back the light variant for decorative lines
+        clean: "button-clean", // Clean variant without decorative lines
       },
       size: {
         default: "button-default",
@@ -52,8 +53,8 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       </Comp>
     )
     
-    // If asChild is true, return just the button without wrapper
-    if (asChild) {
+    // If asChild is true or clean variant, return just the button without wrapper
+    if (asChild || variant === "clean") {
       return buttonElement
     }
     

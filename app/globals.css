@@ -369,4 +369,36 @@
       color: #D4A771 !important;
     }
   }
+  
+  &.button-clean {
+    background-color: transparent;
+    color: black;
+    border: 1px solid black;
+    font-family: sans-serif;
+    font-weight: normal;
+    
+    &:hover {
+      border-color: #D4A771;
+      color: #D4A771;
+    }
+  }
+}
+
+/* Product Card Double Border Styling */
+.product-card-double-border {
+  position: relative;
+  border: 1px solid #000000; /* outer border - 1px black */
+  border-radius: 0; /* no curved edges */
+}
+
+.product-card-double-border::before {
+  content: '';
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  border: 1px solid #000000; /* inner border - 1px black */
+  border-radius: 0; /* no curved edges */
+  pointer-events: none;
 }
