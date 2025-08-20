@@ -5,27 +5,23 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-none text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  "button", // Use your CSS class as the base foundation
   {
     variants: {
       variant: {
-        default: "bg-transparent text-black border border-black font-sans font-normal rounded-none hover:border-[#D4A771] hover:text-[#D4A771] transition-colors duration-200",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
-        dark: "bg-transparent text-black border border-black font-sans font-normal rounded-none hover:border-[#D4A771] hover:text-[#D4A771] transition-colors duration-200",
-        light: "bg-transparent text-white border border-white font-sans font-normal rounded-none hover:border-[#D4A771] hover:!text-[#D4A771] transition-colors duration-200",
+        default: "", // Empty - uses .button base styles
+        destructive: "button-destructive",
+        outline: "button-outline", 
+        secondary: "button-secondary",
+        ghost: "button-ghost",
+        link: "button-link",
+        light: "button-light", // Add back the light variant for decorative lines
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 px-3",
-        lg: "h-11 px-8",
-        icon: "h-10 w-10",
+        default: "button-default",
+        sm: "button-sm", 
+        lg: "button-lg",
+        icon: "button-icon",
       },
     },
     defaultVariants: {
@@ -48,7 +44,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     
     const buttonElement = (
       <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
+        className={cn(buttonVariants({ variant, size }), className)} // className comes last for overrides
         ref={ref}
         {...props}
       >

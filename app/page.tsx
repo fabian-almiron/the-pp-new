@@ -19,32 +19,32 @@ export default function HomePage() {
 
 function HeroSection() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32">
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="flex flex-col justify-center space-y-6">
-            <h1 className="font-serif text-5xl md:text-7xl lg:text-8xl text-gray-800 tracking-tight">
+    <section className="hero-section">
+      <div className="hero-container">
+        <div className="hero-grid">
+          <div className="hero-content">
+            <h1 className="hero-title">
               The Piped Peony
             </h1>
-            <p className="max-w-[600px] text-gray-600 md:text-xl">
+            <p className="hero-description">
               The Piped Peony Academy is for everyone! We'll learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.
             </p>
-            <div className="w-fit">
-              <Button size="lg" variant="dark" className="px-8 py-6 text-lg">
+            <div className="hero-cta-wrapper">
+              <Button size="lg" className="px-8 py-6 text-lg">
                 Sign up for 7 free days
               </Button>
             </div>
           </div>
-          <div className="flex items-center justify-center">
-            <div className="relative w-full max-w-md h-[500px] md:h-[600px]">
-              <div className="absolute inset-0 overflow-hidden rounded-t-[200px]">
-                              <Image
-                src="/placeholder.svg?width=600&height=700"
-                alt="Beautifully decorated cake with buttercream flowers"
-                fill
-                style={{ objectFit: 'cover' }}
-                className="h-full w-full"
-              />
+          <div className="hero-image-area">
+            <div className="hero-image-container">
+              <div className="hero-image-frame">
+                <Image
+                  src="/archy-header-image.webp"
+                  alt="Beautifully decorated cake with buttercream flowers"
+                  fill
+                  style={{ objectFit: 'cover' }}
+                  className="hero-image"
+                />
               </div>
             </div>
           </div>
@@ -91,7 +91,7 @@ function AboutSection() {
             <p>That's why I started the Piped Peony Academy. I wanted to build a path for anyone who had a desire and will to learn the craft. Most importantly, I wanted to price it to be affordable, and I wanted to be there to offer guidance and support.</p>
           </div>
           <div className="mt-8">
-            <Button size="lg" variant="dark" className="px-8 py-6 text-lg">
+            <Button size="lg" className="px-8 py-6 text-lg">
               Learn More
             </Button>
           </div>
@@ -150,7 +150,7 @@ function LatestVideosSection() {
             </div>
           ))}
         </div>
-        <Button size="lg" variant="dark" className="px-8 py-6 text-lg">
+        <Button size="lg"  className="px-8 py-6 text-lg">
           Learn More
         </Button>
       </div>
