@@ -1,7 +1,10 @@
+"use client"
+
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useCart } from "@/contexts/cart-context";
 
 export function SiteHeader() {
   const navLinks = [
@@ -11,6 +14,21 @@ export function SiteHeader() {
     { href: "#", label: "blooming buttercream™", id: "blooming-buttercream" },
     { href: "/shop", label: "shop", id: "shop" },
   ];
+
+  return (
+    <HeaderContent navLinks={navLinks} />
+  );
+}
+
+interface NavLink {
+  href: string;
+  label: string;
+  id: string;
+}
+
+function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
+  const { getItemCount } = useCart();
+  const cartItemCount = getItemCount();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-[#FBF9F6]/80 backdrop-blur-sm">
@@ -30,10 +48,17 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="clean" size="icon">
-            <ShoppingCart className="h-5 w-5 text-gray-700" />
-            <span className="sr-only">Shopping Cart</span>
-          </Button>
+          <Link href="/cart">
+            <Button variant="clean" size="icon" className="relative">
+              <ShoppingCart className="h-5 w-5 text-gray-700" />
+              {cartItemCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-[#D4A771] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+                  {cartItemCount}
+                </span>
+              )}
+              <span className="sr-only">Shopping Cart</span>
+            </Button>
+          </Link>
           <Button variant="clean">
             Sign up
           </Button>
@@ -61,7 +86,11 @@ export function SiteHeader() {
                   </Link>
                 ))}
                 <div className="flex flex-col gap-4 pt-4">
-                   <Button variant="clean">
+                  <Link href="/cart" className="flex items-center gap-2 text-lg font-medium uppercase tracking-wider text-gray-600 hover:text-gray-900 transition-colors">
+                    <ShoppingCart className="h-5 w-5" />
+                    Cart {cartItemCount > 0 && `(${cartItemCount})`}
+                  </Link>
+                  <Button variant="clean">
                     Sign up
                   </Button>
                   <Button variant="clean">

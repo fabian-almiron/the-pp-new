@@ -3,6 +3,7 @@ import { Playfair_Display, Lato, Dancing_Script, Inter } from 'next/font/google'
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { CartProvider } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 
 const playfairDisplay = Playfair_Display({
@@ -50,9 +51,11 @@ export default function RootLayout({
         )}
       >
         <div className="relative flex min-h-screen flex-col">
-          <SiteHeader />
-          <main className="flex-1">{children}</main>
-          <SiteFooter />
+          <CartProvider>
+            <SiteHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </CartProvider>
         </div>
       </body>
     </html>

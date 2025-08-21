@@ -85,6 +85,14 @@ export default function ShopPage() {
         <div className="text-center mb-12">
           <h1 className="font-serif text-4xl md:text-5xl text-gray-800">Shop Our Tools & Supplies</h1>
           <p className="text-gray-600 mt-2">Everything you need to start your buttercream flower journey.</p>
+          <div className="mt-6">
+            <Link href="/cart" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
+              <span>View Cart</span>
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
+          </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
           {products.map((product) => (

@@ -8,10 +8,12 @@ import { ItemGallery } from "@/components/ui/item-gallery"
 import { fetchProductBySlug } from "@/lib/mock-api"
 import { Product } from "@/data/types"
 import { PeonyLoader } from "@/components/ui/peony-loader"
+import { useCart } from "@/contexts/cart-context"
 
 export default function ItemPage() {
   const params = useParams()
   const slug = params.slug as string
+  const { addItem } = useCart()
   
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
@@ -20,6 +22,7 @@ export default function ItemPage() {
   const [selectedHand, setSelectedHand] = useState("right-handed")
   const [quantity, setQuantity] = useState(1)
   const [expandedSection, setExpandedSection] = useState<string | null>("accessories")
+  const [addingToCart, setAddingToCart] = useState(false)
 
   // Fetch product data
   useEffect(() => {
@@ -51,6 +54,26 @@ export default function ItemPage() {
 
   const toggleSection = (section: string) => {
     setExpandedSection(expandedSection === section ? null : section)
+  }
+
+  const handleAddToCart = async () => {
+    if (!product) return
+    
+    setAddingToCart(true)
+    
+    // Simulate a small delay for better UX
+    await new Promise(resolve => setTimeout(resolve, 500))
+    
+    addItem(product, quantity, {
+      hand: product.variants.hasHandPreference ? selectedHand : undefined,
+      size: product.variants.hasSizeOptions ? undefined : undefined, // Add size logic when needed
+      color: product.variants.hasColorOptions ? undefined : undefined // Add color logic when needed
+    })
+    
+    setAddingToCart(false)
+    
+    // Show success feedback (you could add a toast notification here)
+    alert('Item added to cart!')
   }
 
   // Loading state
@@ -151,8 +174,10 @@ export default function ItemPage() {
             {/* Add to Cart */}
             <div className="flex justify-center lg:justify-start button-grey-lines">
               <Button 
-                text="ADD TO CART" 
+                text={addingToCart ? "ADDING..." : "ADD TO CART"}
                 className="!bg-gray-600 !text-white !border-gray-600 hover:!bg-transparent hover:!text-black hover:!border-black"
+                onClick={handleAddToCart}
+                disabled={addingToCart}
               />
             </div>
 
