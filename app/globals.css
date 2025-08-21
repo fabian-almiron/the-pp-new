@@ -402,3 +402,12 @@
   border-radius: 0; /* no curved edges */
   pointer-events: none;
 }
+
+/* Custom button with grey decorative lines */
+.button-grey-lines .group:hover .border-b {
+  border-color: #000000 !important; /* black on hover */
+}
+
+.button-grey-lines .group .border-b {
+  border-color: #4b5563 !important; /* grey-600 */
+}

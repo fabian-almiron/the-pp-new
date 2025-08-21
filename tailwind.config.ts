@@ -22,6 +22,9 @@ const config = {
   			],
   			logo: [
   				'var(--font-dancing-script)'
+  			],
+  			inter: [
+  				'var(--font-inter)'
   			]
   		},
   		colors: {

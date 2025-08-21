@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Lato, Dancing_Script } from 'next/font/google';
+import { Playfair_Display, Lato, Dancing_Script, Inter } from 'next/font/google';
 import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -21,6 +21,12 @@ const dancingScript = Dancing_Script({
   variable: "--font-dancing-script",
 });
 
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
+
 export const metadata: Metadata = {
   title: "The Piped Peony",
   description: "Learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.",
@@ -39,7 +45,8 @@ export default function RootLayout({
           "min-h-screen bg-[#FBF9F6] font-sans antialiased",
           playfairDisplay.variable,
           lato.variable,
-          dancingScript.variable
+          dancingScript.variable,
+          inter.variable
         )}
       >
         <div className="relative flex min-h-screen flex-col">
