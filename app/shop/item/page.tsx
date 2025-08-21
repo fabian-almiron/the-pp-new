@@ -60,61 +60,66 @@ export default function ItemPage() {
 
           {/* Product Details */}
           <div className="space-y-6">
-            <div>
+            <div className="text-center lg:text-left">
               <h1 className="text-3xl font-serif text-gray-900 mb-2">The Essential Flower Piping Kit, Tuned</h1>
               <p className="text-2xl text-gray-900 font-medium">$350.00</p>
             </div>
 
-            {/* Hand Selection */}
-            <div className="space-y-2">
-              <label className="text-sm text-gray-700 font-medium">Hand Preference</label>
-              <div className="flex space-x-2">
-                <button
-                  onClick={() => setSelectedHand("right-handed")}
-                  className={`px-4 py-2 text-sm border rounded transition-colors ${
-                    selectedHand === "right-handed"
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
-                  }`}
-                >
-                  right-handed
-                </button>
-                <button
-                  onClick={() => setSelectedHand("left-handed")}
-                  className={`px-4 py-2 text-sm border rounded transition-colors ${
-                    selectedHand === "left-handed"
-                      ? "bg-black text-white border-black"
-                      : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
-                  }`}
-                >
-                  left-handed
-                </button>
+            {/* Hand Selection & Quantity - Side by side on mobile, stacked on larger screens when needed */}
+            <div className="flex flex-col sm:flex-row sm:gap-8 lg:flex-col lg:gap-0 space-y-6 sm:space-y-0 lg:space-y-6">
+              {/* Hand Selection */}
+              <div className="space-y-2 sm:flex-1 lg:w-full text-center sm:text-right lg:text-left">
+                <label className="text-sm text-gray-700 font-medium block">Hand Preference</label>
+                <div className="flex space-x-2 justify-center sm:justify-end lg:justify-start">
+                  <button
+                    onClick={() => setSelectedHand("right-handed")}
+                    className={`px-4 py-2 text-sm border rounded transition-colors ${
+                      selectedHand === "right-handed"
+                        ? "bg-black text-white border-black"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
+                    }`}
+                  >
+                    right-handed
+                  </button>
+                  <button
+                    onClick={() => setSelectedHand("left-handed")}
+                    className={`px-4 py-2 text-sm border rounded transition-colors ${
+                      selectedHand === "left-handed"
+                        ? "bg-black text-white border-black"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
+                    }`}
+                  >
+                    left-handed
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {/* Quantity */}
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700 font-medium">Quantity</span>
-              <div className="flex items-center border border-gray-300 rounded">
-                <button 
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))} 
-                  className="p-2 hover:bg-gray-50 transition-colors"
-                  disabled={quantity <= 1}
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="px-4 py-2 text-sm min-w-[3rem] text-center">{quantity}</span>
-                <button 
-                  onClick={() => setQuantity(quantity + 1)} 
-                  className="p-2 hover:bg-gray-50 transition-colors"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
+              {/* Quantity */}
+              <div className="space-y-2 sm:flex-1 lg:w-full text-center sm:text-left lg:text-left">
+                <span className="text-sm text-gray-700 font-medium block">Quantity</span>
+                <div className="flex justify-center sm:justify-start lg:justify-start">
+                  <div className="flex items-center border border-gray-300 rounded">
+                    <button 
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))} 
+                      className="p-2 hover:bg-gray-50 transition-colors"
+                      disabled={quantity <= 1}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="px-4 py-2 text-sm min-w-[3rem] text-center">{quantity}</span>
+                    <button 
+                      onClick={() => setQuantity(quantity + 1)} 
+                      className="p-2 hover:bg-gray-50 transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
             {/* Add to Cart */}
-            <div className="flex justify-start button-grey-lines">
+            <div className="flex justify-center lg:justify-start button-grey-lines">
               <Button 
                 text="ADD TO CART" 
                 className="!bg-gray-600 !text-white !border-gray-600 hover:!bg-transparent hover:!text-black hover:!border-black"
