@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -31,17 +32,36 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
   const cartItemCount = getItemCount();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-black/10 bg-[#FBF9F6]/80 backdrop-blur-sm">
-      <div className="container mx-auto flex h-20 items-center justify-between px-4 md:px-6">
-        <Link href="/" className="font-logo text-3xl md:text-4xl text-gray-800">
-          The Piped Peony
+    <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#707070' }}>
+      <div className="hero-container flex h-24 items-center justify-between">
+        <Link href="/" className="flex items-center">
+          <div className="relative">
+            {/* Mobile logo - smaller size */}
+            <Image
+              src="/piped-peony-logo-1536x339.png"
+              alt="The Piped Peony"
+              width={160}
+              height={35}
+              className="h-8 w-auto md:hidden"
+              priority
+            />
+            {/* Desktop logo - larger size */}
+            <Image
+              src="/piped-peony-logo-2048x452.png"
+              alt="The Piped Peony"
+              width={220}
+              height={48}
+              className="hidden md:block h-12 w-auto"
+              priority
+            />
+          </div>
         </Link>
         <nav className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
             <Link
               key={link.id}
               href={link.href}
-              className="text-sm font-medium uppercase tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-sm font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
             >
               {link.label}
             </Link>
@@ -80,13 +100,13 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
                   <Link
                     key={link.id}
                     href={link.href}
-                    className="text-lg font-medium uppercase tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
                   >
                     {link.label}
                   </Link>
                 ))}
                 <div className="flex flex-col gap-4 pt-4">
-                  <Link href="/cart" className="flex items-center gap-2 text-lg font-medium uppercase tracking-wider text-gray-600 hover:text-gray-900 transition-colors">
+                  <Link href="/cart" className="flex items-center gap-2 text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors">
                     <ShoppingCart className="h-5 w-5" />
                     Cart {cartItemCount > 0 && `(${cartItemCount})`}
                   </Link>

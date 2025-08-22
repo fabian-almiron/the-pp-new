@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Facebook, Instagram, PinIcon as Pinterest, Youtube } from 'lucide-react';
 
 export function SiteFooter() {
@@ -11,8 +12,25 @@ export function SiteFooter() {
             <Link href="#" className="font-medium text-gray-700 hover:text-gray-900">FAQs</Link>
           </div>
           <div className="flex flex-col items-center gap-4">
-            <Link href="/" className="font-logo text-4xl text-gray-800">
-              The Piped Peony
+            <Link href="/" className="flex items-center justify-center">
+              <div className="relative">
+                {/* Mobile footer logo */}
+                <Image
+                  src="/full-logo-1-768x135.png"
+                  alt="The Piped Peony"
+                  width={150}
+                  height={26}
+                  className="h-8 w-auto md:hidden"
+                />
+                {/* Desktop footer logo */}
+                <Image
+                  src="/full-logo-1-1024x180.png"
+                  alt="The Piped Peony"
+                  width={200}
+                  height={35}
+                  className="hidden md:block h-10 w-auto"
+                />
+              </div>
             </Link>
             <p className="text-xs uppercase tracking-widest text-gray-500">Techniques. Recipes. Color. Support.</p>
             <div className="flex gap-4">

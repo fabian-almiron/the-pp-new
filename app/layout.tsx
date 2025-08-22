@@ -41,6 +41,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" />
+      </head>
       <body
         className={cn(
           "min-h-screen bg-[#FBF9F6] font-sans antialiased",
@@ -52,6 +55,26 @@ export default function RootLayout({
       >
         <div className="relative flex min-h-screen flex-col">
           <CartProvider>
+            {/* Vertical line - only going UP from intersection point (positive Y-axis) - hidden on mobile */}
+            <div 
+              className="absolute z-10 w-px pointer-events-none hidden md:block"
+              style={{
+                left: "calc(50% - 600px + 1rem)", // Center minus half container width plus left padding
+                top: "0", // Start from top
+                height: "calc(96px + 24px + 520px + 60px)", // Extended to new intersection point
+                backgroundColor: "#707070"
+              }}
+            ></div>
+            {/* Horizontal line - only going RIGHT from intersection point (positive X-axis) - hidden on mobile */}
+            <div 
+              className="absolute z-10 h-px pointer-events-none hidden md:block"
+              style={{
+                left: "calc(50% - 600px + 1rem)", // Start from vertical line intersection
+                top: "calc(96px + 24px + 520px + 60px)", // Moved down 60px
+                width: "800px", // Extended length - only going right
+                backgroundColor: "#707070"
+              }}
+            ></div>
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />

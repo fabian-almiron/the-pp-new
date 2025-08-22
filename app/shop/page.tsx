@@ -112,9 +112,9 @@ export default function ShopPage() {
               <p className="text-base text-gray-600 mb-0">${product.price.toFixed(2)}</p>
               <div className="mt-8 mt-auto mb-4 flex justify-center">
                 <Link href={`/shop/item/${product.slug}`}>
-                  <button 
-                    className="font-semibold border border-black text-black hover:border-[#D4A771] hover:text-[#D4A771] lowercase bg-transparent transition-colors duration-200"
-                    style={{ paddingTop: '2px', paddingBottom: '2px', paddingLeft: '12px', paddingRight: '12px', fontSize: '0.875rem' }}
+                                    <button
+                    className="button-select-options font-semibold border border-black text-black hover:border-[#D4A771] hover:text-[#D4A771] lowercase bg-transparent transition-colors duration-200"
+                    style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '12px', paddingRight: '12px', fontSize: '0.875rem' }}
                   >
                     select options
                   </button>
