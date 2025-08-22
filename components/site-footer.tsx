@@ -7,7 +7,7 @@ export function SiteFooter() {
     <footer className="bg-[#FBF9F6] py-12" style={{ fontFamily: 'sofia-pro, sans-serif' }}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          <div className="flex flex-col items-center md:items-start gap-2">
+          <div className="flex flex-col items-center md:items-start justify-end gap-2">
             <Link href="#" className="font-medium text-black hover:text-gray-700">Contact</Link>
             <Link href="#" className="font-medium text-black hover:text-gray-700">FAQs</Link>
           </div>
@@ -33,7 +33,6 @@ export function SiteFooter() {
                 />
               </div>
             </Link>
-            <p className="text-xs uppercase tracking-widest text-black">Techniques. Recipes. Color. Support.</p>
             <div className="flex gap-4">
               <Link href="#"><Facebook className="h-5 w-5 text-black hover:text-gray-700" /></Link>
               <Link href="#"><Instagram className="h-5 w-5 text-black hover:text-gray-700" /></Link>
@@ -41,12 +40,12 @@ export function SiteFooter() {
               <Link href="#"><Youtube className="h-5 w-5 text-black hover:text-gray-700" /></Link>
             </div>
           </div>
-          <div className="flex flex-col items-center md:items-end gap-2">
+          <div className="flex flex-col items-center md:items-end justify-end gap-2">
             <Link href="#" className="font-medium text-black hover:text-gray-700">Privacy Policy</Link>
             <Link href="#" className="font-medium text-black hover:text-gray-700">Terms & Conditions</Link>
           </div>
         </div>
-        <div className="mt-12 text-center text-sm text-black">
+        <div className="mt-12 text-center text-xs text-gray-400" style={{ fontFamily: 'sofia-pro, sans-serif' }}>
           © {new Date().getFullYear()} The Piped Peony. All Rights Reserved.
         </div>
       </div>

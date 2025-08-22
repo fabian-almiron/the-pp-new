@@ -42,8 +42,17 @@ export default function ShopPage() {
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
           <div className="text-center mb-12">
-            <h1 className="font-serif text-4xl md:text-5xl text-gray-800">Shop Our Tools & Supplies</h1>
-            <p className="text-gray-600 mt-2">Everything you need to start your buttercream flower journey.</p>
+            <div className="flex justify-center mb-6">
+              <img 
+                src="/shop-welcome.png" 
+                alt="Welcome to the Shop" 
+                width={280} 
+                height={216}
+                style={{ width: '280px', height: '216px', objectFit: 'contain' }}
+              />
+            </div>
+            <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
+            <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
           </div>
           <div className="flex justify-center items-center py-16">
             <PeonyLoader />
@@ -59,8 +68,17 @@ export default function ShopPage() {
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
           <div className="text-center mb-12">
-            <h1 className="font-serif text-4xl md:text-5xl text-gray-800">Shop Our Tools & Supplies</h1>
-            <p className="text-gray-600 mt-2">Everything you need to start your buttercream flower journey.</p>
+            <div className="flex justify-center mb-6">
+              <img 
+                src="/shop-welcome.png" 
+                alt="Welcome to the Shop" 
+                width={280} 
+                height={216}
+                style={{ width: '280px', height: '216px', objectFit: 'contain' }}
+              />
+            </div>
+            <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
+            <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
           </div>
           <div className="flex justify-center items-center py-16">
             <div className="text-center">
@@ -83,8 +101,17 @@ export default function ShopPage() {
     <div className="bg-white">
       <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
         <div className="text-center mb-12">
-          <h1 className="font-serif text-4xl md:text-5xl text-gray-800">Shop Our Tools & Supplies</h1>
-          <p className="text-gray-600 mt-2">Everything you need to start your buttercream flower journey.</p>
+          <div className="flex justify-center mb-6">
+            <Image 
+              src="/shop-welcome.png" 
+              alt="Welcome to the Shop" 
+              width={400} 
+              height={200}
+              className="object-contain"
+            />
+          </div>
+          <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
+          <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
           <div className="mt-6">
             <Link href="/cart" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
               <span>View Cart</span>
@@ -114,7 +141,13 @@ export default function ShopPage() {
                 <Link href={`/shop/item/${product.slug}`}>
                                     <button
                     className="button-select-options font-semibold border border-black text-black hover:border-[#D4A771] hover:text-[#D4A771] lowercase bg-transparent transition-colors duration-200"
-                    style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '12px', paddingRight: '12px', fontSize: '0.875rem' }}
+                    style={{ 
+                      paddingTop: '3px', 
+                      paddingBottom: '3px', 
+                      paddingLeft: '30px', 
+                      paddingRight: '30px', 
+                      fontSize: '0.875rem'
+                    }}
                   >
                     select options
                   </button>

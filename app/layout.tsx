@@ -6,6 +6,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { CartProvider } from "@/contexts/cart-context";
 import { cn } from "@/lib/utils";
 import { HomePageLines } from "@/components/home-page-lines";
+import { ShopShadowBorders } from "@/components/shop-shadow-borders";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -31,8 +32,7 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: "The Piped Peony",
-  description: "Learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.",
-    generator: 'v0.dev'
+  description: "Learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights."
 };
 
 export default function RootLayout({
@@ -57,6 +57,7 @@ export default function RootLayout({
         <div className="relative flex min-h-screen flex-col">
           <CartProvider>
             <HomePageLines />
+            <ShopShadowBorders />
             <SiteHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />

@@ -491,15 +491,21 @@
   font-family: "sofia-pro", sans-serif;
   font-weight: 700;
   font-style: normal;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Product Card Double Border Styling */
 .product-card-double-border {
   position: relative;
-  border: 1px solid #000000; /* outer border - 1px black */
+  border: none; /* no outer border - shadow border will replace this */
   border-radius: 0; /* no curved edges */
+  background-color: white; /* ensure background is white */
 }
 
+/* Inner border for content spacing (keeps original layout) */
 .product-card-double-border::before {
   content: '';
   position: absolute;
