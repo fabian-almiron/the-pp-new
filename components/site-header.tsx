@@ -33,8 +33,8 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
 
   return (
     <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#707070' }}>
-      <div className="hero-container flex h-24 items-center justify-between">
-        <Link href="/" className="flex items-center">
+      <div className="container flex h-10 md:h-16 items-center justify-between">
+        <Link href="/" className="flex items-center ml-11">
           <div className="relative">
             {/* Mobile logo - smaller size */}
             <Image
@@ -61,7 +61,8 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
             <Link
               key={link.id}
               href={link.href}
-              className="text-sm font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
+              className="text-base font-normal tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
+              style={{ fontFamily: '"sofia-pro", sans-serif' }}
             >
               {link.label}
             </Link>
@@ -100,7 +101,8 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
                   <Link
                     key={link.id}
                     href={link.href}
-                    className="text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-base font-normal tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
+                    style={{ fontFamily: '"sofia-pro", sans-serif' }}
                   >
                     {link.label}
                   </Link>

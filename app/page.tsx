@@ -21,7 +21,7 @@ export default function HomePage() {
 function HeroSection() {
   return (
     <section className="hero-section">
-      <div className="hero-container">
+      <div className="container">
         <div className="hero-grid">
           <div className="hero-content">
             <h1 className="hero-title">
@@ -65,7 +65,7 @@ function FeaturesSection() {
 
   return (
     <section className="features-section">
-      <div className="features-container">
+      <div className="container">
         <div className="features-grid">
           {features.map((feature) => (
             <div key={feature.title} className="feature-item">
