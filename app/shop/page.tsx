@@ -99,7 +99,7 @@ export default function ShopPage() {
 
   return (
     <div className="bg-white">
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
+      <div className="container mx-auto" style={{ margin: "0px 159.583px", padding: "32px 16px 96px" }}>
         <div className="text-center mb-12">
           <div className="flex justify-center mb-6">
             <Image 
@@ -121,34 +121,28 @@ export default function ShopPage() {
             </Link>
           </div>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 lg:gap-12 xl:gap-16">
+        <div className="shop-grid">
           {products.map((product) => (
-            <div key={product.id} className="group text-center product-card-double-border p-4 bg-white flex flex-col">
-              <Link href={`/shop/item/${product.slug}`} className="flex-grow">
-                <div className="block overflow-hidden mb-6 aspect-video">
+            <div 
+              key={product.id} 
+              className="group shop-item-tile product-card-double-border"
+            >
+              <Link href={`/shop/item/${product.slug}`} className="tile-link">
+                <div className="tile-image-container">
                   <Image
                     src={product.images[0]?.src || "/placeholder.svg"}
                     alt={product.images[0]?.alt || product.name}
                     width={400}
                     height={225}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    className="tile-image"
                   />
                 </div>
-                <h3 className="font-serif text-2xl text-gray-800 mb-3 leading-tight">{product.name}</h3>
+                <h3 className="tile-title">{product.name}</h3>
               </Link>
-              <p className="text-base text-gray-600 mb-0">${product.price.toFixed(2)}</p>
-              <div className="mt-8 mt-auto mb-4 flex justify-center">
+              <p className="tile-price">${product.price.toFixed(2)}</p>
+              <div className="tile-button-container">
                 <Link href={`/shop/item/${product.slug}`}>
-                                    <button
-                    className="button-select-options font-semibold border border-black text-black hover:border-[#D4A771] hover:text-[#D4A771] lowercase bg-transparent transition-colors duration-200"
-                    style={{ 
-                      paddingTop: '3px', 
-                      paddingBottom: '3px', 
-                      paddingLeft: '30px', 
-                      paddingRight: '30px', 
-                      fontSize: '0.875rem'
-                    }}
-                  >
+                  <button className="button-select-options">
                     select options
                   </button>
                 </Link>

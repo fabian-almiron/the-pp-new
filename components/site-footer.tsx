@@ -4,23 +4,29 @@ import { Facebook, Instagram, PinIcon as Pinterest, Youtube } from 'lucide-react
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#FBF9F6] py-12" style={{ fontFamily: 'sofia-pro, sans-serif' }}>
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-          <div className="flex flex-col items-center md:items-start justify-end gap-2">
-            <Link href="#" className="font-medium text-black hover:text-gray-700">Contact</Link>
-            <Link href="#" className="font-medium text-black hover:text-gray-700">FAQs</Link>
+    <footer className="footer-container">
+      <div className="footer-content">
+        <div className="footer-grid">
+          {/* Contact - order 3 on mobile */}
+          <div className="footer-nav-section order-3 md:order-1">
+            <Link href="#" className="footer-nav-link">Contact</Link>
+            <Link href="#" className="footer-nav-link md:block hidden">FAQs</Link>
           </div>
-          <div className="flex flex-col items-center gap-4">
+          
+          {/* FAQ - order 4 on mobile, hidden on desktop (shown in contact section) */}
+          <div className="footer-nav-section order-4 md:hidden">
+            <Link href="#" className="footer-nav-link">FAQs</Link>
+          </div>
+          <div className="footer-center-section order-1 md:order-2">
             <Link href="/" className="flex items-center justify-center">
               <div className="relative">
                 {/* Mobile footer logo */}
                 <Image
                   src="/full-logo-1-768x135.png"
                   alt="The Piped Peony"
-                  width={150}
-                  height={26}
-                  className="h-8 w-auto md:hidden"
+                  width={300}
+                  height={52}
+                  className="h-16 w-auto md:hidden"
                 />
                 {/* Desktop footer logo - updated size and higher resolution */}
                 <Image
@@ -33,19 +39,25 @@ export function SiteFooter() {
                 />
               </div>
             </Link>
-            <div className="flex gap-4">
-              <Link href="#"><Facebook className="h-5 w-5 text-black hover:text-gray-700" /></Link>
-              <Link href="#"><Instagram className="h-5 w-5 text-black hover:text-gray-700" /></Link>
-              <Link href="#"><Pinterest className="h-5 w-5 text-black hover:text-gray-700" /></Link>
-              <Link href="#"><Youtube className="h-5 w-5 text-black hover:text-gray-700" /></Link>
+            <div className="footer-social-links order-2">
+              <Link href="#" className="footer-social-link"><Facebook className="h-5 w-5" /></Link>
+              <Link href="#" className="footer-social-link"><Instagram className="h-5 w-5" /></Link>
+              <Link href="#" className="footer-social-link"><Pinterest className="h-5 w-5" /></Link>
+              <Link href="#" className="footer-social-link"><Youtube className="h-5 w-5" /></Link>
             </div>
           </div>
-          <div className="flex flex-col items-center md:items-end justify-end gap-2">
-            <Link href="#" className="font-medium text-black hover:text-gray-700">Privacy Policy</Link>
-            <Link href="#" className="font-medium text-black hover:text-gray-700">Terms & Conditions</Link>
+          {/* Privacy Policy - order 5 on mobile */}
+          <div className="footer-nav-section order-5 md:order-3">
+            <Link href="#" className="footer-nav-link">Privacy Policy</Link>
+            <Link href="#" className="footer-nav-link md:block hidden">Terms & Conditions</Link>
+          </div>
+          
+          {/* Terms & Conditions - order 6 on mobile, hidden on desktop (shown in privacy section) */}
+          <div className="footer-nav-section order-6 md:hidden">
+            <Link href="#" className="footer-nav-link">Terms & Conditions</Link>
           </div>
         </div>
-        <div className="mt-12 text-center text-xs text-gray-400" style={{ fontFamily: 'sofia-pro, sans-serif' }}>
+        <div className="footer-copyright">
           © {new Date().getFullYear()} The Piped Peony. All Rights Reserved.
         </div>
       </div>

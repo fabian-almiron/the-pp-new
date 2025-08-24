@@ -17,6 +17,7 @@ const buttonVariants = cva(
         link: "button-link",
         light: "button-light", // Add back the light variant for decorative lines
         clean: "button-clean", // Clean variant without decorative lines
+        cta: "button-cta", // CTA variant for homepage buttons
       },
       size: {
         default: "button-default",

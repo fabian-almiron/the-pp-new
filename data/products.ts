@@ -233,6 +233,172 @@ export const mockProducts: Product[] = [
         "Angled Flower Lifter"
       ]
     }
+  },
+  {
+    id: 9,
+    slug: "premium-russian-tips-collection",
+    name: "Premium Russian Tips Collection",
+    price: 89.99,
+    images: [
+      { src: "/placeholder_peony.jpg", alt: "Pink Peony - Russian tip perfection" },
+      { src: "/placeholder_orchid-pink.jpg", alt: "Pink Orchid - Advanced Russian techniques" },
+      { src: "/placeholder_oriental-lily.jpg", alt: "Oriental Lily - Professional Russian piping" },
+      { src: "/placeholder_chrysanthemum.jpg", alt: "Chrysanthemum - Intricate Russian details" }
+    ],
+    shortDescription: "Professional Russian piping tips for stunning one-motion flowers",
+    longDescription: "This premium collection features authentic Russian piping tips that allow you to create incredibly realistic flowers in a single motion. Each tip is precision-crafted to produce multiple petals simultaneously, creating stunning depth and texture that's impossible to achieve with traditional tips. Perfect for advanced decorators ready to elevate their buttercream flower game with professional Russian techniques.",
+    category: "piping-tips",
+    inStock: true,
+    variants: {
+      hasHandPreference: false,
+      hasSizeOptions: false,
+      hasColorOptions: false
+    },
+    specifications: {
+      accessories: [
+        "12 Premium Russian Tips (Assorted Sizes)",
+        "Specialty Coupling System",
+        "Russian Technique Video Tutorial Access",
+        "Premium Storage Case"
+      ],
+      tipCategories: [
+        {
+          name: "Rose Tips",
+          items: ["Large Russian Rose", "Medium Russian Rose", "Small Russian Rose"]
+        },
+        {
+          name: "Chrysanthemum Tips",
+          items: ["Large Chrysanthemum", "Medium Chrysanthemum"]
+        },
+        {
+          name: "Specialty Blooms",
+          items: ["Russian Tulip", "Russian Carnation", "Russian Sunflower", "Russian Dahlia"]
+        }
+      ]
+    }
+  },
+  {
+    id: 10,
+    slug: "edible-shimmer-dust-garden",
+    name: "Edible Shimmer Dust Garden",
+    price: 32.75,
+    images: [
+      { src: "/placeholder_lily.jpg", alt: "White Lily - Sparkling shimmer effects" },
+      { src: "/placeholder_rose-pink.jpg", alt: "Pink Rose - Elegant pearl dust finish" },
+      { src: "/placeholder_peony-blue.jpg", alt: "Blue Peony - Iridescent garden sparkle" }
+    ],
+    shortDescription: "Luxurious edible shimmer collection for ethereal flower finishes",
+    longDescription: "Transform your buttercream flowers into magical, shimmering works of art with this curated collection of premium edible shimmer dusts. Each shade is carefully selected to complement natural flower tones while adding an ethereal, luminous quality that catches light beautifully. Food-safe and flavor-neutral, these shimmers blend seamlessly with buttercream and can be applied wet or dry for varying intensity levels.",
+    category: "ingredients",
+    inStock: true,
+    variants: {
+      hasHandPreference: false,
+      hasSizeOptions: false,
+      hasColorOptions: true
+    },
+    specifications: {
+      accessories: [
+        "8 Premium Shimmer Shades (0.25oz each)",
+        "Professional Application Brushes (x3)",
+        "Mixing Medium for Wet Application",
+        "Shimmer Technique Guide",
+        "UV-Safe Storage Container"
+      ]
+    },
+    disclaimer: "Shimmer effects may vary under different lighting conditions. Store in cool, dry place away from direct sunlight."
+  },
+  {
+    id: 11,
+    slug: "heated-workspace-mat",
+    name: "Temperature-Controlled Workspace Mat",
+    price: 156.50,
+    images: [
+      { src: "/placeholder_chrysanthemum.jpg", alt: "Chrysanthemum - Consistent temperature workspace" },
+      { src: "/placeholder_oriental-lily.jpg", alt: "Oriental Lily - Professional heated surface" },
+      { src: "/placeholder_daisy.jpg", alt: "White Daisy - Temperature-controlled decorating" },
+      { src: "/placeholder_orchid-pink.jpg", alt: "Pink Orchid - Precision temperature control" }
+    ],
+    shortDescription: "Professional temperature-controlled mat for consistent buttercream handling",
+    longDescription: "This innovative heated workspace mat maintains the perfect temperature for buttercream work, ensuring consistent texture and workability regardless of room conditions. The mat features precise digital temperature control, allowing you to set the optimal warmth for your specific buttercream recipe and working style. Essential for professional decorators working in varying environments or during temperature-sensitive seasons.",
+    category: "equipment",
+    inStock: true,
+    variants: {
+      hasHandPreference: false,
+      hasSizeOptions: true,
+      hasColorOptions: false
+    },
+    specifications: {
+      accessories: [
+        "24\" x 18\" Heated Mat",
+        "Digital Temperature Controller",
+        "Non-Slip Bottom Surface",
+        "Easy-Clean Silicone Top Layer",
+        "Power Adapter & 6ft Cord",
+        "Temperature Guide Chart"
+      ]
+    },
+    disclaimer: "Electrical equipment. Follow all safety guidelines. Not waterproof - wipe clean only."
+  },
+  {
+    id: 12,
+    slug: "botanical-inspiration-cards",
+    name: "Botanical Inspiration Card Deck",
+    price: 19.95,
+    images: [
+      { src: "/placeholder_peony.jpg", alt: "Pink Peony - Botanical inspiration deck" },
+      { src: "/placeholder_lily.jpg", alt: "White Lily - Nature study cards" },
+      { src: "/placeholder_rose-pink.jpg", alt: "Pink Rose - Floral reference guide" }
+    ],
+    shortDescription: "Beautiful reference cards featuring real flower photography and piping guides",
+    longDescription: "This stunning deck of 50 botanical inspiration cards features high-quality photography of real flowers paired with detailed piping instructions for recreating each bloom in buttercream. Each card includes seasonal information, color mixing suggestions, and step-by-step technique notes. Perfect for sparking creativity and expanding your flower repertoire with nature-accurate color palettes and forms.",
+    category: "education",
+    inStock: true,
+    variants: {
+      hasHandPreference: false,
+      hasSizeOptions: false,
+      hasColorOptions: false
+    },
+    specifications: {
+      accessories: [
+        "50 Premium Photo Cards (4\" x 6\")",
+        "Protective Storage Box",
+        "Seasonal Flower Calendar",
+        "Quick Reference Guide",
+        "Waterproof Card Coating"
+      ]
+    }
+  },
+  {
+    id: 13,
+    slug: "micro-detail-sculpting-tools",
+    name: "Micro Detail Sculpting Tool Set",
+    price: 27.40,
+    images: [
+      { src: "/placeholder_orchid-pink.jpg", alt: "Pink Orchid - Intricate detail work" },
+      { src: "/placeholder_oriental-lily.jpg", alt: "Oriental Lily - Precision sculpting tools" },
+      { src: "/placeholder_chrysanthemum.jpg", alt: "Chrysanthemum - Fine detail enhancement" },
+      { src: "/placeholder_peony-blue.jpg", alt: "Blue Peony - Professional micro sculpting" },
+      { src: "/placeholder_daisy.jpg", alt: "White Daisy - Delicate flower details" }
+    ],
+    shortDescription: "Precision tools for adding intricate details to buttercream flowers",
+    longDescription: "This specialized set of micro sculpting tools allows you to add incredibly fine details to your buttercream flowers - from delicate petal textures and realistic stamens to intricate leaf veining and flower centers. Each tool is crafted from food-safe materials with ergonomic handles designed for precision work. Perfect for decorators who want to achieve botanical-level realism in their buttercream creations.",
+    category: "tools",
+    inStock: true,
+    variants: {
+      hasHandPreference: true,
+      hasSizeOptions: false,
+      hasColorOptions: false
+    },
+    specifications: {
+      accessories: [
+        "7 Precision Sculpting Tools",
+        "Texture Rolling Pin (Mini)",
+        "Detail Brush Set (x4)",
+        "Magnifying Work Light",
+        "Tool Rest Stand",
+        "Protective Tool Roll"
+      ]
+    }
   }
 ];
 

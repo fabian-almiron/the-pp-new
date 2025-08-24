@@ -32,9 +32,9 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
   const cartItemCount = getItemCount();
 
   return (
-    <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#707070' }}>
-      <div className="container flex h-10 md:h-16 items-center justify-between">
-        <Link href="/" className="flex items-center ml-11">
+    <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
+      <div className="header-container">
+        <Link href="/" className="header-logo">
           <div className="relative">
             {/* Mobile logo - smaller size */}
             <Image
@@ -56,21 +56,20 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
             />
           </div>
         </Link>
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="header-nav">
           {navLinks.map((link) => (
             <Link
               key={link.id}
               href={link.href}
-              className="text-base font-normal tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
-              style={{ fontFamily: '"sofia-pro", sans-serif' }}
+              className="header-nav-link"
             >
               {link.label}
             </Link>
           ))}
         </nav>
-        <div className="hidden md:flex items-center gap-2">
+        <div className="header-actions">
           <Link href="/cart">
-            <Button variant="clean" size="icon" className="relative">
+            <Button variant="clean" size="icon" className="relative !border-none">
               <ShoppingCart className="h-5 w-5 text-gray-700" />
               {cartItemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-[#D4A771] text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
@@ -80,14 +79,14 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
               <span className="sr-only">Shopping Cart</span>
             </Button>
           </Link>
-          <Button variant="clean">
-            Sign up
+          <Button variant="clean" className="!border-none !bg-[#f1eae6]">
+            sign up
           </Button>
-          <Button variant="clean">
-            Login
+          <Button variant="clean" className="!border-none">
+            login
           </Button>
         </div>
-        <div className="md:hidden">
+        <div className="header-mobile-menu">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="clean" size="icon">
@@ -96,13 +95,12 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-[#FBF9F6]">
-              <nav className="flex flex-col gap-6 pt-8">
+              <nav className="flex flex-col pt-8">
                 {navLinks.map((link) => (
                   <Link
                     key={link.id}
                     href={link.href}
-                    className="text-base font-normal tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
-                    style={{ fontFamily: '"sofia-pro", sans-serif' }}
+                    className="header-nav-link mb-4"
                   >
                     {link.label}
                   </Link>
@@ -112,11 +110,11 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
                     <ShoppingCart className="h-5 w-5" />
                     Cart {cartItemCount > 0 && `(${cartItemCount})`}
                   </Link>
-                  <Button variant="clean">
-                    Sign up
+                  <Button variant="clean" className="!border-none !bg-[#f1eae6]">
+                    sign up
                   </Button>
-                  <Button variant="clean">
-                    Login
+                  <Button variant="clean" className="!border-none">
+                    login
                   </Button>
                 </div>
               </nav>

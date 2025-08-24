@@ -17,20 +17,20 @@ export function HomePageLines() {
       <div 
         className="absolute z-10 w-px pointer-events-none hidden md:block"
         style={{
-          left: "calc(50% - 600px + 1rem)", // Center minus half container width plus left padding
+          left: "calc(50% - 600px + 1rem - 50px)", // Center minus half container width plus left padding, moved 50px left
           top: "0", // Start from very top of page
           height: "calc(96px + 24px + 520px + 60px - 130px + 60px)", // Extended 60px past intersection point
-          backgroundColor: "#707070"
+          backgroundColor: "#70707099"
         }}
       ></div>
       {/* Horizontal line - meets vertical line at its bottom end (positive X-axis) - hidden on mobile */}
       <div 
         className="absolute z-10 h-px pointer-events-none hidden md:block"
         style={{
-          left: "calc(50% - 600px + 1rem)", // Start from vertical line intersection
+          left: "calc(50% - 600px + 1rem - 50px)", // Start from vertical line intersection, moved 50px left
           top: "calc(96px + 24px + 520px + 60px - 130px + 60px)", // Match the bottom end of vertical line
-          width: "800px", // Extended length - only going right
-          backgroundColor: "#707070"
+          width: "850px", // Extended length by 50px to maintain same right endpoint
+          backgroundColor: "#70707099"
         }}
       ></div>
     </>
