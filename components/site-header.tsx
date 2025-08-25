@@ -9,7 +9,7 @@ import { useCart } from "@/contexts/cart-context";
 
 export function SiteHeader() {
   const navLinks = [
-    { href: "#", label: "meet dara", id: "meet-dara" },
+    { href: "/about", label: "meet dara", id: "meet-dara" },
     { href: "/academy", label: "academy", id: "academy" },
     { href: "/blog", label: "blog", id: "blog" },
     { href: "#", label: "blooming buttercream™", id: "blooming-buttercream" },
