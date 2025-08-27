@@ -6,11 +6,14 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
+import { useUser } from "@/contexts/user-context";
 
 export function SiteHeader() {
+  const { isLoggedIn } = useUser();
+  
   const navLinks = [
     { href: "/about", label: "meet dara", id: "meet-dara" },
-    { href: "/academy", label: "academy", id: "academy" },
+    { href: isLoggedIn ? "/academy" : "/academy-details", label: "academy", id: "academy" },
     { href: "/blog", label: "blog", id: "blog" },
     { href: "#", label: "blooming buttercream™", id: "blooming-buttercream" },
     { href: "/shop", label: "shop", id: "shop" },
@@ -29,7 +32,17 @@ interface NavLink {
 
 function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
   const { getItemCount } = useCart();
+  const { isLoggedIn, login, logout, user } = useUser();
   const cartItemCount = getItemCount();
+
+  const handleQuickLogin = async () => {
+    // Quick login for testing purposes
+    await login("dara@pipedpeony.com");
+  };
+
+  const handleLogout = () => {
+    logout();
+  };
 
   return (
     <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
@@ -79,12 +92,27 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
               <span className="sr-only">Shopping Cart</span>
             </Button>
           </Link>
-          <Button variant="clean" className="!border-none !bg-[#f1eae6]">
-            sign up
-          </Button>
-          <Button variant="clean" className="!border-none">
-            login
-          </Button>
+          {isLoggedIn ? (
+            <>
+              <span className="text-sm text-gray-600">Welcome, {user?.name}!</span>
+              <Button variant="clean" className="!border-none" onClick={handleLogout}>
+                logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link href="/signup">
+                <Button variant="clean" className="!border-none !bg-[#f1eae6]">
+                  sign up
+                </Button>
+              </Link>
+              <Link href="/login">
+                <Button variant="clean" className="!border-none">
+                  login
+                </Button>
+              </Link>
+            </>
+          )}
         </div>
         <div className="header-mobile-menu">
           <Sheet>
@@ -110,12 +138,27 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
                     <ShoppingCart className="h-5 w-5" />
                     Cart {cartItemCount > 0 && `(${cartItemCount})`}
                   </Link>
-                  <Button variant="clean" className="!border-none !bg-[#f1eae6]">
-                    sign up
-                  </Button>
-                  <Button variant="clean" className="!border-none">
-                    login
-                  </Button>
+                  {isLoggedIn ? (
+                    <>
+                      <span className="text-sm text-gray-600 px-4">Welcome, {user?.name}!</span>
+                      <Button variant="clean" className="!border-none" onClick={handleLogout}>
+                        logout
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      <Link href="/signup">
+                        <Button variant="clean" className="!border-none !bg-[#f1eae6]">
+                          sign up
+                        </Button>
+                      </Link>
+                      <Link href="/login">
+                        <Button variant="clean" className="!border-none">
+                          login
+                        </Button>
+                      </Link>
+                    </>
+                  )}
                 </div>
               </nav>
             </SheetContent>

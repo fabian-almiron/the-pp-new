@@ -1663,3 +1663,853 @@
   width: 100%;
   height: auto;
 }
+
+/* Academy Details Page Styles */
+
+/* Hero Academy Section */
+.hero-academy-section {
+  background-color: #f8f8f8;
+  padding: 0;
+  overflow: hidden;
+}
+
+.hero-academy-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  min-height: 70vh;
+  border: 2px solid #515151;
+}
+
+.hero-academy-image-left,
+.hero-academy-image-right {
+  position: relative;
+  min-height: 400px;
+}
+
+.hero-academy-image {
+  object-fit: cover;
+}
+
+.hero-academy-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 2rem;
+  text-align: center;
+  background-color: white;
+}
+
+.hero-academy-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 300;
+  font-size: 4rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.hero-academy-subtitle {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 16px;
+  color: #515151;
+  margin-bottom: 2rem;
+  padding: 30.8333px 61.6797px;
+}
+
+.hero-academy-cta-wrapper {
+  margin-bottom: 2rem;
+}
+
+.hero-academy-description {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 16px;
+  color: #515151;
+  line-height: 1.6;
+  max-width: 400px;
+  padding: 30.8333px 61.6797px;
+}
+
+/* Responsive design for hero */
+@media (max-width: 1024px) {
+  .hero-academy-grid {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+  
+  .hero-academy-image-left,
+  .hero-academy-image-right {
+    min-height: 300px;
+  }
+  
+  .hero-academy-title {
+    font-size: 3rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-academy-title {
+    font-size: 2.5rem;
+  }
+  
+  .hero-academy-content {
+    padding: 2rem 1rem;
+  }
+  
+  .hero-academy-subtitle,
+  .hero-academy-description {
+    padding: 15px 30px;
+  }
+}
+
+/* Why Piped Peony Section */
+.why-piped-peony-section {
+  padding: 5rem 0;
+  background-color: white;
+}
+
+.why-piped-peony-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.why-piped-peony-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #000;
+}
+
+.why-piped-peony-description {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #515151;
+}
+
+.why-piped-peony-features {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.why-piped-peony-feature {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  color: #515151;
+}
+
+.why-piped-peony-checkmark {
+  color: #D4A771;
+  font-weight: bold;
+  margin-right: 1rem;
+  font-size: 1.2rem;
+}
+
+.why-piped-peony-img {
+  border-radius: 0.5rem;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .why-piped-peony-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .why-piped-peony-title {
+    font-size: 2rem;
+  }
+}
+
+/* Featured Video Section */
+.featured-video-section {
+  padding: 5rem 0;
+  background-color: #f8f8f8;
+}
+
+.featured-video-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #000;
+}
+
+.featured-video-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+  aspect-ratio: 16/9;
+  background-color: #ddd;
+  border-radius: 0.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.featured-video-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+}
+
+.featured-video-play-button {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.featured-video-play-button:hover {
+  transform: scale(1.1);
+}
+
+/* What You Get Section */
+.what-you-get-section {
+  padding: 5rem 0;
+  background-color: white;
+}
+
+.what-you-get-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #000;
+}
+
+.what-you-get-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.what-you-get-card {
+  text-align: center;
+  padding: 2rem;
+}
+
+.what-you-get-card-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #000;
+}
+
+.what-you-get-card-description {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #515151;
+}
+
+@media (max-width: 768px) {
+  .what-you-get-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .what-you-get-title {
+    font-size: 2rem;
+  }
+}
+
+/* Recipe Section */
+.recipe-section {
+  padding: 5rem 0;
+  background-color: #f8f8f8;
+}
+
+.recipe-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.recipe-signature {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  color: #D4A771;
+  margin-bottom: 0.5rem;
+  font-style: italic;
+}
+
+.recipe-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #000;
+}
+
+.recipe-description {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #515151;
+}
+
+.recipe-img {
+  border-radius: 0.5rem;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .recipe-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .recipe-title {
+    font-size: 2rem;
+  }
+}
+
+/* Video Series Section */
+.video-series-section {
+  padding: 5rem 0;
+  background-color: white;
+}
+
+.video-series-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.video-series-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #000;
+}
+
+.video-series-description {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  color: #515151;
+}
+
+.video-series-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.video-series-item {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  color: #515151;
+  margin-bottom: 0.75rem;
+}
+
+.video-series-img {
+  border-radius: 0.5rem;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .video-series-grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  .video-series-title {
+    font-size: 2rem;
+  }
+}
+
+/* Community Testimonials Section */
+.community-testimonials-section {
+  padding: 5rem 0;
+  background-color: #f8f8f8;
+}
+
+.community-testimonials-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: #000;
+  line-height: 1.2;
+}
+
+.community-testimonials-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.community-testimonial-card {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+.community-testimonial-text {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: #515151;
+  font-style: italic;
+}
+
+.community-testimonial-author {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #D4A771;
+  text-align: right;
+}
+
+@media (max-width: 768px) {
+  .community-testimonials-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .community-testimonials-title {
+    font-size: 2rem;
+  }
+}
+
+/* Academy Logged-In Page Styles */
+.academy-logged-in-hero {
+  padding: 5rem 0;
+  background-color: white;
+}
+
+.academy-logged-in-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.academy-logged-in-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 3.5rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 2rem;
+  color: #000;
+}
+
+.academy-logged-in-description {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  color: #515151;
+}
+
+.academy-logged-in-cta-wrapper {
+  margin-bottom: 1rem;
+}
+
+.academy-logged-in-img {
+  border-radius: 0.5rem;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .academy-logged-in-content {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    text-align: center;
+  }
+  
+  .academy-logged-in-title {
+    font-size: 2.5rem;
+  }
+  
+  .academy-logged-in-description {
+    font-size: 1rem;
+  }
+}
+
+/* Login Page Styles */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f5f5f5;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-background-left,
+.login-background-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 200px;
+  background-image: url('/background_peony-petals.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.1;
+  pointer-events: none;
+}
+
+.login-background-left {
+  left: 0;
+  background-position: left center;
+}
+
+.login-background-right {
+  right: 0;
+  background-position: right center;
+  transform: scaleX(-1);
+}
+
+.login-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.login-logo {
+  margin-bottom: 2.5rem;
+}
+
+.login-logo-img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.login-form-group {
+  text-align: left;
+}
+
+.login-label {
+  display: block;
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.login-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: "Sofia Light", sans-serif;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: #4285f4;
+}
+
+.login-password-wrapper {
+  position: relative;
+}
+
+.login-password-input {
+  padding-right: 3rem;
+}
+
+.login-password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.login-recaptcha {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  padding: 1rem;
+  background: #f9f9f9;
+  margin: 1rem 0;
+}
+
+.recaptcha-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.recaptcha-input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin: 0;
+}
+
+.recaptcha-label {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.875rem;
+  color: #333;
+  margin: 0;
+}
+
+.recaptcha-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.recaptcha-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.recaptcha-text {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+  color: #4285f4;
+}
+
+.recaptcha-privacy {
+  font-size: 0.6rem;
+  color: #999;
+}
+
+.login-remember-wrapper {
+  text-align: left;
+}
+
+.login-remember {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  cursor: pointer;
+}
+
+.login-remember-input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+.login-error {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.login-submit-wrapper {
+  margin-top: 1rem;
+}
+
+.login-submit-button {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  background-color: #f5f5f5;
+  border: 2px solid #ddd;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.login-submit-button:hover {
+  background-color: #e9e9e9;
+  border-color: #bbb;
+}
+
+.login-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.login-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 2rem;
+  text-align: center;
+}
+
+.login-forgot-password,
+.login-back-home {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.login-forgot-password:hover,
+.login-back-home:hover {
+  color: #4285f4;
+}
+
+.login-back-home {
+  color: #999;
+  font-size: 0.8rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .login-container {
+    margin: 1rem;
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-background-left,
+  .login-background-right {
+    width: 100px;
+  }
+  
+  .login-logo-img {
+    max-width: 280px;
+  }
+  
+  .login-recaptcha {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+/* Signup Page Additional Styles */
+.signup-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 3rem 2.5rem;
+  width: 100%;
+  max-width: 520px;
+  text-align: center;
+  position: relative;
+  z-index: 10;
+}
+
+.signup-title {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 1.75rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.signup-subtitle {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.95rem;
+  color: #666;
+  margin-bottom: 2rem;
+  line-height: 1.4;
+}
+
+.signup-password-hint {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.signup-terms-wrapper {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+
+.signup-terms-wrapper .login-remember {
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.signup-link {
+  color: #4285f4;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.signup-link:hover {
+  text-decoration: underline;
+}
+
+.signup-login-link {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.signup-login-link p {
+  font-family: "Sofia Light", sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0;
+}
+
+/* Mobile adjustments for signup */
+@media (max-width: 768px) {
+  .signup-container {
+    margin: 1rem;
+    padding: 2rem 1.5rem;
+    max-width: none;
+  }
+  
+  .signup-title {
+    font-size: 1.5rem;
+  }
+  
+  .signup-subtitle {
+    font-size: 0.875rem;
+  }
+}

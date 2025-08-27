@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CartProvider } from "@/contexts/cart-context";
+import { UserProvider } from "@/contexts/user-context";
 import { cn } from "@/lib/utils";
 import { HomePageLines } from "@/components/home-page-lines";
 import { ShopShadowBorders } from "@/components/shop-shadow-borders";
@@ -55,13 +56,15 @@ export default function RootLayout({
         )}
       >
         <div className="relative flex min-h-screen flex-col">
-          <CartProvider>
-            <HomePageLines />
-            <ShopShadowBorders />
-            <SiteHeader />
-            <main className="flex-1">{children}</main>
-            <SiteFooter />
-          </CartProvider>
+          <UserProvider>
+            <CartProvider>
+              <HomePageLines />
+              <ShopShadowBorders />
+              <SiteHeader />
+              <main className="flex-1">{children}</main>
+              <SiteFooter />
+            </CartProvider>
+          </UserProvider>
         </div>
       </body>
     </html>
