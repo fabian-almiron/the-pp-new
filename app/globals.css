@@ -1668,26 +1668,50 @@
 
 /* Hero Academy Section */
 .hero-academy-section {
-  background-color: #f8f8f8;
+  background-color: #f6f5f3;
   padding: 0;
   overflow: hidden;
 }
 
 .hero-academy-grid {
   display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  min-height: 70vh;
-  border: 2px solid #515151;
+  grid-template-columns: 0.67fr 2fr 0.67fr;
+  min-height: 55vh;
 }
 
-.hero-academy-image-left,
+.hero-academy-image-left {
+  position: relative;
+  min-height: 420px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
 .hero-academy-image-right {
   position: relative;
-  min-height: 400px;
+  min-height: 450px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
 }
 
 .hero-academy-image {
-  object-fit: cover;
+  position: relative !important;
+  width: auto !important;
+  height: auto !important;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.hero-academy-image-left .hero-academy-image {
+  width: 320px !important;
+  height: 420px !important;
+}
+
+.hero-academy-image-right .hero-academy-image {
+  width: auto !important;
+  height: 420px !important;
+  max-width: 100%;
 }
 
 .hero-academy-content {
@@ -1697,24 +1721,46 @@
   align-items: center;
   padding: 3rem 2rem;
   text-align: center;
-  background-color: white;
+  background-color: #f6f5f3;
+  position: relative;
+}
+
+.hero-academy-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  background-color: #f6f5f3;
+  border: 1px solid #515151;
+  padding: 2rem;
+  margin-top: 0.5rem;
 }
 
 .hero-academy-title {
-  font-family: "sofia-pro", sans-serif;
-  font-weight: 300;
-  font-size: 4rem;
-  letter-spacing: 0.2em;
+  font-family: "Playfair Display", serif;
+  font-size: 83.65px;
+  color: #000000;
   margin-bottom: 1rem;
-  color: #000;
+  letter-spacing: normal;
+  font-weight: normal;
 }
 
 .hero-academy-subtitle {
-  font-family: "Sofia Light", sans-serif;
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  color: #000000;
+  margin-bottom: 0.5rem;
+  padding: 0;
+}
+
+.hero-academy-pricing {
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
   font-size: 16px;
   color: #515151;
   margin-bottom: 2rem;
-  padding: 30.8333px 61.6797px;
+  padding: 0;
 }
 
 .hero-academy-cta-wrapper {
@@ -1722,12 +1768,19 @@
 }
 
 .hero-academy-description {
-  font-family: "Sofia Light", sans-serif;
-  font-size: 16px;
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 12px;
   color: #515151;
   line-height: 1.6;
   max-width: 400px;
-  padding: 30.8333px 61.6797px;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.hero-academy-description a {
+  color: #515151;
+  text-decoration: underline;
 }
 
 /* Responsive design for hero */
@@ -1739,7 +1792,7 @@
   
   .hero-academy-image-left,
   .hero-academy-image-right {
-    min-height: 300px;
+    min-height: 350px;
   }
   
   .hero-academy-title {
@@ -1791,7 +1844,13 @@
   color: #515151;
 }
 
-.why-piped-peony-features {
+.why-piped-peony-features-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.why-piped-peony-features-column {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -1801,16 +1860,14 @@
   display: flex;
   align-items: center;
   margin-bottom: 1rem;
-  font-family: "Sofia Light", sans-serif;
-  font-size: 1rem;
+  font-family: "Sofia Pro Regular", sans-serif;
+  font-size: 16px;
   color: #515151;
 }
 
 .why-piped-peony-checkmark {
-  color: #D4A771;
-  font-weight: bold;
   margin-right: 1rem;
-  font-size: 1.2rem;
+  flex-shrink: 0;
 }
 
 .why-piped-peony-img {
@@ -1827,6 +1884,11 @@
   
   .why-piped-peony-title {
     font-size: 2rem;
+  }
+  
+  .why-piped-peony-features-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 }
 
@@ -1936,16 +1998,17 @@
 .recipe-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 4rem;
-  align-items: center;
+  gap: 8rem;
+  align-items: stretch;
+  max-width: 50%;
+  margin: 0 auto;
 }
 
 .recipe-signature {
-  font-family: "Sofia Light", sans-serif;
-  font-size: 1rem;
-  color: #D4A771;
+  font-family: 'lindsey-signature', sans-serif;
+  font-size: 47.3866px;
+  color: #707070;
   margin-bottom: 0.5rem;
-  font-style: italic;
 }
 
 .recipe-title {
@@ -1965,15 +2028,16 @@
 }
 
 .recipe-img {
-  border-radius: 0.5rem;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: contain;
 }
 
 @media (max-width: 768px) {
   .recipe-grid {
     grid-template-columns: 1fr;
-    gap: 2rem;
+    gap: 4rem;
+    max-width: 85%;
   }
   
   .recipe-title {

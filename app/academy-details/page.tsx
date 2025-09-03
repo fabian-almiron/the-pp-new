@@ -28,31 +28,32 @@ function HeroAcademySection() {
           <Image
             src="/flowers-leftacdm-227x300.png"
             alt="Beautiful buttercream flowers"
-            fill
-            style={{ objectFit: 'cover' }}
+            width={227}
+            height={300}
             className="hero-academy-image"
           />
         </div>
         <div className="hero-academy-content">
           <h1 className="hero-academy-title">ACADEMY</h1>
-          <p className="hero-academy-subtitle">Get started with a 7-day free trial!</p>
-          <div className="hero-academy-cta-wrapper">
-            <Button variant="cta">
-              See what's included
-            </Button>
+          <div className="hero-academy-body">
+            <p className="hero-academy-subtitle">Get started with a 7-day free trial!</p>
+            <p className="hero-academy-pricing">No contract membership for only $15 a month.</p>
+            <div className="hero-academy-cta-wrapper">
+              <Button variant="cta">
+                Sign up for 7 free days
+              </Button>
+            </div>
+            <p className="hero-academy-description">
+              By signing up you agree to The Piped Peony's <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+            </p>
           </div>
-          <p className="hero-academy-description">
-            Becoming an expert in the Piped Peony's School of
-            Buttercream Artistry takes time, but with our proven
-            method you'll be creating beautiful designs in no time.
-          </p>
         </div>
         <div className="hero-academy-image-right">
           <Image
             src="/aca-imgright.png"
             alt="Decorated cake with buttercream flowers"
-            fill
-            style={{ objectFit: 'cover' }}
+            width={400}
+            height={300}
             className="hero-academy-image"
           />
         </div>
@@ -62,12 +63,16 @@ function HeroAcademySection() {
 }
 
 function WhyPipedPeonySection() {
-  const features = [
-    "Get your questions answered",
-    "Learn at any pace",
-    "Access exclusive recipes",
-    "Supportive community",
-    "Monthly new content"
+  const featuresColumn1 = [
+    "Unlimited classes",
+    "Techniques",
+    "Exclusive recipes"
+  ];
+  
+  const featuresColumn2 = [
+    "Color mixing ideas",
+    "Support & community",
+    "No contract required"
   ];
 
   return (
@@ -75,18 +80,40 @@ function WhyPipedPeonySection() {
       <div className="container">
         <div className="why-piped-peony-grid">
           <div className="why-piped-peony-content">
-            <h2 className="why-piped-peony-title">Why Piped Peony</h2>
+            <h2 className="why-piped-peony-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>Why Piped Peony</h2>
             <p className="why-piped-peony-description">
               Whether you are a complete beginner or more advanced, our Academy has something to offer everyone looking to enhance their piping skills.
             </p>
-            <ul className="why-piped-peony-features">
-              {features.map((feature, index) => (
-                <li key={index} className="why-piped-peony-feature">
-                  <span className="why-piped-peony-checkmark">✓</span>
-                  {feature}
-                </li>
-              ))}
-            </ul>
+            <div className="why-piped-peony-features-grid">
+              <ul className="why-piped-peony-features-column">
+                {featuresColumn1.map((feature, index) => (
+                  <li key={index} className="why-piped-peony-feature">
+                    <Image
+                      src="/checkmark.svg"
+                      alt="Checkmark"
+                      width={21.5}
+                      height={21.5}
+                      className="why-piped-peony-checkmark"
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+              <ul className="why-piped-peony-features-column">
+                {featuresColumn2.map((feature, index) => (
+                  <li key={index} className="why-piped-peony-feature">
+                    <Image
+                      src="/checkmark.svg"
+                      alt="Checkmark"
+                      width={21.5}
+                      height={21.5}
+                      className="why-piped-peony-checkmark"
+                    />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
           <div className="why-piped-peony-image">
             <Image
@@ -107,7 +134,7 @@ function FeaturedVideoSection() {
   return (
     <section className="featured-video-section">
       <div className="container">
-        <h2 className="featured-video-title">Featured Video</h2>
+        <h2 className="featured-video-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>Featured Video</h2>
         <div className="featured-video-wrapper">
           {/* Placeholder for video - will be replaced with actual video embed */}
           <div className="featured-video-placeholder">
@@ -125,34 +152,22 @@ function FeaturedVideoSection() {
 }
 
 function WhatYouGetSection() {
-  const benefits = [
-    {
-      title: "Weekly Meetings & Updates",
-      description: "Join our weekly live meetings where we discuss techniques, answer questions, and share updates on new content and seasonal designs."
-    },
-    {
-      title: "Unlimited Community & Support",
-      description: "Access to our private Facebook community where you can share your work, get feedback, and connect with fellow bakers from around the world."
-    },
-    {
-      title: "Exclusive Recipes",
-      description: "Get access to our signature Blooming Buttercream™ recipe and other exclusive formulations that make your flowers look more realistic."
-    },
-    {
-      title: "New Monthly Content",
-      description: "Fresh content every month including seasonal designs, new techniques, and trending piping styles to keep your skills current."
-    }
+  const features = [
+    { title: "Watch Anytime, Anywhere", description: "Watch on-demand classes at your convenience, allowing for a more flexible and efficient learning experience." },
+    { title: "Online Community & Support", description: "Upon joining, you will be granted access to a private Facebook group that provides you with the necessary support to acquire and enhance your piping skills." },
+    { title: "Exclusive Recipes", description: "As a member, you will gain access to cake and piping recipes that will enhance the beauty and taste of your creations, including our exclusive Blooming Buttercream™ recipe." },
+    { title: "New Monthly Content", description: "Stay ahead of the latest trends and seasons with new designs and the latest innovative techniques." },
   ];
 
   return (
-    <section className="what-you-get-section">
+    <section className="features-section">
       <div className="container">
-        <h2 className="what-you-get-title">What You Get</h2>
-        <div className="what-you-get-grid">
-          {benefits.map((benefit, index) => (
-            <div key={index} className="what-you-get-card">
-              <h3 className="what-you-get-card-title">{benefit.title}</h3>
-              <p className="what-you-get-card-description">{benefit.description}</p>
+        <h2 className="text-center mb-8 md:mb-12" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>What You Get</h2>
+        <div className="features-grid">
+          {features.map((feature) => (
+            <div key={feature.title} className="feature-item">
+              <h3 className="feature-title">{feature.title}</h3>
+              <p className="feature-description">{feature.description}</p>
             </div>
           ))}
         </div>
@@ -168,7 +183,7 @@ function RecipeSection() {
         <div className="recipe-grid">
           <div className="recipe-content">
             <p className="recipe-signature">Recipe</p>
-            <h2 className="recipe-title">Blooming Buttercream™</h2>
+            <h2 className="recipe-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>Blooming Buttercream™</h2>
             <p className="recipe-description">
               Our exclusive Blooming Buttercream™ recipe is what sets our flowers apart from others you've seen online. This special formulation creates flowers that look incredibly realistic and have the perfect consistency for piping.
             </p>
@@ -181,7 +196,7 @@ function RecipeSection() {
           </div>
           <div className="recipe-image">
             <Image
-              src="/fullblorosetn.png"
+              src="/blooming-pic.jpeg"
               alt="Blooming Buttercream flowers"
               width={400}
               height={400}
@@ -209,7 +224,7 @@ function VideoSeriesSection() {
             />
           </div>
           <div className="video-series-content">
-            <h2 className="video-series-title">Video Series</h2>
+            <h2 className="video-series-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>Video Series</h2>
             <p className="video-series-description">
               Follow along with our comprehensive video series that takes you step-by-step through each technique. From basic piping to advanced flower arrangements, our videos are designed to help you learn at your own pace.
             </p>
@@ -250,7 +265,7 @@ function CommunityTestimonialsSection() {
   return (
     <section className="community-testimonials-section">
       <div className="container">
-        <h2 className="community-testimonials-title">
+        <h2 className="community-testimonials-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>
           The Go-To Community<br />
           of Thousands of Bakers
         </h2>
