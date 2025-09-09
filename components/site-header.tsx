@@ -7,13 +7,33 @@ import { ShoppingCart, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
 import { useUser } from "@/contexts/user-context";
+import { LoggedInHeader } from "@/components/logged-in-header";
 
 export function SiteHeader() {
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn, loading } = useUser();
   
+  // Show loading state
+  if (loading) {
+    return (
+      <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
+        <div className="header-container">
+          <div className="flex items-center justify-center w-full py-4">
+            <div className="text-sm text-gray-600">Loading...</div>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  // Show logged-in header for authenticated users
+  if (isLoggedIn) {
+    return <LoggedInHeader />;
+  }
+
+  // Show regular header for non-authenticated users
   const navLinks = [
     { href: "/about", label: "meet dara", id: "meet-dara" },
-    { href: isLoggedIn ? "/academy" : "/academy-details", label: "academy", id: "academy" },
+    { href: "/academy-details", label: "academy", id: "academy" },
     { href: "/blog", label: "blog", id: "blog" },
     { href: "#", label: "blooming buttercream™", id: "blooming-buttercream" },
     { href: "/shop", label: "shop", id: "shop" },

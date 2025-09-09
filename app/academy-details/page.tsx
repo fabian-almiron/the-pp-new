@@ -13,9 +13,8 @@ export default function AcademyDetailsPage() {
       <WhatYouGetSection />
       <RecipeSection />
       <VideoSeriesSection />
-      <CommunityTestimonialsSection />
-      <FaqSection />
       <TestimonialsSection />
+      <FaqSection />
     </>
   );
 }
@@ -236,46 +235,6 @@ function VideoSeriesSection() {
               <div className="video-series-item">• Troubleshooting Guide</div>
             </div>
           </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CommunityTestimonialsSection() {
-  const testimonials = [
-    {
-      text: "I joined about 3 months ago and I was hesitant at first as I live in Canada. However, this experience has been incredible. Not only is Dara's teaching style accessible and engaging, but her community is so supportive.",
-      author: "Ana K"
-    },
-    {
-      text: "The instruction and community are both incredible. I recommend it to anyone wanting to learn or is currently learning the art of buttercream flowers.",
-      author: "Samantha"
-    },
-    {
-      text: "I'm so thankful I found this community. The support and encouragement has been amazing. Dara makes learning so much fun and easy to understand.",
-      author: "Jessica M"
-    },
-    {
-      text: "The comprehensive content and supportive community make this academy worth every penny. My piping skills have improved dramatically.",
-      author: "Rose R"
-    }
-  ];
-
-  return (
-    <section className="community-testimonials-section">
-      <div className="container">
-        <h2 className="community-testimonials-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>
-          The Go-To Community<br />
-          of Thousands of Bakers
-        </h2>
-        <div className="community-testimonials-grid">
-          {testimonials.map((testimonial, index) => (
-            <div key={index} className="community-testimonial-card">
-              <p className="community-testimonial-text">"{testimonial.text}"</p>
-              <p className="community-testimonial-author">- {testimonial.author}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>

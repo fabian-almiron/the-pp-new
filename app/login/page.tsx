@@ -28,7 +28,7 @@ export default function LoginPage() {
     try {
       const success = await login(email);
       if (success) {
-        router.push("/academy");
+        router.push("/video-library");
       } else {
         setError("Invalid email or password. Try 'dara@pipedpeony.com' for demo.");
       }
