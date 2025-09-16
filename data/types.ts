@@ -49,3 +49,25 @@ export interface User {
   joinDate: string;
   profileImage: string;
 }
+
+// Video Course Types
+export interface Chapter {
+  id: string;
+  title: string;
+  videoSrc: string;
+  duration: number; // in seconds
+}
+
+export interface Course {
+  title: string;
+  series: string;
+  chapters: Chapter[];
+  aboutContent: string;
+  whatYouNeedContent: string;
+}
+
+export interface CarouselItem {
+  slug: string;
+  title: string;
+  thumbnailUrl: string;
+}

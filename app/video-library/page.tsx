@@ -1,10 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Play } from "lucide-react";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
+import { Button } from "@/components/ui/button";
 
 export default function VideoLibraryPage() {
   return (
@@ -12,6 +14,7 @@ export default function VideoLibraryPage() {
       <VideoLibraryHero />
       <DifficultyLevels />
       <NewestVideos />
+      <VideoSeriesSection />
     </>
   );
 }
@@ -130,28 +133,74 @@ function NewestVideos() {
           <CarouselContent className="-ml-2 md:-ml-4">
             {newestVideos.map((video, index) => (
               <CarouselItem key={index} className="video-carousel-item">
-                <div className="video-item-wrapper">
-                  <div className="video-thumbnail-wrapper">
-                    <Image
-                      src={video.thumbnail}
-                      alt={video.title}
-                      width={400}
-                      height={200}
-                      className="video-thumbnail"
-                    />
-                    <div className="video-play-overlay">
-                      <Play className="video-play-icon" fill="white" />
+                <Link href="/courses/the-black-cake-class" className="block">
+                  <div className="video-item-wrapper">
+                    <div className="video-thumbnail-wrapper">
+                      <Image
+                        src={video.thumbnail}
+                        alt={video.title}
+                        width={400}
+                        height={200}
+                        className="video-thumbnail"
+                      />
+                      <div className="video-play-overlay">
+                        <Play className="video-play-icon" fill="white" />
+                      </div>
+                    </div>
+                    <div className="video-item-content">
+                      <h3 className="video-item-title">{video.title}</h3>
+                      <p className="video-item-description">{video.description}</p>
                     </div>
                   </div>
-                  <div className="video-item-content">
-                    <h3 className="video-item-title">{video.title}</h3>
-                    <p className="video-item-description">{video.description}</p>
-                  </div>
-                </div>
+                </Link>
               </CarouselItem>
             ))}
           </CarouselContent>
         </Carousel>
+      </div>
+    </section>
+  );
+}
+
+function VideoSeriesSection() {
+  return (
+    <section className="video-series-section-new">
+      <div className="video-series-content">
+        <h2 className="video-series-title">Video Series</h2>
+        <div className="video-series-grid">
+          <div className="video-series-card">
+            <div className="video-series-link">
+              <div className="video-series-card-content">
+                <h3 className="video-series-card-title">Coloring</h3>
+                <p className="video-series-card-parts">10 parts</p>
+                <p className="video-series-card-description">
+                  By utilizing the color wheel and the three primary colors, you
+                  can discover the art of creating secondary and tertiary
+                  colors with ease.
+                </p>
+                <div className="video-series-button-wrapper">
+                  <Link href="/category/coloring-series">
+                    <Button variant="clean">View Series</Button>
+                  </Link>
+                </div>
+              </div>
+              <div className="video-series-image-wrapper">
+                <div className="video-series-image-container">
+                  <Image
+                    src="/coloring-300x161.jpg"
+                    alt="Coloring series featuring cake decorating with color techniques"
+                    width={655}
+                    height={400}
+                    className="video-series-image"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="video-series-view-all-wrapper">
+          <Button variant="default">View All Series</Button>
+        </div>
       </div>
     </section>
   );
