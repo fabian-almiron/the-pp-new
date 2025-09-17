@@ -35,7 +35,7 @@ export function SiteHeader() {
     { href: "/about", label: "meet dara", id: "meet-dara" },
     { href: "/academy-details", label: "academy", id: "academy" },
     { href: "/blog", label: "blog", id: "blog" },
-    { href: "#", label: "blooming buttercream™", id: "blooming-buttercream" },
+    { href: "/academy-details#blooming-buttercream", label: "blooming buttercream™", id: "blooming-buttercream" },
     { href: "/shop", label: "shop", id: "shop" },
   ];
 

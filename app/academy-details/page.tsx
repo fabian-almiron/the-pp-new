@@ -3,10 +3,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { TestimonialsCarousel } from "@/components/testimonials-carousel";
+import { ScrollToHash } from "@/components/scroll-to-hash";
 
 export default function AcademyDetailsPage() {
   return (
     <>
+      <ScrollToHash />
       <HeroAcademySection />
       <WhyPipedPeonySection />
       <FeaturedVideoSection />
@@ -177,7 +179,7 @@ function WhatYouGetSection() {
 
 function RecipeSection() {
   return (
-    <section className="recipe-section">
+    <section id="blooming-buttercream" className="recipe-section">
       <div className="container">
         <div className="recipe-grid">
           <div className="recipe-content">
