@@ -68,9 +68,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <div className="inline-flex flex-col items-center group">
         {buttonElement}
-        <div className="mt-1 flex flex-col w-full">
+        <div className="flex flex-col w-full" style={{ marginTop: '2px' }}>
           <div className={`border-b ${lineBaseColor} ${lineHoverColor} transition-colors duration-200`}></div>
-          <div className="h-1"></div>
+          <div style={{ height: '4px' }}></div>
           <div className={`border-b ${lineBaseColor} ${lineHoverColor} transition-colors duration-200`}></div>
         </div>
       </div>

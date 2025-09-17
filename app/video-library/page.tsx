@@ -5,8 +5,11 @@ import {
   Carousel,
   CarouselContent,
   CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
+import { FlowerPipingCarousel } from "@/components/flower-piping-carousel";
 
 export default function VideoLibraryPage() {
   return (
@@ -15,6 +18,8 @@ export default function VideoLibraryPage() {
       <DifficultyLevels />
       <NewestVideos />
       <VideoSeriesSection />
+      <FlowerPipingCarousel />
+      <BusinessSeriesSection />
     </>
   );
 }
@@ -162,6 +167,8 @@ function NewestVideos() {
   );
 }
 
+// FlowerPipingSection refactored into FlowerPipingCarousel component
+
 function VideoSeriesSection() {
   return (
     <section className="video-series-section-new">
@@ -200,6 +207,44 @@ function VideoSeriesSection() {
         </div>
         <div className="video-series-view-all-wrapper">
           <Button variant="default">View All Series</Button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function BusinessSeriesSection() {
+  return (
+    <section className="video-series-section-new">
+      <div className="video-series-content">
+        <h2 className="video-series-title">Business Series</h2>
+        <div className="video-series-grid">
+          <div className="video-series-card">
+            <div className="video-series-link">
+              <div className="video-series-card-content">
+                <h3 className="video-series-card-title">Business Series</h3>
+                <p className="video-series-card-description">
+                  We know that to truly be successful, you must master the business side of your craft. From pricing and branding to client management and growth strategies, this series guides you through building a sustainable business.
+                </p>
+                <div className="video-series-button-wrapper">
+                  <Link href="/category/business-series">
+                    <Button variant="default">View Series</Button>
+                  </Link>
+                </div>
+              </div>
+              <div className="video-series-image-wrapper">
+                <div className="video-series-image-container">
+                  <Image
+                    src="/academy-dara.png"
+                    alt="Instructor smiling while working on a decorated cake"
+                    width={655}
+                    height={400}
+                    className="video-series-image"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>

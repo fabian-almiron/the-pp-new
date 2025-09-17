@@ -2092,7 +2092,7 @@ html {
 }
 
 .video-series-img {
-  border-radius: 0.5rem;
+  border-radius: 0;
   width: 100%;
   height: auto;
 }
@@ -2761,6 +2761,170 @@ html {
   .newest-videos-section {
     padding: 6rem 0;
   }
+}
+
+/* Flower Piping Section */
+.flower-piping-section {
+  width: 100%;
+  padding: 3rem 0;
+  background-color: #ffffff;
+}
+
+@media (min-width: 768px) {
+  .flower-piping-section {
+    padding: 6rem 0;
+  }
+}
+
+.flower-piping-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+@media (min-width: 768px) {
+  .flower-piping-content {
+    padding: 0 1.5rem;
+  }
+}
+
+.flower-piping-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.25rem;
+  color: #000000;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .flower-piping-title {
+    font-size: 3rem;
+  }
+}
+
+/* Use same responsive item sizing as testimonials: 1/3/4 */
+.flower-carousel-item,
+.testimonials-carousel-item {
+  flex: 0 0 100%;
+  min-width: 0;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .flower-carousel-item,
+  .testimonials-carousel-item {
+    flex: 0 0 33.333333%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .flower-carousel-item,
+  .testimonials-carousel-item {
+    flex: 0 0 25%;
+  }
+}
+
+.flower-item-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #000000;
+  border-radius: 0;
+  overflow: hidden;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.flower-image-wrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  padding: 8px; /* space between image and outer card border */
+  background: #ffffff;
+  box-sizing: border-box;
+}
+
+.flower-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flower-item-content {
+  padding: 0.75rem 1rem 1rem;
+  text-align: left;
+}
+
+.flower-item-title {
+  font-weight: 600;
+  color: #111827;
+}
+
+.flower-carousel-indicators {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.flower-carousel-indicators .dot {
+  width: 8px;
+  height: 8px;
+  border: 1px solid #000000;
+  background: transparent;
+  border-radius: 50%;
+}
+
+.flower-carousel-indicators .dot.active {
+  background: #000000;
+}
+
+/* Fixed 4-item container look on desktop */
+.flower-piping-fixed {
+  position: relative;
+  max-width: 1200px; /* controls overall width */
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.flower-carousel-fixed-content {
+  margin-left: 0; /* reset negative margins */
+}
+
+.flower-carousel-fixed-item {
+  flex: 0 0 100%;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+@media (min-width: 768px) {
+  .flower-carousel-fixed-item {
+    flex: 0 0 33.333333%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .flower-carousel-fixed-item {
+    flex: 0 0 25%; /* show exactly 4 */
+  }
+}
+
+/* Rectangular side nav buttons */
+.flower-nav-btn {
+  position: absolute;
+  height: 48px;
+  width: 36px;
+  background-color: #374151; /* gray-700 */
+  color: white;
+  border-radius: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flower-piping-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.5rem;
 }
 
 .newest-videos-content {
