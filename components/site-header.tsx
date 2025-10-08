@@ -6,62 +6,32 @@ import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
-import { useUser } from "@/contexts/user-context";
 import { LoggedInHeader } from "@/components/logged-in-header";
+import { useUser as useClerkUser, useClerk } from "@clerk/nextjs";
+import Navigation from '@/components/navigation';
 
 export function SiteHeader() {
-  const { isLoggedIn, loading } = useUser();
+  const { isSignedIn, isLoaded } = useClerkUser();
   
-  // Show loading state
-  if (loading) {
-    return (
-      <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
-        <div className="header-container">
-          <div className="flex items-center justify-center w-full py-4">
-            <div className="text-sm text-gray-600">Loading...</div>
-          </div>
-        </div>
-      </header>
-    );
-  }
-
   // Show logged-in header for authenticated users
-  if (isLoggedIn) {
+  if (isLoaded && isSignedIn) {
     return <LoggedInHeader />;
   }
 
-  // Show regular header for non-authenticated users
-  const navLinks = [
-    { href: "/about", label: "meet dara", id: "meet-dara" },
-    { href: "/academy-details", label: "academy", id: "academy" },
-    { href: "/blog", label: "blog", id: "blog" },
-    { href: "/academy-details#blooming-buttercream", label: "blooming buttercream™", id: "blooming-buttercream" },
-    { href: "/shop", label: "shop", id: "shop" },
-  ];
-
+  // Show regular header (will handle both loading and non-authenticated states)
   return (
-    <HeaderContent navLinks={navLinks} />
+    <HeaderContent />
   );
 }
 
-interface NavLink {
-  href: string;
-  label: string;
-  id: string;
-}
-
-function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
+function HeaderContent() {
   const { getItemCount } = useCart();
-  const { isLoggedIn, login, logout, user } = useUser();
+  const { isSignedIn } = useClerkUser();
+  const { signOut } = useClerk();
   const cartItemCount = getItemCount();
 
-  const handleQuickLogin = async () => {
-    // Quick login for testing purposes
-    await login("dara@pipedpeony.com");
-  };
-
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await signOut();
   };
 
   return (
@@ -73,7 +43,7 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
             <Image
               src="/piped-peony-logo-1536x339.png"
               alt="The Piped Peony"
-              width={160}
+              width={100}
               height={35}
               className="h-8 w-auto md:hidden"
               priority
@@ -84,22 +54,15 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
               alt="The Piped Peony"
               width={220}
               height={48}
-              className="hidden md:block h-12 w-auto"
+              className="hidden md:block h-16 w-auto"
               priority
             />
           </div>
         </Link>
-        <nav className="header-nav">
-          {navLinks.map((link) => (
-            <Link
-              key={link.id}
-              href={link.href}
-              className="header-nav-link"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
+        <Navigation 
+          menuSlug="logged-out-header" 
+          className="header-nav"
+        />
         <div className="header-actions">
           <Link href="/cart">
             <Button variant="clean" size="icon" className="relative !border-none">
@@ -112,9 +75,13 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
               <span className="sr-only">Shopping Cart</span>
             </Button>
           </Link>
-          {isLoggedIn ? (
+          {isSignedIn ? (
             <>
-              <span className="text-sm text-gray-600">Welcome, {user?.name}!</span>
+              <Link href="/my-account">
+                <Button variant="clean" className="!border-none">
+                  my account
+                </Button>
+              </Link>
               <Button variant="clean" className="!border-none" onClick={handleLogout}>
                 logout
               </Button>
@@ -144,36 +111,35 @@ function HeaderContent({ navLinks }: { navLinks: NavLink[] }) {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-[#FBF9F6]">
               <nav className="flex flex-col pt-8">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.id}
-                    href={link.href}
-                    className="header-nav-link mb-4"
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                <Navigation 
+                  menuSlug="logged-out-header" 
+                  className="flex flex-col space-y-4"
+                />
                 <div className="flex flex-col gap-4 pt-4">
                   <Link href="/cart" className="flex items-center gap-2 text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors">
                     <ShoppingCart className="h-5 w-5" />
                     Cart {cartItemCount > 0 && `(${cartItemCount})`}
                   </Link>
-                  {isLoggedIn ? (
+                  {isSignedIn ? (
                     <>
-                      <span className="text-sm text-gray-600 px-4">Welcome, {user?.name}!</span>
-                      <Button variant="clean" className="!border-none" onClick={handleLogout}>
+                      <Link href="/my-account">
+                        <Button variant="clean" className="!border-none w-full">
+                          my account
+                        </Button>
+                      </Link>
+                      <Button variant="clean" className="!border-none w-full" onClick={handleLogout}>
                         logout
                       </Button>
                     </>
                   ) : (
                     <>
                       <Link href="/signup">
-                        <Button variant="clean" className="!border-none !bg-[#f1eae6]">
+                        <Button variant="clean" className="!border-none !bg-[#f1eae6] w-full">
                           sign up
                         </Button>
                       </Link>
                       <Link href="/login">
-                        <Button variant="clean" className="!border-none">
+                        <Button variant="clean" className="!border-none w-full">
                           login
                         </Button>
                       </Link>

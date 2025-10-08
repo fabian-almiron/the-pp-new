@@ -1,143 +1,10 @@
 import { Course, CarouselItem } from "@/data/types";
 import { CoursePageClient } from "@/components/course-page-client";
 import { notFound } from "next/navigation";
+import { fetchCourseBySlug, fetchCoursesBySeries } from "@/lib/strapi-api";
 
-// Mock data - In a real app, this would come from a database or API
-const mockCourses: Record<string, Course> = {
-  "the-black-cake-class": {
-    title: "The Black Cake Class",
-    series: "Coloring Series",
-    chapters: [
-      {
-        id: "overview",
-        title: "Overview",
-        videoSrc: "/videos/black-cake-overview.mp4", // placeholder
-        duration: 180, // 3 minutes
-      },
-      {
-        id: "best-way-avoid-black-lips",
-        title: "What is the best way to avoid black lips?",
-        videoSrc: "/videos/black-cake-avoid-lips.mp4", // placeholder
-        duration: 240, // 4 minutes
-      },
-      {
-        id: "buttercream-to-use",
-        title: "What buttercream should I use?",
-        videoSrc: "/videos/black-cake-buttercream.mp4", // placeholder
-        duration: 300, // 5 minutes
-      },
-      {
-        id: "measure-coloring",
-        title: "Measure black coloring into buttercream",
-        videoSrc: "/videos/black-cake-measure.mp4", // placeholder
-        duration: 420, // 7 minutes
-      },
-      {
-        id: "microwave-sessions",
-        title: "Microwave sessions",
-        videoSrc: "/videos/black-cake-microwave.mp4", // placeholder
-        duration: 360, // 6 minutes
-      },
-      {
-        id: "color-developing-blades",
-        title: "Color Developing Method 1: Blades",
-        videoSrc: "/videos/black-cake-blades.mp4", // placeholder
-        duration: 480, // 8 minutes
-      },
-      {
-        id: "color-developing-patience",
-        title: "Color Developing Method 2: Patience",
-        videoSrc: "/videos/black-cake-patience.mp4", // placeholder
-        duration: 600, // 10 minutes
-      },
-      {
-        id: "acrylic-express",
-        title: "The Acrylic Express: Let's get a smooth finish and sharp edge",
-        videoSrc: "/videos/black-cake-acrylic.mp4", // placeholder
-        duration: 540, // 9 minutes
-      },
-      {
-        id: "applying-center",
-        title: "Applying buttercream to the center",
-        videoSrc: "/videos/black-cake-center.mp4", // placeholder
-        duration: 420, // 7 minutes
-      },
-      {
-        id: "applying-top-disc",
-        title: "Applying the top disc",
-        videoSrc: "/videos/black-cake-top-disc.mp4", // placeholder
-        duration: 300, // 5 minutes
-      },
-      {
-        id: "applying-to-cake",
-        title: "Applying buttercream to the cake",
-        videoSrc: "/videos/black-cake-to-cake.mp4", // placeholder
-        duration: 480, // 8 minutes
-      },
-      {
-        id: "removing-excess",
-        title: "Removing excess buttercream",
-        videoSrc: "/videos/black-cake-excess.mp4", // placeholder
-        duration: 360, // 6 minutes
-      },
-      {
-        id: "final-smoothing",
-        title: "Final smoothing",
-        videoSrc: "/videos/black-cake-smoothing.mp4", // placeholder
-        duration: 420, // 7 minutes
-      },
-      {
-        id: "acrylic-disc-removal",
-        title: "Acrylic disc removal",
-        videoSrc: "/videos/black-cake-removal.mp4", // placeholder
-        duration: 240, // 4 minutes
-      },
-      {
-        id: "conclusion",
-        title: "Conclusion",
-        videoSrc: "/videos/black-cake-conclusion.mp4", // placeholder
-        duration: 120, // 2 minutes
-      },
-    ],
-    aboutContent: `
-      <p>In this class, you'll learn how to get a rich, black buttercream. The best part? No excessive color use or black cocoa powder involved! So, you can say goodbye to that Oreo-like taste. Plus, we'll show you how to use acrylic discs to give your black cake a smooth buttercream finish and that sharp, professional buttercream edge!</p>
-    `,
-    whatYouNeedContent: `
-      <ul>
-        <li>Black gel food coloring (AmeriColor Super Black recommended)</li>
-        <li>Buttercream (recipe provided in course)</li>
-        <li>Acrylic discs</li>
-        <li>Offset spatula</li>
-        <li>Bench scraper</li>
-        <li>Microwave-safe bowl</li>
-        <li>Stand mixer or hand mixer</li>
-      </ul>
-    `,
-  },
-};
-
-const mockRelatedCourses: CarouselItem[] = [
-  {
-    slug: "the-greens-evergreenish-buttercream",
-    title: "The Greens: Evergreenish Buttercream",
-    thumbnailUrl: "/placeholder_peony.jpg",
-  },
-  {
-    slug: "the-reds-deep-red-buttercream",
-    title: "The Reds: Deep Red Buttercream",
-    thumbnailUrl: "/placeholder_rose-pink.jpg",
-  },
-  {
-    slug: "how-to-gel-white-buttercream",
-    title: "How to Gel White Buttercream",
-    thumbnailUrl: "/placeholder_lily.jpg",
-  },
-  {
-    slug: "the-muting-levers",
-    title: "The Muting Levers",
-    thumbnailUrl: "/placeholder_orchid-pink.jpg",
-  },
-];
+// Mark this page as dynamic (always server-rendered)
+export const dynamic = 'force-dynamic';
 
 interface CoursePageProps {
   params: {
@@ -145,40 +12,132 @@ interface CoursePageProps {
   };
 }
 
-export default function CoursePage({ params }: CoursePageProps) {
-  const course = mockCourses[params.slug];
+// Helper function to convert timestamp format "00.00.01" to seconds
+function parseTimestamp(timeStr: string | undefined | null): number {
+  if (!timeStr || typeof timeStr !== 'string') return 0;
   
-  if (!course) {
+  try {
+    const timeParts = timeStr.split('.');
+    if (timeParts.length === 3) {
+      const hours = parseInt(timeParts[0]) || 0;
+      const minutes = parseInt(timeParts[1]) || 0;
+      const seconds = parseInt(timeParts[2]) || 0;
+      return hours * 3600 + minutes * 60 + seconds;
+    }
+  } catch (error) {
+    console.warn('Error parsing timestamp:', timeStr, error);
+  }
+  
+  return 0;
+}
+
+// Helper function to convert Strapi course to legacy Course format
+function convertToLegacyCourse(strapiCourse: any): Course {
+  if (!strapiCourse) {
+    throw new Error('Course data is missing');
+  }
+  // Convert video chapters to the format expected by the component
+  const chapters = (strapiCourse.videoChapters && Array.isArray(strapiCourse.videoChapters)) 
+    ? strapiCourse.videoChapters.map((chapter: any, index: number) => ({
+        id: `chapter-${index}`,
+        title: chapter?.title || `Chapter ${index + 1}`,
+        videoSrc: strapiCourse.videoId 
+          ? `https://player.vimeo.com/video/${strapiCourse.videoId}#t=${chapter?.time || '0'}`
+          : '',
+        duration: parseTimestamp(chapter?.time), // Convert timestamp to seconds for display
+      }))
+    : [];
+
+  // If we have a videoId but no chapters, create a single chapter
+  if (strapiCourse.videoId && chapters.length === 0) {
+    chapters.push({
+      id: 'main',
+      title: 'Full Video',
+      videoSrc: `https://player.vimeo.com/video/${strapiCourse.videoId}`,
+      duration: 0,
+    });
+  }
+
+  // Convert equipment needed to HTML list
+  const whatYouNeedContent = strapiCourse.equipmentNeeded && strapiCourse.equipmentNeeded.length > 0
+    ? `<ul>${strapiCourse.equipmentNeeded.map((item: string) => `<li>${item}</li>`).join('')}</ul>`
+    : '<p>No equipment list provided.</p>';
+
+  return {
+    title: strapiCourse.title,
+    series: strapiCourse.series || 'General',
+    chapters,
+    aboutContent: strapiCourse.about || strapiCourse.content || '<p>No description available.</p>',
+    whatYouNeedContent,
+  };
+}
+
+export default async function CoursePage({ params }: CoursePageProps) {
+  const { slug } = await params;
+  const { data: strapiCourse, error } = await fetchCourseBySlug(slug);
+  
+  if (error || !strapiCourse) {
     notFound();
+  }
+
+  // Convert to legacy format
+  const course = convertToLegacyCourse(strapiCourse);
+
+  // Fetch related courses from the same series
+  let relatedCourses: CarouselItem[] = [];
+  if (strapiCourse.series) {
+    const { data: seriesCourses } = await fetchCoursesBySeries(strapiCourse.series);
+    if (seriesCourses) {
+      relatedCourses = seriesCourses
+        .filter(c => c.slug !== slug) // Exclude current course
+        .slice(0, 4) // Limit to 4 related courses
+        .map(c => ({
+          slug: c.slug,
+          title: c.title,
+          thumbnailUrl: c.featuredImage?.url || '/placeholder_peony.jpg',
+        }));
+    }
+  }
+
+  // If no related courses, fetch featured courses
+  if (relatedCourses.length === 0) {
+    const { fetchFeaturedCourses } = await import('@/lib/strapi-api');
+    const { data: featured } = await fetchFeaturedCourses();
+    if (featured) {
+      relatedCourses = featured.slice(0, 4).map(c => ({
+        slug: c.slug,
+        title: c.title,
+        thumbnailUrl: c.featuredImage?.url || '/placeholder_peony.jpg',
+      }));
+    }
   }
 
   return (
     <CoursePageClient 
       course={course} 
-      relatedCourses={mockRelatedCourses}
+      relatedCourses={relatedCourses}
     />
   );
 }
 
-// Generate static params for known courses (optional, for static generation)
-export function generateStaticParams() {
-  return Object.keys(mockCourses).map((slug) => ({
-    slug,
-  }));
-}
-
 // Metadata for SEO
-export function generateMetadata({ params }: CoursePageProps) {
-  const course = mockCourses[params.slug];
+export async function generateMetadata({ params }: CoursePageProps) {
+  const { slug } = await params;
+  const { data: strapiCourse } = await fetchCourseBySlug(slug);
   
-  if (!course) {
+  if (!strapiCourse) {
     return {
       title: "Course Not Found",
     };
   }
 
+  const description = strapiCourse.excerpt || 
+    strapiCourse.about?.replace(/<[^>]*>/g, '').substring(0, 160) ||
+    strapiCourse.content?.replace(/<[^>]*>/g, '').substring(0, 160) ||
+    '';
+
   return {
-    title: `${course.title} - ${course.series} | The Piped Peony`,
-    description: course.aboutContent.replace(/<[^>]*>/g, '').substring(0, 160),
+    title: `${strapiCourse.title} - ${strapiCourse.series || 'Courses'} | The Piped Peony`,
+    description,
   };
 }

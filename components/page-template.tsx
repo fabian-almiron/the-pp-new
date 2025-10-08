@@ -1,6 +1,6 @@
 "use client"
 
-import { useUser } from "@/contexts/user-context";
+import { useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -10,16 +10,16 @@ interface PageTemplateProps {
 }
 
 export function PageTemplate({ title, children }: PageTemplateProps) {
-  const { isLoggedIn, loading } = useUser();
+  const { isSignedIn, isLoaded } = useUser();
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && !isLoggedIn) {
+    if (isLoaded && !isSignedIn) {
       router.push("/login");
     }
-  }, [isLoggedIn, loading, router]);
+  }, [isSignedIn, isLoaded, router]);
 
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-lg">Loading...</div>
@@ -27,7 +27,7 @@ export function PageTemplate({ title, children }: PageTemplateProps) {
     );
   }
 
-  if (!isLoggedIn) {
+  if (!isSignedIn) {
     return null;
   }
 

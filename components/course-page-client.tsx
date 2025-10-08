@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Course, Chapter, CarouselItem } from "@/data/types";
-import { VideoPlayer } from "@/components/video-player";
+import { VideoPlayer, VideoPlayerRef } from "@/components/video-player";
 import { ChapterList } from "@/components/chapter-list";
 import { CourseTabs } from "@/components/course-tabs";
 import { ContentCarousel } from "@/components/content-carousel";
@@ -14,6 +14,11 @@ interface CoursePageClientProps {
 
 export function CoursePageClient({ course, relatedCourses }: CoursePageClientProps) {
   const [activeChapter, setActiveChapter] = useState<Chapter>(course.chapters[0]);
+  const videoPlayerRef = useRef<VideoPlayerRef>(null);
+
+  const handlePlayVideo = () => {
+    videoPlayerRef.current?.playVideo();
+  };
 
   return (
     <main>
@@ -30,12 +35,14 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
               </p>
             </div>
             
-            <VideoPlayer chapter={activeChapter} />
-            
-            <CourseTabs 
-              aboutContent={course.aboutContent}
-              whatYouNeedContent={course.whatYouNeedContent}
-            />
+            <div className="sticky top-4">
+              <VideoPlayer ref={videoPlayerRef} chapter={activeChapter} />
+              
+              <CourseTabs 
+                aboutContent={course.aboutContent}
+                whatYouNeedContent={course.whatYouNeedContent}
+              />
+            </div>
           </div>
           
           {/* Right Column - Chapter List */}
@@ -44,6 +51,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
               chapters={course.chapters}
               activeChapterId={activeChapter.id}
               onSelectChapter={setActiveChapter}
+              onPlayVideo={handlePlayVideo}
             />
           </div>
         </div>

@@ -7,7 +7,7 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['localhost'],
+    domains: ['localhost', 'vumbnail.com'],
     formats: ['image/webp', 'image/avif'],
   },
   experimental: {

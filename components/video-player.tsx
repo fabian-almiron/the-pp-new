@@ -1,26 +1,196 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { Chapter } from "@/data/types";
 
 interface VideoPlayerProps {
   chapter: Chapter;
 }
 
-export function VideoPlayer({ chapter }: VideoPlayerProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
+export interface VideoPlayerRef {
+  playVideo: () => void;
+}
 
-  useEffect(() => {
-    if (videoRef.current && chapter.videoSrc) {
-      videoRef.current.src = chapter.videoSrc;
-      videoRef.current.load();
-      // Auto-play when chapter changes (you may want to remove this for better UX)
-      videoRef.current.play().catch(() => {
-        // Handle autoplay policy restrictions
-        console.log("Autoplay prevented by browser policy");
-      });
+export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapter }, ref) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [player, setPlayer] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Extract video ID and timestamp from Vimeo URL
+  const parseVimeoUrl = (url: string) => {
+    if (!url) return { videoId: null, timestamp: 0 };
+    
+    // Handle URLs like: https://player.vimeo.com/video/818412860#t=00.00.01
+    const videoIdMatch = url.match(/\/video\/(\d+)/);
+    const timestampMatch = url.match(/#t=([^&]*)/);
+    
+    const videoId = videoIdMatch ? videoIdMatch[1] : null;
+    let timestamp = 0;
+    
+    if (timestampMatch) {
+      const timeStr = timestampMatch[1];
+      // Parse timestamp format like "00.00.01" (hours.minutes.seconds)
+      const timeParts = timeStr.split('.');
+      if (timeParts.length === 3) {
+        const hours = parseInt(timeParts[0]) || 0;
+        const minutes = parseInt(timeParts[1]) || 0;
+        const seconds = parseInt(timeParts[2]) || 0;
+        timestamp = hours * 3600 + minutes * 60 + seconds;
+      }
     }
-  }, [chapter.videoSrc]);
+    
+    return { videoId, timestamp };
+  };
+
+  const { videoId, timestamp } = parseVimeoUrl(chapter.videoSrc);
+
+  // Expose playVideo method to parent component
+  useImperativeHandle(ref, () => ({
+    playVideo: () => {
+      if (player && typeof player.play === 'function') {
+        // First unmute the video, then play it
+        Promise.resolve()
+          .then(() => {
+            // Set volume to 100% (unmuted)
+            if (typeof player.setVolume === 'function') {
+              return player.setVolume(1);
+            }
+          })
+          .then(() => {
+            // Then play the video
+            return player.play();
+          })
+          .catch((error: any) => {
+            console.error('Error playing/unmuting video:', error);
+          });
+      }
+    }
+  }), [player]);
+
+  // Load Vimeo Player API
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    // Check if Vimeo Player API is already loaded
+    if (window.Vimeo) {
+      initializePlayer();
+      return;
+    }
+
+    // Load Vimeo Player API script
+    const script = document.createElement('script');
+    script.src = 'https://player.vimeo.com/api/player.js';
+    script.onload = () => {
+      initializePlayer();
+    };
+    document.head.appendChild(script);
+
+    return () => {
+      // Cleanup: remove script if component unmounts
+      const existingScript = document.querySelector('script[src="https://player.vimeo.com/api/player.js"]');
+      if (existingScript) {
+        document.head.removeChild(existingScript);
+      }
+    };
+  }, []);
+
+  // Initialize Vimeo player when video changes
+  useEffect(() => {
+    if (window.Vimeo && videoId && containerRef.current) {
+      initializePlayer();
+    }
+  }, [videoId, chapter.videoSrc]);
+
+  const initializePlayer = () => {
+    if (!videoId || !containerRef.current || !window.Vimeo) return;
+
+    setIsLoading(true);
+
+    // Destroy existing player if it exists
+    if (player) {
+      try {
+        player.destroy();
+      } catch (error) {
+        console.log('Player already destroyed or invalid');
+      }
+      setPlayer(null);
+    }
+
+    // Clear the container
+    containerRef.current.innerHTML = '';
+
+    // Create new Vimeo player
+    const newPlayer = new window.Vimeo.Player(containerRef.current, {
+      id: videoId,
+      width: '100%',
+      height: '100%',
+      responsive: true,
+    });
+
+    // Set up event listeners
+    newPlayer.ready().then(() => {
+      setIsLoading(false);
+      setPlayer(newPlayer);
+      // Jump to timestamp if specified (after player is set)
+      if (timestamp > 0) {
+        return newPlayer.setCurrentTime(timestamp).then(() => {
+          // Set volume to 100% (unmuted) before auto-playing
+          if (typeof newPlayer.setVolume === 'function') {
+            return newPlayer.setVolume(1);
+          }
+        }).then(() => {
+          // Auto-play after jumping to initial timestamp and unmuting
+          return newPlayer.play();
+        });
+      }
+    }).catch((error: any) => {
+      console.error('Error loading Vimeo player:', error);
+      setIsLoading(false);
+    });
+  };
+
+  // Jump to timestamp when chapter changes (but not on initial load)
+  useEffect(() => {
+    if (player && timestamp > 0) {
+      // Use a timeout to avoid rapid successive calls
+      const timeoutId = setTimeout(() => {
+        // Check if player is still valid before proceeding
+        if (!player || typeof player.setCurrentTime !== 'function') {
+          console.log('Player not available for timestamp jump');
+          return;
+        }
+
+        player.setCurrentTime(timestamp).then(() => {
+          // Set volume to 100% (unmuted) before auto-playing
+          if (typeof player.setVolume === 'function') {
+            return player.setVolume(1);
+          }
+        }).then(() => {
+          // Auto-play after jumping to timestamp and unmuting
+          if (player && typeof player.play === 'function') {
+            return player.play();
+          }
+        }).catch((error: any) => {
+          console.error('Error setting timestamp, unmuting, or playing video:', error);
+        });
+      }, 200);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [player, timestamp]);
+
+  // Cleanup player on unmount
+  useEffect(() => {
+    return () => {
+      if (player) {
+        try {
+          player.destroy();
+        } catch (error) {
+          console.log('Player cleanup: already destroyed');
+        }
+      }
+    };
+  }, [player]);
 
   const formatDuration = (seconds: number): string => {
     const mins = Math.floor(seconds / 60);
@@ -28,25 +198,32 @@ export function VideoPlayer({ chapter }: VideoPlayerProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  if (!videoId) {
+    return (
+      <div className="relative mt-4 aspect-video bg-gray-100 rounded-md flex items-center justify-center">
+        <p className="text-gray-500">No video available for this chapter</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <h1 className="text-4xl font-serif font-bold text-gray-900">
-        {chapter.title}
-      </h1>
-      <p className="text-lg text-gray-500 mt-1">
-        Duration: {formatDuration(chapter.duration)}
-      </p>
-      
-      <div className="relative mt-4 aspect-video">
-        <video
-          ref={videoRef}
-          className="w-full h-full rounded-md shadow-lg bg-black"
-          controls
-          preload="metadata"
-        >
-          Your browser does not support the video tag.
-        </video>
+      <div className="relative mt-4 aspect-video bg-black rounded-md overflow-hidden shadow-lg">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
+              <p>Loading video...</p>
+            </div>
+          </div>
+        )}
+        <div
+          ref={containerRef}
+          className="w-full h-full"
+        />
       </div>
     </div>
   );
-}
+});
+
+VideoPlayer.displayName = 'VideoPlayer';

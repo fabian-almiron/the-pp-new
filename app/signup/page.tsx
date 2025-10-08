@@ -6,12 +6,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/contexts/user-context";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { useSignUp } from "@clerk/nextjs";
+import { OAuthStrategy } from "@clerk/types";
+import SubscriptionPlans from "@/components/subscription-plans";
+import { useSubscription } from "@/hooks/use-subscription";
 
 export default function SignupPage() {
+  const [currentStep, setCurrentStep] = useState<'signup' | 'subscription'>('signup');
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     password: "",
     confirmPassword: ""
@@ -22,7 +27,8 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   
-  const { signup } = useUser();
+  const { signUp, isLoaded, setActive } = useSignUp();
+  const { createSubscriptionCheckout } = useSubscription();
   const router = useRouter();
 
   const handleInputChange = (field: string, value: string) => {
@@ -31,11 +37,13 @@ export default function SignupPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isLoaded) return;
+    
     setIsLoading(true);
     setError("");
 
     // Validation
-    if (!formData.name.trim()) {
+    if (!formData.firstName.trim() || !formData.lastName.trim()) {
       setError("Please enter your full name.");
       setIsLoading(false);
       return;
@@ -47,8 +55,8 @@ export default function SignupPage() {
       return;
     }
 
-    if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters long.");
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long.");
       setIsLoading(false);
       return;
     }
@@ -66,23 +74,115 @@ export default function SignupPage() {
     }
 
     try {
-      const success = await signup({
-        name: formData.name.trim(),
-        email: formData.email.toLowerCase().trim(),
-        password: formData.password
+      const signUpAttempt = await signUp.create({
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        emailAddress: formData.email.toLowerCase().trim(),
+        password: formData.password,
       });
-      
-      if (success) {
-        router.push("/academy");
+
+      if (signUpAttempt.status === 'complete') {
+        await setActive({ session: signUpAttempt.createdSessionId });
+        // Move to subscription selection step
+        setCurrentStep('subscription');
       } else {
-        setError("An account with this email already exists.");
+        // If email verification is required, handle it
+        setError("Please check your email to verify your account.");
       }
-    } catch (err) {
-      setError("Signup failed. Please try again.");
+    } catch (err: any) {
+      setError(err?.errors?.[0]?.message || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleOAuthSignUp = async (strategy: OAuthStrategy) => {
+    if (!isLoaded) return;
+    
+    try {
+      await signUp.authenticateWithRedirect({
+        strategy,
+        redirectUrl: '/sso-callback',
+        redirectUrlComplete: '/video-library',
+      });
+    } catch (err: any) {
+      setError(err?.errors?.[0]?.message || "OAuth sign up failed. Please try again.");
+    }
+  };
+
+  const handleSubscriptionSelect = async (subscriptionId: number) => {
+    try {
+      setIsLoading(true);
+      const checkoutUrl = await createSubscriptionCheckout(subscriptionId);
+      window.location.href = checkoutUrl;
+    } catch (error) {
+      setError('Failed to start subscription process. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSkipSubscription = () => {
+    // Force a hard navigation to ensure session is picked up
+    window.location.href = '/video-library';
+  };
+
+  if (currentStep === 'subscription') {
+    return (
+      <div className="login-page">
+        <div className="login-background-left"></div>
+        <div className="login-background-right"></div>
+        
+        <div className="signup-container max-w-4xl">
+          <div className="flex items-center justify-center mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => setCurrentStep('signup')}
+              className="mr-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <h2 className="signup-title">Choose Your Plan</h2>
+          </div>
+          
+          <p className="signup-subtitle mb-8">
+            Welcome! Now select a subscription plan to unlock premium content and courses.
+          </p>
+
+          {error && (
+            <div className="login-error mb-6">
+              {error}
+            </div>
+          )}
+
+          <SubscriptionPlans 
+            onSubscriptionSelect={handleSubscriptionSelect}
+            showTitle={false}
+          />
+
+          <div className="text-center mt-8">
+            <Button
+              variant="outline"
+              onClick={handleSkipSubscription}
+              disabled={isLoading}
+            >
+              Skip for now - Browse as Customer
+            </Button>
+            <p className="text-sm text-gray-500 mt-2">
+              You can upgrade to a subscription plan anytime from your account settings.
+            </p>
+          </div>
+
+          <div className="login-footer">
+            <Link href="/" className="login-back-home">
+              ← Go to The Piped Peony
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="login-page">
@@ -90,33 +190,38 @@ export default function SignupPage() {
       <div className="login-background-right"></div>
       
       <div className="signup-container">
-        <div className="login-logo">
-          <Image
-            src="/piped-peony-logo-2048x452.png"
-            alt="The Piped Peony"
-            width={400}
-            height={88}
-            className="login-logo-img"
-            priority
-          />
-        </div>
-
         <h2 className="signup-title">Create Your Account</h2>
         <p className="signup-subtitle">Join The Piped Peony Academy and start your buttercream artistry journey!</p>
 
         <form onSubmit={handleSubmit} className="login-form">
-          <div className="login-form-group">
-            <label htmlFor="name" className="login-label">
-              Full Name *
-            </label>
-            <Input
-              id="name"
-              type="text"
-              value={formData.name}
-              onChange={(e) => handleInputChange("name", e.target.value)}
-              className="login-input"
-              required
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div className="login-form-group">
+              <label htmlFor="firstName" className="login-label">
+                First Name *
+              </label>
+              <Input
+                id="firstName"
+                type="text"
+                value={formData.firstName}
+                onChange={(e) => handleInputChange("firstName", e.target.value)}
+                className="login-input"
+                required
+              />
+            </div>
+
+            <div className="login-form-group">
+              <label htmlFor="lastName" className="login-label">
+                Last Name *
+              </label>
+              <Input
+                id="lastName"
+                type="text"
+                value={formData.lastName}
+                onChange={(e) => handleInputChange("lastName", e.target.value)}
+                className="login-input"
+                required
+              />
+            </div>
           </div>
 
           <div className="login-form-group">
@@ -159,7 +264,7 @@ export default function SignupPage() {
               </button>
             </div>
             <small className="signup-password-hint">
-              Must be at least 6 characters long
+              Must be at least 8 characters long
             </small>
           </div>
 
@@ -190,27 +295,6 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* reCAPTCHA placeholder */}
-          <div className="login-recaptcha">
-            <div className="recaptcha-checkbox">
-              <input type="checkbox" id="recaptcha" className="recaptcha-input" />
-              <label htmlFor="recaptcha" className="recaptcha-label">
-                I'm not a robot
-              </label>
-            </div>
-            <div className="recaptcha-logo">
-              <div className="recaptcha-icon">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L13.09 8.26L20 9L13.09 9.74L12 16L10.91 9.74L4 9L10.91 8.26L12 2Z" fill="#4285F4"/>
-                </svg>
-              </div>
-              <span className="recaptcha-text">reCAPTCHA</span>
-              <div className="recaptcha-privacy">
-                <span>Privacy - Terms</span>
-              </div>
-            </div>
-          </div>
-
           <div className="signup-terms-wrapper">
             <label className="login-remember">
               <input
@@ -229,17 +313,69 @@ export default function SignupPage() {
             </div>
           )}
 
+          {/* Clerk CAPTCHA Element */}
+          <div id="clerk-captcha" className="mb-2"></div>
+
           <div className="login-submit-wrapper">
             <Button
               type="submit"
               variant="clean"
               className="login-submit-button"
-              disabled={isLoading}
+              disabled={isLoading || !isLoaded}
             >
               {isLoading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
             </Button>
           </div>
         </form>
+
+        {/* OAuth Divider */}
+        <div className="flex items-center gap-4 my-4">
+          <div className="flex-1 border-t border-gray-300"></div>
+          <span className="text-sm text-gray-500 font-medium">OR</span>
+          <div className="flex-1 border-t border-gray-300"></div>
+        </div>
+
+        {/* OAuth Buttons */}
+        <div className="space-y-2 mb-4">
+          <button
+            type="button"
+            onClick={() => handleOAuthSignUp('oauth_google')}
+            disabled={!isLoaded}
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-md bg-white hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            <span className="text-sm font-medium text-gray-700">Continue with Google</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleOAuthSignUp('oauth_apple')}
+            disabled={!isLoaded}
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-md bg-black hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.05 20.28c-.98.95-2.05.88-3.08.4-1.09-.5-2.08-.48-3.24 0-1.44.62-2.2.44-3.06-.4C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.09l-.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/>
+            </svg>
+            <span className="text-sm font-medium text-white">Continue with Apple</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => handleOAuthSignUp('oauth_facebook')}
+            disabled={!isLoaded}
+            className="w-full flex items-center justify-center gap-3 px-4 py-2.5 border border-gray-300 rounded-md bg-[#1877F2] hover:bg-[#166FE5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            <span className="text-sm font-medium text-white">Continue with Facebook</span>
+          </button>
+        </div>
 
         <div className="signup-login-link">
           <p>Already have an account? <Link href="/login" className="signup-link">Sign in here</Link></p>

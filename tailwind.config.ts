@@ -13,20 +13,23 @@ const config = {
   		}
   	},
   	extend: {
-  		fontFamily: {
-  			sans: [
-  				'var(--font-lato)'
-  			],
-  			serif: [
-  				'var(--font-playfair-display)'
-  			],
-  			logo: [
-  				'var(--font-dancing-script)'
-  			],
-  			inter: [
-  				'var(--font-inter)'
-  			]
-  		},
+		fontFamily: {
+			sans: [
+				'var(--font-lato)'
+			],
+			serif: [
+				'var(--font-playfair-display)'
+			],
+			logo: [
+				'var(--font-dancing-script)'
+			],
+			inter: [
+				'var(--font-inter)'
+			],
+			signature: [
+				'var(--font-lindsey-signature)'
+			]
+		},
   		colors: {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',

@@ -40,9 +40,11 @@ function HeroAcademySection() {
             <p className="hero-academy-subtitle">Get started with a 7-day free trial!</p>
             <p className="hero-academy-pricing">No contract membership for only $15 a month.</p>
             <div className="hero-academy-cta-wrapper">
-              <Button variant="cta">
-                Sign up for 7 free days
-              </Button>
+              <Link href="/signup">
+                <Button variant="cta">
+                  Sign up for 7 free days
+                </Button>
+              </Link>
             </div>
             <p className="hero-academy-description">
               By signing up you agree to The Piped Peony's <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
@@ -191,9 +193,11 @@ function RecipeSection() {
             <p className="recipe-description">
               Available exclusively to Academy members, this recipe has been perfected over years of testing and refinement.
             </p>
-            <Button variant="cta">
-              Get the recipe
-            </Button>
+            <Link href="/signup">
+              <Button variant="cta">
+                Get the recipe
+              </Button>
+            </Link>
           </div>
           <div className="recipe-image">
             <Image

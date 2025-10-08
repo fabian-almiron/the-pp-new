@@ -26,10 +26,13 @@ export default function VideoLibraryPage() {
 
 function VideoLibraryHero() {
   return (
-    <section className="video-library-hero">
+    <section 
+      className="video-library-hero"
+      style={{ backgroundImage: 'url(/archive-header-bg.svg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+    >
       <div className="video-library-hero-content">
         <h1 className="video-library-hero-title">
-          Welcome To The<br />
+          <span className="vl-title-span">Welcome To The</span><br />
           VIDEO LIBRARY
         </h1>
         <p className="video-library-hero-subtitle">

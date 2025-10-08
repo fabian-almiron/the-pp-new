@@ -31,9 +31,11 @@ function HeroSection() {
               The Piped Peony Academy is for everyone! We'll learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.
             </p>
             <div className="hero-cta-wrapper">
-              <Button variant="cta">
-                Sign up for 7 free days
-              </Button>
+              <Link href="/signup">
+                <Button variant="cta">
+                  Sign up for 7 free days
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="hero-image-area relative z-20">
@@ -93,9 +95,11 @@ function AboutSection() {
             <p>That's why I started the Piped Peony Academy. I wanted to build a path for anyone who had a desire and will to learn the craft. Most importantly, I wanted to price it to be affordable, and I wanted to be there to offer guidance and support.</p>
           </div>
           <div className="about-button-wrapper">
-            <Button variant="cta">
-              Learn More
-            </Button>
+            <Link href="/meet-dara">
+              <Button variant="cta">
+                Learn More
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -110,13 +114,16 @@ function AboutSection() {
               <p>That's why I started the Piped Peony Academy. I wanted to build a path for anyone who had a desire and will to learn the craft. Most importantly, I wanted to price it to be affordable, and I wanted to be there to offer guidance and support.</p>
             </div>
             <div className="about-button-wrapper">
-              <Button variant="cta">
-                Learn More
-              </Button>
+              <Link href="/meet-dara">
+                <Button variant="cta">
+                  Learn More
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="about-line-decoration">
-            <div className="about-line"></div>
+
+            <img src="/dara-about.jpeg" alt="Dara" className="about-line-image" />
           </div>
         </div>
       </div>
@@ -155,9 +162,11 @@ function LatestVideosSection() {
             </div>
           ))}
         </div>
-        <Button variant="cta">
-          Learn More
-        </Button>
+        <Link href="/video-library">
+          <Button variant="cta">
+            Learn More
+          </Button>
+        </Link>
       </div>
     </section>
   );
@@ -203,9 +212,11 @@ function CtaSection() {
         <h2 className="cta-title">
           Join The Piped Peony<br />Academy Community!
         </h2>
-        <Button variant="light" className="button-cta">
-          Sign up today
-        </Button>
+        <Link href="/signup">
+          <Button variant="light" className="button-cta">
+            Sign up today
+          </Button>
+        </Link>
       </div>
     </section>
   );

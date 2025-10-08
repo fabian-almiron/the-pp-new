@@ -14,6 +14,8 @@ export interface CartItem {
   selectedSize?: string
   selectedColor?: string
   cartKey: string // Unique key for cart operations
+  stripePriceId?: string // Stripe Price ID for checkout
+  stripeProductId?: string // Stripe Product ID for checkout
 }
 
 interface CartState {
@@ -180,7 +182,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       selectedHand: options.hand,
       selectedSize: options.size,
       selectedColor: options.color,
-      cartKey
+      cartKey,
+      stripePriceId: product.stripePriceId,
+      stripeProductId: product.stripeProductId,
     }
     dispatch({ type: 'ADD_ITEM', payload: cartItem })
   }

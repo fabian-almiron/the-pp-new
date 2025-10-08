@@ -1,13 +1,19 @@
 "use client"
 
+import { useState } from "react"
 import { useCart } from "@/contexts/cart-context"
 import { Button } from "@/components/ui/button"
 import { Plus, Minus, X } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
+import { useUser } from "@clerk/nextjs"
+import { useRouter } from "next/navigation"
 
 export default function CartPage() {
   const { state, removeItem, updateQuantity } = useCart()
+  const { isSignedIn, isLoaded } = useUser()
+  const router = useRouter()
+  const [isProcessing, setIsProcessing] = useState(false)
 
   const handleQuantityChange = (cartKey: string, newQuantity: number) => {
     if (newQuantity < 1) return
@@ -16,6 +22,51 @@ export default function CartPage() {
 
   const handleRemoveItem = (cartKey: string) => {
     removeItem(cartKey)
+  }
+
+  const handleCheckout = async () => {
+    // Check if user is signed in
+    if (!isLoaded) {
+      return
+    }
+
+    if (!isSignedIn) {
+      // Redirect to login page with return URL
+      router.push('/login?redirect_url=' + encodeURIComponent(window.location.pathname))
+      return
+    }
+
+    setIsProcessing(true)
+
+    try {
+      // Call your API to create a Stripe Checkout session
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          items: state.items,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong')
+      }
+
+      // Modern approach: Direct redirect to Stripe Checkout URL
+      if (data.url) {
+        window.location.href = data.url
+      } else {
+        throw new Error('No checkout URL returned')
+      }
+    } catch (error: any) {
+      console.error('Checkout error:', error)
+      alert(error.message || 'Failed to initiate checkout. Please try again.')
+      setIsProcessing(false)
+    }
   }
 
   if (state.items.length === 0) {
@@ -166,9 +217,16 @@ export default function CartPage() {
             <div className="text-2xl font-serif text-gray-900 mb-4">
               Cart Total: ${state.total.toFixed(2)}
             </div>
+            {!isSignedIn && isLoaded && (
+              <p className="text-sm text-gray-600 mb-3">
+                Please <Link href="/login?redirect_url=/cart" className="text-blue-600 hover:underline">sign in</Link> to proceed with checkout
+              </p>
+            )}
             <Button
-              text="Proceed to Checkout"
+              text={isProcessing ? "Processing..." : (isSignedIn ? "Proceed to Checkout" : "Sign In to Checkout")}
               className="!bg-white !text-black !border-black hover:!bg-black hover:!text-white"
+              onClick={handleCheckout}
+              disabled={isProcessing || !isLoaded}
             />
           </div>
         </div>

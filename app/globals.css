@@ -865,6 +865,7 @@ html {
   margin-right: 4px;
   transition: color 0.2s ease;
   text-decoration: none;
+  text-transform: lowercase;
 }
 
 .header-nav-link:hover {
@@ -2228,22 +2229,18 @@ html {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5f5f5;
+  background-color: #f6f5f3;
+  background-image: url('/archive-header-bg.svg');
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
   position: relative;
   overflow: hidden;
 }
 
 .login-background-left,
 .login-background-right {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 200px;
-  background-image: url('/background_peony-petals.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  opacity: 0.1;
-  pointer-events: none;
+  display: none;
 }
 
 .login-background-left {
@@ -2282,7 +2279,7 @@ html {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 1rem;
 }
 
 .login-form-group {
@@ -2300,10 +2297,10 @@ html {
 
 .login-input {
   width: 100%;
-  padding: 0.75rem;
+  padding: 0.625rem;
   border: 2px solid #ddd;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-family: "Sofia Light", sans-serif;
   background: white;
   transition: border-color 0.2s ease;
@@ -2419,7 +2416,7 @@ html {
 }
 
 .login-submit-wrapper {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
 }
 
 .login-submit-button {
@@ -2500,7 +2497,7 @@ html {
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 3rem 2.5rem;
+  padding: 1.75rem 2rem;
   width: 100%;
   max-width: 520px;
   text-align: center;
@@ -2511,16 +2508,16 @@ html {
 .signup-title {
   font-family: "sofia-pro", sans-serif;
   font-weight: 400;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
   color: #333;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 .signup-subtitle {
   font-family: "Sofia Light", sans-serif;
-  font-size: 0.95rem;
+  font-size: 0.875rem;
   color: #666;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   line-height: 1.4;
 }
 
@@ -2534,7 +2531,7 @@ html {
 
 .signup-terms-wrapper {
   text-align: left;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .signup-terms-wrapper .login-remember {
@@ -2553,8 +2550,8 @@ html {
 }
 
 .signup-login-link {
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
   border-top: 1px solid #eee;
 }
 

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchProducts } from "@/lib/mock-api";
+import { fetchProducts } from "@/lib/strapi-api";
 import { Product } from "@/data/types";
 import { PeonyLoader } from "@/components/ui/peony-loader";
 
@@ -27,6 +27,8 @@ export default function ShopPage() {
       }
       
       if (response.data) {
+        console.log('🛍️ Loaded products:', response.data.length);
+        console.log('📋 Product slugs:', response.data.map(p => p.slug));
         setProducts(response.data);
       }
       
