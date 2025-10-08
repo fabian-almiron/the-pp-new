@@ -7,7 +7,24 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ['localhost', 'vumbnail.com'],
+    remotePatterns: [
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+      },
+      {
+        protocol: 'https',
+        hostname: 'vumbnail.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dazzling-friends-80757c9c53.strapiapp.com', // Your Strapi Cloud domain
+      },
+      {
+        protocol: 'https',
+        hostname: '*.strapiapp.com', // Wildcard for Strapi Cloud
+      },
+    ],
     formats: ['image/webp', 'image/avif'],
   },
   experimental: {

@@ -213,6 +213,9 @@ async function fetchFromStrapi(endpoint: string, cacheOptions?: { revalidate?: n
     const fetchOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
+        ...(process.env.STRAPI_API_TOKEN && {
+          'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
+        }),
       },
       cache: 'no-store', // Default: Always get fresh data
     };
