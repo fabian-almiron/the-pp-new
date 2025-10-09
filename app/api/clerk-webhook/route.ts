@@ -107,13 +107,22 @@ async function handleUserCreated(
   }
 
   const { roles } = await rolesResponse.json();
-  console.log('📋 Available roles:', roles.map((r: any) => r.name));
+  console.log('📋 Available roles:', roles.map((r: any) => ({ name: r.name, type: r.type, id: r.id })));
   
-  const customerRole = roles.find((r: any) => r.name === 'Customer' || r.type === 'customer');
+  // Try to find Customer role, or fall back to first available role
+  let customerRole = roles.find((r: any) => r.name === 'Customer');
+  
+  // If no Customer role, try 'Authenticated' or first available role
+  if (!customerRole && roles.length > 0) {
+    customerRole = roles.find((r: any) => r.name === 'Authenticated') || 
+                  roles.find((r: any) => r.type === 'authenticated') || 
+                  roles[0];
+    console.log('✅ Using fallback role for new user:', customerRole.name);
+  }
   
   if (!customerRole) {
-    console.error('❌ Customer role not found in Strapi. Available roles:', roles.map((r: any) => r.name));
-    throw new Error('Customer role not found');
+    console.error('❌ No roles found in Strapi');
+    throw new Error('No roles found in Strapi');
   }
 
   console.log('✅ Found Customer role:', customerRole.id);
