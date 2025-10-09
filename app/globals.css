@@ -836,7 +836,7 @@ html {
 
 @media (min-width: 768px) {
   .header-container {
-    height: 4rem;
+    height: 5rem;
   }
 }
 
@@ -1110,7 +1110,7 @@ html {
 }
 
 .about-signature {
-  font-family: var(--font-dancing-script), 'Lindsey Signature', cursive;
+  font-family: 'lindsey-signature', sans-serif;
   font-size: 2.25rem;
   color: #374151;
   margin-bottom: 1rem;
@@ -1304,7 +1304,7 @@ html {
 }
 
 .faq-signature {
-  font-family: var(--font-dancing-script), 'Lindsey Signature', cursive;
+  font-family: 'lindsey-signature', sans-serif;
   font-size: 1.875rem;
   color: #374151;
   margin-bottom: 0.5rem;
