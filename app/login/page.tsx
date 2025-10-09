@@ -70,7 +70,7 @@ function LoginContent() {
   return (
     <div 
       className="login-page"
-      style={{ backgroundImage: 'url(/archive-header-bg.svg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+      style={{ backgroundImage: 'url(/archive-header-bg.svg)', backgroundSize: '100%', backgroundPosition: 'center' }}
     >
       <div className="login-background-left"></div>
       <div className="login-background-right"></div>

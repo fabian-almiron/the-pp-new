@@ -2232,10 +2232,11 @@ html {
   background-color: #f6f5f3;
   background-image: url('/archive-header-bg.svg');
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: 100%;
   background-position: center;
   position: relative;
   overflow: hidden;
+  padding: 5rem 1rem;
 }
 
 .login-background-left,
