@@ -40,7 +40,8 @@ function slugToTitle(slug: string): string {
 // Helper to fetch category by slug
 async function fetchCategoryBySlug(slug: string) {
   try {
-    const response = await fetch(`http://localhost:1337/api/categories?filters[slug][$eq]=${slug}`, {
+    const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+    const response = await fetch(`${strapiUrl}/api/categories?filters[slug][$eq]=${slug}`, {
       headers: { 'Content-Type': 'application/json' },
       cache: 'no-store'
     });
