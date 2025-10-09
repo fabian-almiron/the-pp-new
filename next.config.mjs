@@ -22,6 +22,10 @@ const nextConfig = {
       },
       {
         protocol: 'https',
+        hostname: 'dazzling-friends-80757c9c53.media.strapiapp.com', // Strapi Cloud media domain
+      },
+      {
+        protocol: 'https',
         hostname: '*.strapiapp.com', // Wildcard for Strapi Cloud
       },
     ],

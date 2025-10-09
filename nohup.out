@@ -228,3 +228,7 @@ Ready! You are using Stripe API Version [2020-08-27]. Your webhook signing secre
 2025-10-07 18:43:05  <--  [200] POST http://localhost:3000/api/stripe-webhook [evt_1SFlTBFSIMTXJoJ2zSnz2dXN]
 2025-10-07 18:58:23   --> balance.available [evt_1SFlhyFSIMTXJoJ2diTz8GNZ]
 2025-10-07 18:58:23  <--  [200] POST http://localhost:3000/api/stripe-webhook [evt_1SFlhyFSIMTXJoJ2diTz8GNZ]
+Session expired, reconnecting...
+Ready! You are using Stripe API Version [2020-08-27]. Your webhook signing secret is whsec_0b386972f2782761b55bcbfb6005880c7854f009b23a5c9ae9f2e0cc8816e900 (^C to quit)
+time="Wed, 08 Oct 2025 21:51:24 MDT" level=error msg="Error when writing ping message: websocket: close sent" prefix=websocket.Client.writePump
+time="Wed, 08 Oct 2025 22:07:29 MDT" level=error msg="Error when writing ping message: websocket: close sent" prefix=websocket.Client.writePump

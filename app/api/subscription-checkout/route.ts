@@ -59,11 +59,63 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // If user doesn't exist in Strapi, create them
     if (!strapiUserId) {
-      return NextResponse.json(
-        { error: 'User not found in Strapi. Please contact support.' },
-        { status: 404 }
-      );
+      console.log('User not found in Strapi, creating user...');
+      
+      try {
+        // Get the default "Customer" role
+        const rolesResponse = await fetch(`${strapiUrl}/api/users-permissions/roles`, {
+          headers: {
+            'Authorization': `Bearer ${strapiToken}`,
+          },
+        });
+
+        if (!rolesResponse.ok) {
+          throw new Error('Failed to fetch roles from Strapi');
+        }
+
+        const { roles } = await rolesResponse.json();
+        const customerRole = roles.find((r: any) => r.name === 'Customer' || r.type === 'customer');
+        
+        if (!customerRole) {
+          throw new Error('Customer role not found');
+        }
+
+        // Create user in Strapi
+        const createUserResponse = await fetch(`${strapiUrl}/api/users`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${strapiToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            username: userEmail.split('@')[0],
+            email: userEmail,
+            password: Math.random().toString(36).substring(2, 15), // Random password since auth is handled by Clerk
+            clerkId: userId,
+            confirmed: true,
+            blocked: false,
+            role: customerRole.id,
+          }),
+        });
+
+        if (createUserResponse.ok) {
+          const newUser = await createUserResponse.json();
+          strapiUserId = newUser.id;
+          console.log('✅ Created Strapi user:', strapiUserId, 'for Clerk user:', userId);
+        } else {
+          const errorText = await createUserResponse.text();
+          console.error('❌ Failed to create Strapi user:', createUserResponse.status, errorText);
+          throw new Error(`Failed to create Strapi user: ${errorText}`);
+        }
+      } catch (error) {
+        console.error('❌ Error creating Strapi user:', error);
+        return NextResponse.json(
+          { error: 'Failed to create user in Strapi. Please contact support.' },
+          { status: 500 }
+        );
+      }
     }
 
     // Create or retrieve Stripe customer

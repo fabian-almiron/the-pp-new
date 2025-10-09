@@ -131,16 +131,26 @@ function convertStrapiProduct(strapiProduct: StrapiProduct): Product {
   const images: GalleryImage[] = [];
   
   if (strapiProduct.image) {
+    // Check if URL is already absolute (Strapi Cloud) or relative (local Strapi)
+    const imageUrl = strapiProduct.image.url.startsWith('http') 
+      ? strapiProduct.image.url 
+      : `${STRAPI_URL}${strapiProduct.image.url}`;
+    
     images.push({
-      src: `${STRAPI_URL}${strapiProduct.image.url}`,
+      src: imageUrl,
       alt: strapiProduct.image.alternativeText || strapiProduct.name
     });
   }
   
   if (strapiProduct.gallery && strapiProduct.gallery.length > 0) {
     strapiProduct.gallery.forEach(img => {
+      // Check if URL is already absolute (Strapi Cloud) or relative (local Strapi)
+      const imageUrl = img.url.startsWith('http') 
+        ? img.url 
+        : `${STRAPI_URL}${img.url}`;
+      
       images.push({
-        src: `${STRAPI_URL}${img.url}`,
+        src: imageUrl,
         alt: img.alternativeText || strapiProduct.name
       });
     });
@@ -369,7 +379,9 @@ function convertStrapiBlog(strapiBlog: StrapiBlog): BlogPost {
     excerpt: strapiBlog.excerpt,
     content: strapiBlog.content,
     coverImage: strapiBlog.coverImage ? {
-      url: `${STRAPI_URL}${strapiBlog.coverImage.url}`,
+      url: strapiBlog.coverImage.url.startsWith('http') 
+        ? strapiBlog.coverImage.url 
+        : `${STRAPI_URL}${strapiBlog.coverImage.url}`,
       alternativeText: strapiBlog.coverImage.alternativeText
     } : undefined,
     author: strapiBlog.author,
@@ -537,18 +549,26 @@ function convertStrapiRecipe(strapiRecipe: StrapiRecipe): Recipe {
     excerpt: strapiRecipe.excerpt,
     content: strapiRecipe.content,
     coverImage: strapiRecipe.coverImage ? {
-      url: `${STRAPI_URL}${strapiRecipe.coverImage.url}`,
+      url: strapiRecipe.coverImage.url.startsWith('http') 
+        ? strapiRecipe.coverImage.url 
+        : `${STRAPI_URL}${strapiRecipe.coverImage.url}`,
       alternativeText: strapiRecipe.coverImage.alternativeText
     } : strapiRecipe.featuredImage ? {
-      url: `${STRAPI_URL}${strapiRecipe.featuredImage.url}`,
+      url: strapiRecipe.featuredImage.url.startsWith('http') 
+        ? strapiRecipe.featuredImage.url 
+        : `${STRAPI_URL}${strapiRecipe.featuredImage.url}`,
       alternativeText: strapiRecipe.featuredImage.alternativeText
     } : undefined,
     featuredImage: strapiRecipe.featuredImage ? {
-      url: `${STRAPI_URL}${strapiRecipe.featuredImage.url}`,
+      url: strapiRecipe.featuredImage.url.startsWith('http') 
+        ? strapiRecipe.featuredImage.url 
+        : `${STRAPI_URL}${strapiRecipe.featuredImage.url}`,
       alternativeText: strapiRecipe.featuredImage.alternativeText
     } : undefined,
     headerImage: strapiRecipe.headerImage ? {
-      url: `${STRAPI_URL}${strapiRecipe.headerImage.url}`,
+      url: strapiRecipe.headerImage.url.startsWith('http') 
+        ? strapiRecipe.headerImage.url 
+        : `${STRAPI_URL}${strapiRecipe.headerImage.url}`,
       alternativeText: strapiRecipe.headerImage.alternativeText
     } : undefined,
     category: category, // First category for backward compatibility
@@ -651,11 +671,15 @@ function convertStrapiCourse(strapiCourse: StrapiCourse): StrapiCourse {
     ...strapiCourse,
     featuredImage: strapiCourse.featuredImage ? {
       ...strapiCourse.featuredImage,
-      url: `${STRAPI_URL}${strapiCourse.featuredImage.url}`
+      url: strapiCourse.featuredImage.url.startsWith('http') 
+        ? strapiCourse.featuredImage.url 
+        : `${STRAPI_URL}${strapiCourse.featuredImage.url}`
     } : undefined,
     gallery: strapiCourse.gallery?.map(img => ({
       ...img,
-      url: `${STRAPI_URL}${img.url}`
+      url: img.url.startsWith('http') 
+        ? img.url 
+        : `${STRAPI_URL}${img.url}`
     }))
   };
 }
