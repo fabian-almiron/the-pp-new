@@ -3,10 +3,12 @@
 import Link from 'next/link';
 import { fetchMenu, Menu, MenuItem } from '@/lib/strapi-api';
 import { useEffect, useState } from 'react';
+import { ChevronDown, ChevronRight } from 'lucide-react';
 
 interface NavigationProps {
   menuSlug: string;
   className?: string;
+  onLinkClick?: () => void;
 }
 
 interface MenuItemComponentProps {
@@ -14,7 +16,7 @@ interface MenuItemComponentProps {
   className?: string;
 }
 
-function MenuItemComponent({ item, className = "", showArrow = false, arrowDirection = "right" }: MenuItemComponentProps & { showArrow?: boolean; arrowDirection?: "down" | "right" }) {
+function MenuItemComponent({ item, className = "", showArrow = false, arrowDirection = "right", onLinkClick }: MenuItemComponentProps & { showArrow?: boolean; arrowDirection?: "down" | "right"; onLinkClick?: () => void }) {
   const linkProps = {
     href: item.url,
     target: item.target,
@@ -34,7 +36,7 @@ function MenuItemComponent({ item, className = "", showArrow = false, arrowDirec
   // External links
   if (item.isExternal) {
     return (
-      <a {...linkProps} rel="noopener noreferrer">
+      <a {...linkProps} rel="noopener noreferrer" onClick={onLinkClick}>
         {content}
       </a>
     );
@@ -42,13 +44,69 @@ function MenuItemComponent({ item, className = "", showArrow = false, arrowDirec
 
   // Internal links
   return (
-    <Link {...linkProps}>
+    <Link {...linkProps} onClick={onLinkClick}>
       {content}
     </Link>
   );
 }
 
-export default function Navigation({ menuSlug, className = "" }: NavigationProps) {
+// Collapsible mobile menu item component
+function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem; level?: number; onLinkClick?: () => void }) {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const hasChildren = item.children && item.children.length > 0;
+  const textSizes = [
+    "text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900", // level 0
+    "text-base text-gray-500 hover:text-gray-900", // level 1
+    "text-sm text-gray-400 hover:text-gray-900" // level 2
+  ];
+  
+  const paddingClasses = [
+    "py-2", // level 0
+    "py-1", // level 1
+    "py-1" // level 2
+  ];
+
+  const className = `block ${textSizes[level]} ${paddingClasses[level]} transition-colors`;
+
+  if (!hasChildren) {
+    return (
+      <MenuItemComponent 
+        item={item} 
+        className={className}
+        onLinkClick={onLinkClick}
+      />
+    );
+  }
+
+  return (
+    <div>
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={`flex items-center justify-between w-full ${className} text-left`}
+      >
+        <span>{item.title}</span>
+        {hasChildren && (
+          isOpen ? 
+            <ChevronDown className="h-4 w-4" /> : 
+            <ChevronRight className="h-4 w-4" />
+        )}
+      </button>
+      
+      {hasChildren && isOpen && (
+        <ul className={`pl-4 mt-2 space-y-2`}>
+          {item.children?.map((child) => (
+            <li key={child.id}>
+              <CollapsibleMenuItem item={child} level={level + 1} onLinkClick={onLinkClick} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+export default function Navigation({ menuSlug, className = "", onLinkClick }: NavigationProps) {
   const [menu, setMenu] = useState<Menu | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -111,15 +169,14 @@ export default function Navigation({ menuSlug, className = "" }: NavigationProps
       {isHeaderNav ? (
         // Header navigation layout - render only top-level items
         <>
-          {menu.menuItems
-            .filter(item => !item.parent) // Only show items without parents
-            .map((item) => (
+          {menu.menuItems.map((item) => (
               <div key={item.id} className="relative group">
                 <MenuItemComponent 
                   item={item} 
                   className="header-nav-link"
                   showArrow={item.children && item.children.length > 0}
                   arrowDirection="down"
+                  onLinkClick={onLinkClick}
                 />
                 
                 {/* Dropdown for children */}
@@ -131,6 +188,7 @@ export default function Navigation({ menuSlug, className = "" }: NavigationProps
                           item={child} 
                           className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors"
                           showArrow={child.children && child.children.length > 0}
+                          onLinkClick={onLinkClick}
                         />
                         
                         {/* Nested dropdown for grandchildren (3rd level) */}
@@ -141,6 +199,7 @@ export default function Navigation({ menuSlug, className = "" }: NavigationProps
                                 key={grandchild.id}
                                 item={grandchild} 
                                 className="block px-4 py-2 text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
+                                onLinkClick={onLinkClick}
                               />
                             ))}
                           </div>
@@ -153,48 +212,11 @@ export default function Navigation({ menuSlug, className = "" }: NavigationProps
             ))}
         </>
       ) : (
-        // Default navigation layout (mobile/sidebar)
+        // Default navigation layout (mobile/sidebar) - collapsible
         <ul className="flex flex-col space-y-2">
-          {menu.menuItems
-            .filter(item => !item.parent) // Only show items without parents
-            .map((item) => (
+          {menu.menuItems.map((item) => (
               <li key={item.id}>
-                <MenuItemComponent 
-                  item={item} 
-                  className="block py-2 text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors"
-                  showArrow={item.children && item.children.length > 0}
-                  arrowDirection="down"
-                />
-                
-                {/* Show children in mobile as nested list */}
-                {item.children && item.children.length > 0 && (
-                  <ul className="pl-4 mt-2 space-y-2">
-                    {item.children.map((child) => (
-                      <li key={child.id}>
-                        <MenuItemComponent 
-                          item={child} 
-                          className="block py-1 text-base text-gray-500 hover:text-gray-900 transition-colors"
-                          showArrow={child.children && child.children.length > 0}
-                          arrowDirection="down"
-                        />
-                        
-                        {/* Show grandchildren (3rd level) */}
-                        {child.children && child.children.length > 0 && (
-                          <ul className="pl-4 mt-1 space-y-1">
-                            {child.children.map((grandchild) => (
-                              <li key={grandchild.id}>
-                                <MenuItemComponent 
-                                  item={grandchild} 
-                                  className="block py-1 text-sm text-gray-400 hover:text-gray-900 transition-colors"
-                                />
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )}
+                <CollapsibleMenuItem item={item} level={0} onLinkClick={onLinkClick} />
               </li>
             ))}
         </ul>

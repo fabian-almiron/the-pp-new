@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Lato, Dancing_Script, Inter } from 'next/font/google';
 import localFont from 'next/font/local';
 import "./globals.css";
+import "./mobile-header-fix.css";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CartProvider } from "@/contexts/cart-context";

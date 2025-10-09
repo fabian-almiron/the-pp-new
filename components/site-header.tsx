@@ -4,11 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu } from 'lucide-react';
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
 import { useCart } from "@/contexts/cart-context";
 import { LoggedInHeader } from "@/components/logged-in-header";
 import { useUser as useClerkUser, useClerk } from "@clerk/nextjs";
 import Navigation from '@/components/navigation';
+import { useState } from 'react';
 
 export function SiteHeader() {
   const { isSignedIn, isLoaded } = useClerkUser();
@@ -20,11 +21,12 @@ export function SiteHeader() {
 
   // Show regular header (will handle both loading and non-authenticated states)
   return (
-    <HeaderContent />
+    <LoggedOutHeader />
   );
 }
 
-function HeaderContent() {
+function LoggedOutHeader() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { getItemCount } = useCart();
   const { isSignedIn } = useClerkUser();
   const { signOut } = useClerk();
@@ -43,9 +45,9 @@ function HeaderContent() {
             <Image
               src="/piped-peony-logo-1536x339.png"
               alt="The Piped Peony"
-              width={100}
-              height={35}
-              className="h-8 w-auto md:hidden"
+              width={120}
+              height={40}
+              className="h-10 w-auto md:hidden"
               priority
             />
             {/* Desktop logo - larger size */}
@@ -102,7 +104,7 @@ function HeaderContent() {
           )}
         </div>
         <div className="header-mobile-menu">
-          <Sheet>
+          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="clean" size="icon">
                 <Menu className="h-6 w-6 text-gray-700" />
@@ -110,35 +112,37 @@ function HeaderContent() {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-[#FBF9F6]">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
               <nav className="flex flex-col pt-8">
                 <Navigation 
                   menuSlug="logged-out-header" 
                   className="flex flex-col space-y-4"
+                  onLinkClick={() => setIsMobileMenuOpen(false)}
                 />
                 <div className="flex flex-col gap-4 pt-4">
-                  <Link href="/cart" className="flex items-center gap-2 text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors">
+                  <Link href="/cart" className="flex items-center gap-2 text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
                     <ShoppingCart className="h-5 w-5" />
                     Cart {cartItemCount > 0 && `(${cartItemCount})`}
                   </Link>
                   {isSignedIn ? (
                     <>
-                      <Link href="/my-account">
+                      <Link href="/my-account" onClick={() => setIsMobileMenuOpen(false)}>
                         <Button variant="clean" className="!border-none w-full">
                           my account
                         </Button>
                       </Link>
-                      <Button variant="clean" className="!border-none w-full" onClick={handleLogout}>
+                      <Button variant="clean" className="!border-none w-full" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
                         logout
                       </Button>
                     </>
                   ) : (
                     <>
-                      <Link href="/signup">
+                      <Link href="/signup" onClick={() => setIsMobileMenuOpen(false)}>
                         <Button variant="clean" className="!border-none !bg-[#f1eae6] w-full">
                           sign up
                         </Button>
                       </Link>
-                      <Link href="/login">
+                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
                         <Button variant="clean" className="!border-none w-full">
                           login
                         </Button>

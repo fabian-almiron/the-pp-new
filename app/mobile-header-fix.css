@@ -1,0 +1,32 @@
+/* Mobile Header Fix */
+@media (max-width: 767px) {
+  .header-container {
+    height: 4rem !important;
+    min-height: 4rem;
+    padding: 0.5rem 1rem;
+  }
+  
+  .header-logo img {
+    max-height: 2.5rem;
+    width: auto;
+  }
+  
+  /* Ensure proper spacing and prevent overflow */
+  .header-mobile-menu {
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  
+  /* Hide any potential overflow text */
+  .header-container * {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  /* Ensure logo doesn't overflow */
+  .header-logo {
+    flex-shrink: 0;
+    max-width: calc(100% - 4rem);
+  }
+}
