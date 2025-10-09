@@ -8,6 +8,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: NextRequest) {
   try {
+    // Check environment variables first
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error('❌ STRIPE_SECRET_KEY not configured');
+      return NextResponse.json({ error: 'Stripe configuration missing' }, { status: 500 });
+    }
+    
+    if (!process.env.STRAPI_API_TOKEN) {
+      console.error('❌ STRAPI_API_TOKEN not configured');
+      return NextResponse.json({ error: 'Strapi configuration missing' }, { status: 500 });
+    }
+    
     const { subscriptionId, userId, userEmail } = await request.json();
 
     if (!subscriptionId || !userId || !userEmail) {
@@ -185,9 +196,19 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error: any) {
-    console.error('Stripe subscription checkout error:', error);
+    console.error('❌ Stripe subscription checkout error:', error);
+    console.error('❌ Error details:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    
+    // Return more detailed error for debugging
     return NextResponse.json(
-      { error: error.message || 'Internal server error' },
+      { 
+        error: error.message || 'Internal server error',
+        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      },
       { status: 500 }
     );
   }
