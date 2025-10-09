@@ -23,6 +23,7 @@ html {
     width: 100%;
     padding-top: 1.5rem;
     padding-bottom: 0;
+    background-color: #fbf9f6;
   }
   
   @media (min-width: 768px) {
@@ -36,6 +37,7 @@ html {
     .hero-section {
       padding-top: 3rem;
       padding-bottom: 8rem;
+      
     }
   }
   
@@ -2590,6 +2592,10 @@ html {
   padding: 3rem 0;
   background-color: white;
   text-align: center;
+}
+
+section.featuredvl-section {
+  margin-top: -179px;
 }
 
 @media (min-width: 768px) {

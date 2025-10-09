@@ -59,7 +59,7 @@ export default function RootLayout({
         </head>
         <body
           className={cn(
-            "min-h-screen bg-[#FBF9F6] font-sans antialiased",
+            "min-h-screen font-sans antialiased",
             playfairDisplay.variable,
             lato.variable,
             dancingScript.variable,
