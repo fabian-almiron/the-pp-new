@@ -136,7 +136,7 @@ export default function ItemPage() {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FBF9F6] flex items-center justify-center">
+      <div className="min-h-screen bg-white flex items-center justify-center">
         <PeonyLoader />
       </div>
     )
@@ -145,11 +145,18 @@ export default function ItemPage() {
   // Error state
   if (error || !product) {
     return (
-      <div className="min-h-screen bg-[#FBF9F6] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-serif text-gray-900 mb-4">Product Not Found</h1>
-          <p className="text-gray-600 mb-8">{error || "The requested product could not be found."}</p>
-          <Button text="Back to Shop" className="!bg-[#D4A771] !text-white" />
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center px-4">
+          <div className="mb-8">
+            <h1 className="text-4xl font-serif font-bold text-gray-900 mb-4">Product Not Found</h1>
+            <p className="text-lg text-gray-600 max-w-md mx-auto">
+              {error || "The requested product could not be found."}
+            </p>
+          </div>
+          <Button 
+            text="Back to Shop" 
+            className="!bg-[#D4A771] !text-white !border-[#D4A771] hover:!bg-[#C99860] !px-8 !py-3 !rounded-lg !shadow-md hover:!shadow-lg" 
+          />
         </div>
       </div>
     )
@@ -157,37 +164,51 @@ export default function ItemPage() {
 
 
   return (
-    <div className="min-h-screen bg-[#FBF9F6]">
+    <div className="min-h-screen bg-white">
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16">
           {/* Product Images */}
-          <ItemGallery images={product.images} />
+          <div className="lg:sticky lg:top-8 lg:self-start">
+            <ItemGallery images={product.images} />
+          </div>
 
           {/* Product Details */}
-          <div className="space-y-6">
-            <div className="text-center lg:text-left">
-              <h1 className="text-3xl font-serif text-gray-900 mb-2">{product.name}</h1>
-              <p className="text-2xl text-gray-900 font-medium">${product.price.toFixed(2)}</p>
+          <div className="space-y-8">
+            <div>
+              <h1 className="text-4xl lg:text-5xl font-serif font-bold text-gray-900 mb-3">
+                {product.name}
+              </h1>
+              <p className="text-3xl text-[#D4A771] font-semibold">
+                ${product.price.toFixed(2)}
+              </p>
             </div>
 
-            {/* Conditional sections based on product variants */}
-            <div className="flex flex-col sm:flex-row sm:gap-8 lg:flex-col lg:gap-0 space-y-6 sm:space-y-0 lg:space-y-6">
+            {/* Product Description */}
+            <div className="prose prose-gray max-w-none">
+              <p className="text-gray-700 leading-relaxed">{product.shortDescription}</p>
+              {product.longDescription && (
+                <p className="text-gray-600 leading-relaxed mt-4">{product.longDescription}</p>
+              )}
+            </div>
+
+            {/* Options Card */}
+            <div className="bg-gray-50 rounded-xl p-6 space-y-6">
               {/* Dynamic Variations - show if product has variations */}
               {product.hasVariations && product.variations && product.variations.options.length > 0 && (
-                <div className="space-y-2 sm:flex-1 lg:w-full text-center sm:text-right lg:text-left">
-                  <label className="text-sm text-gray-700 font-medium block">
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide block">
                     {product.variations.type === 'hand' ? 'Hand Preference' : 'Options'}
                   </label>
-                  <div className="flex flex-wrap gap-2 justify-center sm:justify-end lg:justify-start">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {product.variations.options.map((variation) => (
                       <button
                         key={variation.name}
                         onClick={() => setSelectedVariation(variation.name)}
-                        className={`px-4 py-2 text-sm border transition-colors ${
+                        className={`px-6 py-3 text-sm font-medium rounded-lg border-2 transition-all ${
                           selectedVariation === variation.name
-                            ? "bg-black text-white border-black"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
+                            ? "bg-[#D4A771] text-white border-[#D4A771] shadow-md"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:shadow-sm"
                         }`}
                       >
                         {variation.name}
@@ -198,7 +219,7 @@ export default function ItemPage() {
                   {selectedVariation && (() => {
                     const selected = product.variations.options.find(v => v.name === selectedVariation);
                     return selected && selected.price !== product.price ? (
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-lg font-semibold text-[#D4A771]">
                         ${selected.price.toFixed(2)}
                       </p>
                     ) : null;
@@ -208,90 +229,101 @@ export default function ItemPage() {
 
               {/* Legacy Hand Selection - only show if product uses old format */}
               {!product.hasVariations && product.variants.hasHandPreference && (
-                <div className="space-y-2 sm:flex-1 lg:w-full text-center sm:text-right lg:text-left">
-                  <label className="text-sm text-gray-700 font-medium block">Hand Preference</label>
-                  <div className="flex space-x-2 justify-center sm:justify-end lg:justify-start">
+                <div className="space-y-3">
+                  <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide block">
+                    Hand Preference
+                  </label>
+                  <div className="flex gap-3">
                     <button
                       onClick={() => setSelectedHand("right-handed")}
-                      className={`px-4 py-2 text-sm border rounded transition-colors ${
+                      className={`flex-1 px-6 py-3 text-sm font-medium rounded-lg border-2 transition-all ${
                         selectedHand === "right-handed"
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
+                          ? "bg-[#D4A771] text-white border-[#D4A771] shadow-md"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:shadow-sm"
                       }`}
                     >
-                      right-handed
+                      Right-Handed
                     </button>
                     <button
                       onClick={() => setSelectedHand("left-handed")}
-                      className={`px-4 py-2 text-sm border rounded transition-colors ${
+                      className={`flex-1 px-6 py-3 text-sm font-medium rounded-lg border-2 transition-all ${
                         selectedHand === "left-handed"
-                          ? "bg-black text-white border-black"
-                          : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:text-[#D4A771]"
+                          ? "bg-[#D4A771] text-white border-[#D4A771] shadow-md"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-[#D4A771] hover:shadow-sm"
                       }`}
                     >
-                      left-handed
+                      Left-Handed
                     </button>
                   </div>
                 </div>
               )}
 
               {/* Quantity */}
-              <div className="space-y-2 sm:flex-1 lg:w-full text-center sm:text-left lg:text-left">
-                <span className="text-sm text-gray-700 font-medium block">Quantity</span>
-                <div className="flex justify-center sm:justify-start lg:justify-start">
-                  <div className="flex items-center border border-gray-300 rounded">
+              <div className="space-y-3">
+                <label className="text-sm font-semibold text-gray-900 uppercase tracking-wide block">
+                  Quantity
+                </label>
+                <div className="flex items-center">
+                  <div className="inline-flex items-center bg-white border-2 border-gray-300 rounded-lg overflow-hidden">
                     <button 
                       onClick={() => setQuantity(Math.max(1, quantity - 1))} 
-                      className="p-2 hover:bg-gray-50 transition-colors"
+                      className="p-3 hover:bg-gray-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                       disabled={quantity <= 1}
                     >
-                      <Minus className="h-4 w-4" />
+                      <Minus className="h-5 w-5 text-gray-700" />
                     </button>
-                    <span className="px-4 py-2 text-sm min-w-[3rem] text-center">{quantity}</span>
+                    <span className="px-6 py-3 text-base font-semibold min-w-[4rem] text-center border-x-2 border-gray-300">
+                      {quantity}
+                    </span>
                     <button 
                       onClick={() => setQuantity(quantity + 1)} 
-                      className="p-2 hover:bg-gray-50 transition-colors"
+                      className="p-3 hover:bg-gray-50 transition-colors"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-5 w-5 text-gray-700" />
                     </button>
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Add to Cart */}
-            <div className="flex justify-center lg:justify-start button-grey-lines">
+              {/* Add to Cart Button */}
               <Button 
-                text={addingToCart ? "ADDING..." : "ADD TO CART"}
-                className="!bg-gray-600 !text-white !border-gray-600 hover:!bg-transparent hover:!text-black hover:!border-black"
+                text={addingToCart ? "ADDING TO CART..." : "ADD TO CART"}
+                className="!w-full !py-4 !text-base !font-semibold !bg-[#D4A771] !text-white !border-[#D4A771] hover:!bg-[#C99860] hover:!border-[#C99860] !rounded-lg !shadow-md hover:!shadow-lg !transition-all"
                 onClick={handleAddToCart}
                 disabled={addingToCart}
               />
             </div>
 
-            {/* Product Description */}
-            <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
-              <p>{product.shortDescription}</p>
-              <p>{product.longDescription}</p>
-            </div>
+            {/* Stock Status */}
+            {product.inStock ? (
+              <div className="flex items-center gap-2 text-green-600">
+                <div className="w-2 h-2 bg-green-600 rounded-full"></div>
+                <span className="text-sm font-medium">In Stock & Ready to Ship</span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-red-600">
+                <div className="w-2 h-2 bg-red-600 rounded-full"></div>
+                <span className="text-sm font-medium">Currently Out of Stock</span>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Dynamic Product Tabs Section */}
         {product.productTabs && product.productTabs.length > 0 && (
-          <div className="mt-16 max-w-4xl mx-auto">
-            <div className="bg-white border border-gray-200 shadow-sm">
+          <div className="mt-20">
+            <div className="bg-white rounded-2xl border-2 border-gray-200 shadow-lg overflow-hidden">
               {/* Tab Navigation */}
-              <div className="border-b border-gray-200">
-                <div className="flex">
+              <div className="border-b-2 border-gray-200 bg-gray-50">
+                <div className="flex flex-wrap">
                   {product.productTabs.map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id.toString())}
-                      className={`px-6 py-4 text-sm font-medium border-b-2 transition-colors ${
+                      className={`px-6 lg:px-8 py-4 text-sm lg:text-base font-semibold border-b-4 transition-all ${
                         activeTab === tab.id.toString()
-                          ? "border-black text-black"
-                          : "border-transparent text-gray-500 hover:text-gray-700"
+                          ? "border-[#D4A771] text-[#D4A771] bg-white"
+                          : "border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100"
                       }`}
                     >
                       {tab.title}
@@ -301,15 +333,15 @@ export default function ItemPage() {
               </div>
 
               {/* Tab Content */}
-              <div className="p-6">
+              <div className="p-8 lg:p-12">
                 {product.productTabs.map((tab) => (
                   activeTab === tab.id.toString() && (
-                    <div key={tab.id}>
+                    <div key={tab.id} className="animate-fadeIn">
                       {/* Tab Content (if displayType includes content) */}
                       {tab.content && (tab.displayType === 'content_only' || tab.displayType === 'content_and_accordion') && (
-                        <div className="mb-6">
+                        <div className="mb-8">
                           <div 
-                            className="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none"
+                            className="prose prose-gray prose-lg max-w-none [&>ul]:list-disc [&>ul]:pl-6 [&>ol]:list-decimal [&>ol]:pl-6"
                             dangerouslySetInnerHTML={{ __html: tab.content }}
                           />
                         </div>
@@ -319,25 +351,38 @@ export default function ItemPage() {
                       {tab.accordionItems.length > 0 && (tab.displayType === 'accordion_only' || tab.displayType === 'content_and_accordion') && (
                         <div className="space-y-4">
                           {tab.accordionItems.map((item, index) => (
-                            <div key={item.id} className={index > 0 ? "border-t border-gray-200 pt-4" : ""}>
+                            <div 
+                              key={item.id} 
+                              className={`${
+                                index > 0 ? "border-t-2 border-gray-100 pt-6" : ""
+                              } ${
+                                expandedAccordions[`${tab.id}-${item.id}`] ? "bg-gray-50 -mx-6 px-6 py-4 rounded-lg" : ""
+                              }`}
+                            >
                               <button
                                 onClick={() => toggleAccordion(tab.id, item.id)}
                                 className="flex items-center justify-between w-full text-left group"
                               >
-                                <h3 className="text-lg font-medium text-gray-900 font-serif group-hover:text-[#D4A771] transition-colors">
+                                <h3 className="text-xl font-bold text-gray-900 font-serif group-hover:text-[#D4A771] transition-colors pr-4">
                                   {item.title}
                                 </h3>
-                                <span className="text-gray-400 group-hover:text-[#D4A771] transition-colors">
-                                  {expandedAccordions[`${tab.id}-${item.id}`] ? "−" : "+"}
-                                </span>
+                                <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all ${
+                                  expandedAccordions[`${tab.id}-${item.id}`]
+                                    ? "bg-[#D4A771] text-white rotate-180"
+                                    : "bg-gray-200 text-gray-600 group-hover:bg-[#D4A771] group-hover:text-white"
+                                }`}>
+                                  <span className="text-xl font-light leading-none">
+                                    {expandedAccordions[`${tab.id}-${item.id}`] ? "−" : "+"}
+                                  </span>
+                                </div>
                               </button>
-                              <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                              <div className={`overflow-hidden transition-all duration-500 ease-in-out ${
                                 expandedAccordions[`${tab.id}-${item.id}`]
-                                  ? "max-h-96 opacity-100 mt-3" 
-                                  : "max-h-0 opacity-0 mt-0"
+                                  ? "max-h-[1000px] opacity-100 mt-4" 
+                                  : "max-h-0 opacity-0"
                               }`}>
                                 <div 
-                                  className="text-sm text-gray-700 leading-relaxed prose prose-sm max-w-none pb-2"
+                                  className="prose prose-gray max-w-none [&>ul]:list-disc [&>ul]:pl-6 [&>ol]:list-decimal [&>ol]:pl-6"
                                   dangerouslySetInnerHTML={{ __html: item.content }}
                                 />
                               </div>
