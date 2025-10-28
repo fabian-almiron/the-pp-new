@@ -51,16 +51,19 @@ function DifficultyLevels() {
   const difficultyLevels = [
     {
       title: "Beginner",
+      slug: "beginner",
       image: "/placeholder_daisy.jpg",
       alt: "Beginner level tutorials featuring simple cake decorating techniques"
     },
     {
-      title: "Intermediate", 
+      title: "Intermediate",
+      slug: "intermediate", 
       image: "/placeholder_lily.jpg",
       alt: "Intermediate level tutorials with advanced piping techniques"
     },
     {
       title: "Advanced",
+      slug: "advanced",
       image: "/placeholder_rose-pink.jpg", 
       alt: "Advanced level tutorials for expert cake decoration"
     }
@@ -68,27 +71,35 @@ function DifficultyLevels() {
 
   return (
     <section className="featuredvl-section w-full py-12 md:py-24 ">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 max-w-7xl mx-auto px-4 md:px-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto px-4 md:px-6">
         {difficultyLevels.map((level, index) => (
-          <div 
-            key={index} 
-            className="relative bg-white cursor-pointer transition-all duration-300 border border-black hover:shadow-xl hover:-translate-y-1"
+          <Link 
+            key={index}
+            href={`/level/${level.slug}`}
+            className="group relative"
           >
-            <div className="relative w-full h-64 md:h-64 overflow-hidden">
-              <Image
-                src={level.image}
-                alt={level.alt}
-                width={400}
-                height={300}
-                className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-              />
-              <div className="absolute bg-white bottom-0 left-0 right-0 bg-black  text-center py-3 px-4">
-                <h3 className="font-playfair  md:text-2xl text-black font-normal">
+            <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-full flex flex-col">
+              {/* Level Image */}
+              <div className="relative h-64 bg-[#FBF9F6]">
+                <Image
+                  src={level.image}
+                  alt={level.alt}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                />
+                
+                {/* Overlay on hover */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#D4A771]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </div>
+
+              {/* Level Title */}
+              <div className="p-5 flex items-center justify-center">
+                <h3 className="font-playfair text-2xl text-black group-hover:text-[#D4A771] transition-colors font-normal">
                   {level.title}
                 </h3>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </section>

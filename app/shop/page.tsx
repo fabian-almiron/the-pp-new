@@ -123,33 +123,49 @@ export default function ShopPage() {
             </Link>
           </div>
         </div>
-        <div className="shop-grid">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {products.map((product) => (
-            <div 
-              key={product.id} 
-              className="group shop-item-tile product-card-double-border"
+            <Link
+              key={product.id}
+              href={`/shop/item/${product.slug}`}
+              className="group relative"
             >
-              <Link href={`/shop/item/${product.slug}`} className="tile-link">
-                <div className="tile-image-container">
+              <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-full flex flex-col">
+                {/* Product Image */}
+                <div className="relative h-44 bg-[#FBF9F6]">
                   <Image
                     src={product.images[0]?.src || "/placeholder.svg"}
                     alt={product.images[0]?.alt || product.name}
-                    width={400}
-                    height={225}
-                    className="tile-image"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  
+                  {/* Overlay on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#D4A771]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 </div>
-                <h3 className="tile-title">{product.name}</h3>
-              </Link>
-              <p className="tile-price">${product.price.toFixed(2)}</p>
-              <div className="tile-button-container">
-                <Link href={`/shop/item/${product.slug}`}>
-                  <button className="button-select-options">
-                    select options
-                  </button>
-                </Link>
+
+                {/* Product Info */}
+                <div className="p-5 flex-1 flex flex-col">
+                  <h3 className="text-base font-bold mb-2 text-black group-hover:text-[#D4A771] transition-colors line-clamp-2 min-h-[3rem]">
+                    {product.name}
+                  </h3>
+                  
+                  <p className="text-lg font-semibold text-gray-700 mb-4">
+                    ${product.price.toFixed(2)}
+                  </p>
+
+                  {/* Product Meta */}
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+                    <span className="text-sm text-gray-500">
+                      View Details
+                    </span>
+                    <span className="text-sm font-medium text-[#D4A771] group-hover:translate-x-1 transition-transform">
+                      →
+                    </span>
+                  </div>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

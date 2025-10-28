@@ -675,8 +675,9 @@ html {
 .product-card-double-border {
   position: relative;
   border: none; /* no outer border - shadow border will replace this */
-  border-radius: 0; /* no curved edges */
+  border-radius: 0.75rem; /* rounded-xl = 12px curved edges */
   background-color: white; /* ensure background is white */
+  overflow: hidden; /* ensure inner content respects border radius */
 }
 
 /* Inner border for content spacing (keeps original layout) */
@@ -688,7 +689,7 @@ html {
   right: 12px;
   bottom: 12px;
   border: 1px solid #000000; /* inner border - 1px black */
-  border-radius: 0; /* no curved edges */
+  border-radius: 0.5rem; /* slightly smaller radius for inner border */
   pointer-events: none;
 }
 
