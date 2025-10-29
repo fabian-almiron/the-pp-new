@@ -95,6 +95,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
           slug: c.slug,
           title: c.title,
           thumbnailUrl: c.featuredImage?.url || '/placeholder_peony.jpg',
+          series: c.series,
         }));
     }
   }
@@ -108,6 +109,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
         slug: c.slug,
         title: c.title,
         thumbnailUrl: c.featuredImage?.url || '/placeholder_peony.jpg',
+        series: c.series,
       }));
     }
   }

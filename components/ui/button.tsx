@@ -15,8 +15,9 @@ const buttonVariants = cva(
         secondary: "button-secondary",
         ghost: "button-ghost",
         link: "button-link",
-        light: "button-light", // Add back the light variant for decorative lines
-        clean: "button-clean", // Clean variant without decorative lines
+        dark: "button-dark", // Dark variant for light backgrounds
+        light: "button-light", // Light variant for dark backgrounds
+        clean: "button-clean", // Clean variant
         cta: "button-cta", // CTA variant for homepage buttons
       },
       size: {
@@ -44,7 +45,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, asChild = false, text = "Sign up for 7 free days", children, ...props }, ref) => {
     const Comp = asChild ? Slot : "button"
     
-    const buttonElement = (
+    return (
       <Comp
         className={cn(buttonVariants({ variant, size }), className)} // className comes last for overrides
         ref={ref}
@@ -52,28 +53,6 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       >
         {children || text}
       </Comp>
-    )
-    
-    // If asChild is true or clean variant, return just the button without wrapper
-    if (asChild || variant === "clean") {
-      return buttonElement
-    }
-    
-    // Determine line colors based on variant
-    const isLightVariant = variant === "light"
-    const lineBaseColor = isLightVariant ? "border-white" : "border-black"
-    const lineHoverColor = "group-hover:border-[#D4A771]"
-    
-    // Return button with decorative lines
-    return (
-      <div className="inline-flex flex-col items-center group">
-        {buttonElement}
-        <div className="flex flex-col w-full" style={{ marginTop: '2px' }}>
-          <div className={`border-b ${lineBaseColor} ${lineHoverColor} transition-colors duration-200`}></div>
-          <div style={{ height: '4px' }}></div>
-          <div className={`border-b ${lineBaseColor} ${lineHoverColor} transition-colors duration-200`}></div>
-        </div>
-      </div>
     )
   }
 )

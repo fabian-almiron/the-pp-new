@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Video } from "lucide-react";
 import { CarouselItem } from "@/data/types";
 import {
   Carousel,
@@ -18,8 +18,12 @@ interface ContentCarouselProps {
 }
 
 export function ContentCarousel({ items, title = "Continue the Series" }: ContentCarouselProps) {
+  if (!items || items.length === 0) {
+    return null;
+  }
+
   return (
-    <section className="mt-12">
+    <section className="mt-16 mb-12">
       <h2 className="text-3xl font-serif font-bold text-gray-900 text-center mb-8">
         {title}
       </h2>
@@ -28,27 +32,51 @@ export function ContentCarousel({ items, title = "Continue the Series" }: Conten
         <Carousel
           opts={{
             align: "start",
-            loop: true,
+            loop: items.length > 3,
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="-ml-4 pb-4">
             {items.map((item, index) => (
-              <CarouselItemComponent key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+              <CarouselItemComponent key={index} className="pl-4 md:basis-1/2 lg:basis-1/3">
                 <Link href={`/courses/${item.slug}`} className="block group">
-                  <div className="relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow">
-                    <div className="relative aspect-video">
+                  <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-full flex flex-col">
+                    {/* Course Image */}
+                    <div className="relative h-44 bg-[#FBF9F6]">
                       <Image
                         src={item.thumbnailUrl}
                         alt={item.title}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
+                      
+                      {/* Overlay on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#D4A771]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                     </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold text-gray-900 group-hover:text-black transition-colors">
+
+                    {/* Course Info */}
+                    <div className="p-5 flex-1 flex flex-col">
+                      {/* Series Badge */}
+                      {item.series && (
+                        <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">
+                          {item.series}
+                        </p>
+                      )}
+                      
+                      <h3 className="text-base font-bold mb-2 text-black group-hover:text-[#D4A771] transition-colors line-clamp-2 min-h-[3rem]">
                         {item.title}
                       </h3>
+
+                      {/* Course Meta */}
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
+                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                          <Video className="w-4 h-4 text-[#D4A771]" />
+                          <span className="font-medium">Course</span>
+                        </div>
+                        <span className="text-sm font-medium text-[#D4A771] group-hover:translate-x-1 transition-transform">
+                          View →
+                        </span>
+                      </div>
                     </div>
                   </div>
                 </Link>
@@ -56,13 +84,11 @@ export function ContentCarousel({ items, title = "Continue the Series" }: Conten
             ))}
           </CarouselContent>
           
-          <CarouselPrevious className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:shadow-lg">
-            <ChevronLeft className="h-4 w-4" />
-          </CarouselPrevious>
-          
-          <CarouselNext className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-white rounded-full p-2 shadow-md hover:shadow-lg">
-            <ChevronRight className="h-4 w-4" />
-          </CarouselNext>
+          {/* Navigation buttons centered below carousel */}
+          <div className="flex items-center justify-center gap-4 mt-6">
+            <CarouselPrevious className="static translate-x-0 translate-y-0" />
+            <CarouselNext className="static translate-x-0 translate-y-0" />
+          </div>
         </Carousel>
       </div>
     </section>

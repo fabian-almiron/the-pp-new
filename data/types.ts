@@ -111,6 +111,7 @@ export interface CarouselItem {
   slug: string;
   title: string;
   thumbnailUrl: string;
+  series?: string;
 }
 
 // Strapi Course Types (from WordPress import)
