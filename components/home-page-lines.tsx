@@ -11,26 +11,54 @@ export function HomePageLines() {
     return null;
   }
 
+  const cornerTop = 630; // calc(96px + 24px + 520px + 60px - 130px + 60px) = 630px
+  const cornerRadius = 70; // Perfect roundness
+  const lineColor = "rgba(112, 112, 112, 0.6)";
+
   return (
     <>
-      {/* Vertical line - extends from top of page through header past intersection point - hidden on mobile */}
+      {/* Vertical line - extends from top of page to just before the corner */}
       <div 
-        className="absolute z-10 w-px pointer-events-none hidden md:block"
+        className="absolute z-10 pointer-events-none hidden md:block"
         style={{
-          left: "calc(50% - 600px + 1rem - 50px)", // Center minus half container width plus left padding, moved 50px left
-          top: "0", // Start from very top of page
-          height: "calc(96px + 24px + 520px + 60px - 130px + 60px)", // Extended 60px past intersection point
-          backgroundColor: "#70707099"
+          left: "calc(50% - 600px + 1rem - 50px)",
+          top: "0",
+          width: "1px",
+          height: `${cornerTop - cornerRadius}px`,
+          backgroundColor: lineColor
         }}
       ></div>
-      {/* Horizontal line - meets vertical line at its bottom end (positive X-axis) - hidden on mobile */}
-      <div 
-        className="absolute z-10 h-px pointer-events-none hidden md:block"
+      
+      {/* Rounded corner using SVG */}
+      <svg
+        className="absolute z-10 pointer-events-none hidden md:block"
         style={{
-          left: "calc(50% - 600px + 1rem - 50px)", // Start from vertical line intersection, moved 50px left
-          top: "calc(96px + 24px + 520px + 60px - 130px + 60px)", // Match the bottom end of vertical line
-          width: "850px", // Extended length by 50px to maintain same right endpoint
-          backgroundColor: "#70707099"
+          left: "calc(50% - 600px + 1rem - 50px)",
+          top: `${cornerTop - cornerRadius}px`,
+          width: `${cornerRadius}px`,
+          height: `${cornerRadius}px`,
+          overflow: "visible"
+        }}
+        viewBox={`0 0 ${cornerRadius} ${cornerRadius}`}
+        preserveAspectRatio="none"
+      >
+        <path
+          d={`M 0.5 0 Q 0 ${cornerRadius} ${cornerRadius} ${cornerRadius - 0.5}`}
+          stroke={lineColor}
+          strokeWidth="1"
+          fill="none"
+        />
+      </svg>
+
+      {/* Horizontal line - starts after the rounded corner */}
+      <div 
+        className="absolute z-10 pointer-events-none hidden md:block"
+        style={{
+          left: `calc(50% - 600px + 1rem - 50px + ${cornerRadius}px)`,
+          top: `${cornerTop}px`,
+          height: "1px",
+          width: `${850 - cornerRadius}px`,
+          backgroundColor: lineColor
         }}
       ></div>
     </>

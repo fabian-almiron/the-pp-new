@@ -37,7 +37,7 @@ function LoggedOutHeader() {
   };
 
   return (
-    <header className="w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
+    <header className="sticky top-0 z-50 w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
       <div className="header-container">
         <Link href="/" className="header-logo">
           <div className="relative">
