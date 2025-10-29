@@ -122,6 +122,17 @@ export async function POST(request: NextRequest) {
       },
       billing_address_collection: 'required',
       allow_promotion_codes: true,
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: `Order from The Piped Peony`,
+          footer: 'Thank you for your purchase!',
+          metadata: {
+            clerkUserId: user.id,
+            strapiUserId: strapiUserId?.toString() || '',
+          },
+        },
+      },
       metadata: {
         clerkUserId: user.id,
         strapiUserId: strapiUserId?.toString() || '',

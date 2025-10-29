@@ -49,3 +49,7 @@ ehthumbs.db
 Thumbs.db
 # clerk configuration (can include secrets)
 /.clerk/
+
+# Security: Ignore log files that may contain secrets
+nohup.out
+*.log
