@@ -3,12 +3,10 @@ import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/nextjs/server';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-09-30.clover',
 });
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
-const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const strapiToken = process.env.STRAPI_API_TOKEN; // You'll need to add this to your .env.local
 
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY!,
@@ -93,25 +91,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
   
   if (session.mode === 'subscription' && session.subscription) {
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
-    await createOrUpdateUserSubscription(subscription, 'active');
     
-    // Update user role to Subscriber
-    const strapiUserId = session.metadata?.strapiUserId;
+    // Update Clerk user role to Subscriber
     const clerkUserId = session.metadata?.clerkUserId;
-    console.log('👤 Strapi User ID from metadata:', strapiUserId);
     console.log('👤 Clerk User ID from metadata:', clerkUserId);
     
-    if (strapiUserId) {
-      console.log('🔄 Updating user role to Subscriber in Strapi...');
-      await updateUserRole(strapiUserId, 'Subscriber');
-      console.log('✅ Strapi user role update completed');
-    } else {
-      console.error('❌ No strapiUserId found in session metadata');
-    }
-
     if (clerkUserId) {
-      console.log('🔄 Updating user role to subscriber in Clerk...');
-      await updateClerkUserRole(clerkUserId, 'subscriber');
+      console.log('🔄 Updating user role to Subscriber in Clerk...');
+      await updateClerkUserRole(clerkUserId, 'Subscriber');
       console.log('✅ Clerk user role update completed');
     } else {
       console.error('❌ No clerkUserId found in session metadata');
@@ -120,179 +107,69 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
 }
 
 async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
-  await createOrUpdateUserSubscription(subscription, subscription.status);
+  console.log('✅ Subscription created:', subscription.id);
+  // Update Clerk role if needed
+  const clerkUserId = subscription.metadata?.clerkUserId;
+  if (clerkUserId && ['active', 'trialing'].includes(subscription.status)) {
+    await updateClerkUserRole(clerkUserId, 'Subscriber');
+  }
 }
 
 async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
-  await createOrUpdateUserSubscription(subscription, subscription.status);
+  console.log('🔄 Subscription updated:', subscription.id, 'Status:', subscription.status);
   
-  // Update user role based on subscription status
-  const strapiUserId = subscription.metadata?.strapiUserId;
+  // Update Clerk user role based on subscription status
   const clerkUserId = subscription.metadata?.clerkUserId;
   
-  if (strapiUserId || clerkUserId) {
+  if (clerkUserId) {
     const isActive = ['active', 'trialing'].includes(subscription.status);
-    const strapiRole = isActive ? 'Subscriber' : 'Customer';
-    const clerkRole = isActive ? 'subscriber' : 'customer';
-    
-    if (strapiUserId) {
-      await updateUserRole(strapiUserId, strapiRole);
-    }
-    
-    if (clerkUserId) {
-      await updateClerkUserRole(clerkUserId, clerkRole);
-    }
+    const role = isActive ? 'Subscriber' : 'Customer';
+    await updateClerkUserRole(clerkUserId, role);
   }
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  await createOrUpdateUserSubscription(subscription, 'canceled');
+  console.log('❌ Subscription deleted:', subscription.id);
   
-  // Downgrade user role to Customer
-  const strapiUserId = subscription.metadata?.strapiUserId;
+  // Downgrade Clerk user role to Customer
   const clerkUserId = subscription.metadata?.clerkUserId;
   
-  if (strapiUserId) {
-    await updateUserRole(strapiUserId, 'Customer');
-  }
-  
   if (clerkUserId) {
-    await updateClerkUserRole(clerkUserId, 'customer');
+    await updateClerkUserRole(clerkUserId, 'Customer');
   }
 }
 
 async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  if (invoice.subscription) {
-    const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-    await createOrUpdateUserSubscription(subscription, subscription.status);
+  console.log('✅ Invoice payment succeeded:', invoice.id);
+  const subscriptionId = (invoice as any).subscription;
+  
+  if (subscriptionId && typeof subscriptionId === 'string') {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const clerkUserId = subscription.metadata?.clerkUserId;
+    
+    if (clerkUserId && ['active', 'trialing'].includes(subscription.status)) {
+      await updateClerkUserRole(clerkUserId, 'Subscriber');
+    }
   }
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
-  if (invoice.subscription) {
-    const subscription = await stripe.subscriptions.retrieve(invoice.subscription as string);
-    await createOrUpdateUserSubscription(subscription, subscription.status);
-    
-    // Downgrade user role if payment failed
-    const strapiUserId = subscription.metadata?.strapiUserId;
-    if (strapiUserId && subscription.status === 'past_due') {
-      await updateUserRole(strapiUserId, 'Customer');
-    }
-  }
-}
-
-async function createOrUpdateUserSubscription(stripeSubscription: Stripe.Subscription, status: string) {
-  const strapiUserId = stripeSubscription.metadata?.strapiUserId;
-  const strapiSubscriptionId = stripeSubscription.metadata?.strapiSubscriptionId;
+  console.log('❌ Invoice payment failed:', invoice.id);
+  const subscriptionId = (invoice as any).subscription;
   
-  if (!strapiUserId || !strapiSubscriptionId) {
-    console.error('Missing metadata in subscription:', stripeSubscription.id);
-    return;
-  }
-
-  // Check if user subscription already exists
-  const existingResponse = await fetch(
-    `${strapiUrl}/api/usersubscriptions?filters[stripeSubscriptionId][$eq]=${stripeSubscription.id}`,
-    {
-      headers: {
-        'Authorization': `Bearer ${strapiToken}`,
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-
-  const subscriptionData = {
-    user: strapiUserId,
-    subscription: strapiSubscriptionId,
-    stripeSubscriptionId: stripeSubscription.id,
-    stripeCustomerId: stripeSubscription.customer as string,
-    status: status,
-    currentPeriodStart: new Date(stripeSubscription.current_period_start * 1000).toISOString(),
-    currentPeriodEnd: new Date(stripeSubscription.current_period_end * 1000).toISOString(),
-    cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
-    trialStart: stripeSubscription.trial_start ? new Date(stripeSubscription.trial_start * 1000).toISOString() : null,
-    trialEnd: stripeSubscription.trial_end ? new Date(stripeSubscription.trial_end * 1000).toISOString() : null,
-    canceledAt: stripeSubscription.canceled_at ? new Date(stripeSubscription.canceled_at * 1000).toISOString() : null,
-    endedAt: stripeSubscription.ended_at ? new Date(stripeSubscription.ended_at * 1000).toISOString() : null,
-  };
-
-  if (existingResponse.ok) {
-    const { data: existingSubscriptions } = await existingResponse.json();
+  if (subscriptionId && typeof subscriptionId === 'string') {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
     
-    if (existingSubscriptions.length > 0) {
-      // Update existing subscription
-      const existingId = existingSubscriptions[0].id;
-      await fetch(`${strapiUrl}/api/usersubscriptions/${existingId}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${strapiToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data: subscriptionData }),
-      });
-    } else {
-      // Create new subscription
-      await fetch(`${strapiUrl}/api/usersubscriptions`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${strapiToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data: subscriptionData }),
-      });
+    // Downgrade Clerk user role if payment failed
+    const clerkUserId = subscription.metadata?.clerkUserId;
+    if (clerkUserId && subscription.status === 'past_due') {
+      await updateClerkUserRole(clerkUserId, 'Customer');
     }
   }
 }
 
-async function updateUserRole(strapiUserId: string, roleName: string) {
-  try {
-    console.log(`🔍 Updating user ${strapiUserId} to role ${roleName}`);
-    
-    // Get the role ID by name
-    const rolesResponse = await fetch(`${strapiUrl}/api/users-permissions/roles`, {
-      headers: {
-        'Authorization': `Bearer ${strapiToken}`,
-      },
-    });
-    
-    if (!rolesResponse.ok) {
-      console.error('❌ Failed to fetch roles:', rolesResponse.status);
-      return;
-    }
-    
-    const { roles } = await rolesResponse.json();
-    const role = roles.find((r: any) => r.name === roleName);
-    
-    if (!role) {
-      console.error(`❌ Role ${roleName} not found. Available roles:`, roles.map((r: any) => r.name));
-      return;
-    }
 
-    console.log(`✅ Found role ${roleName} with ID:`, role.id);
-
-    // Update user role
-    const updateResponse = await fetch(`${strapiUrl}/api/users/${strapiUserId}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${strapiToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        role: role.id,
-      }),
-    });
-
-    if (updateResponse.ok) {
-      console.log(`✅ Successfully updated user ${strapiUserId} to ${roleName}`);
-    } else {
-      console.error(`❌ Failed to update user role:`, updateResponse.status, await updateResponse.text());
-    }
-  } catch (error) {
-    console.error('❌ Error updating user role:', error);
-  }
-}
-
-async function updateClerkUserRole(clerkUserId: string, role: 'customer' | 'subscriber') {
+async function updateClerkUserRole(clerkUserId: string, role: 'Customer' | 'Subscriber') {
   try {
     console.log(`🔍 Updating Clerk user ${clerkUserId} to role ${role}`);
     

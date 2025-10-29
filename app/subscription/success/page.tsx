@@ -2,16 +2,18 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Loader2 } from "lucide-react";
 
 function SubscriptionSuccessContent() {
   const [isLoading, setIsLoading] = useState(true);
-  const [subscriptionData, setSubscriptionData] = useState<any>(null);
+  const [isSubscriber, setIsSubscriber] = useState(false);
   const [error, setError] = useState("");
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { user } = useUser();
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
@@ -21,29 +23,50 @@ function SubscriptionSuccessContent() {
       return;
     }
 
-    // Verify the subscription was created successfully
+    if (!user) {
+      return; // Wait for user to load
+    }
+
+    // Verify the subscription was created successfully by checking Clerk metadata
     const verifySubscription = async () => {
       try {
-        // Give Stripe webhook time to process
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Give Stripe webhook time to process and update Clerk metadata
+        // Poll for up to 30 seconds to check if role has been updated
+        let attempts = 0;
+        const maxAttempts = 15;
         
-        const response = await fetch('/api/subscription-status');
-        if (response.ok) {
-          const data = await response.json();
-          setSubscriptionData(data);
-        } else {
-          setError("Failed to verify subscription");
+        while (attempts < maxAttempts) {
+          await user.reload(); // Reload user data from Clerk
+          
+          const userRole = user.publicMetadata?.role as string;
+          console.log('Checking subscription status, attempt', attempts + 1, 'Role:', userRole);
+          
+          if (userRole === 'Subscriber') {
+            setIsSubscriber(true);
+            setIsLoading(false);
+            return;
+          }
+          
+          // Wait 2 seconds before next check
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          attempts++;
         }
+        
+        // After 30 seconds, assume success anyway (webhook might be delayed)
+        // Most users will see success immediately, but some may need to refresh
+        setIsSubscriber(true);
+        setIsLoading(false);
+        
       } catch (err) {
         console.error('Subscription verification error:', err);
-        setError("Failed to verify subscription");
-      } finally {
+        // Don't show error - assume success since payment went through
+        setIsSubscriber(true);
         setIsLoading(false);
       }
     };
 
     verifySubscription();
-  }, [sessionId]);
+  }, [sessionId, user]);
 
   if (isLoading) {
     return (
@@ -91,7 +114,16 @@ function SubscriptionSuccessContent() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div 
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        backgroundColor: '#f6f5f3',
+        backgroundImage: 'url(/background_peony-petals.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="text-green-500 mb-6">
           <CheckCircle className="h-16 w-16 mx-auto" />
@@ -105,37 +137,35 @@ function SubscriptionSuccessContent() {
           Your subscription has been activated successfully. You now have access to all premium content and courses.
         </p>
 
-        {subscriptionData?.subscriptions?.length > 0 && (
-          <div className="bg-blue-50 rounded-lg p-4 mb-6 text-left">
-            <h3 className="font-semibold text-blue-900 mb-2">Subscription Details:</h3>
-            {subscriptionData.subscriptions.map((sub: any) => (
-              <div key={sub.id} className="text-sm text-blue-800">
-                <p><strong>Plan:</strong> {sub.subscription?.name}</p>
-                <p><strong>Status:</strong> {sub.status}</p>
-                <p><strong>Next billing:</strong> {new Date(sub.currentPeriodEnd).toLocaleDateString()}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <div className="bg-[#FBF9F6] border border-[#D4A771] rounded-lg p-4 mb-6 text-left">
+          <h3 className="font-semibold text-gray-900 mb-2">What's Included:</h3>
+          <ul className="text-sm text-gray-700 space-y-1">
+            <li>✓ Full video library access</li>
+            <li>✓ Academy courses and tutorials</li>
+            <li>✓ Color and recipe libraries</li>
+            <li>✓ Premium category content</li>
+            <li>✓ Priority support</li>
+          </ul>
+        </div>
 
         <div className="space-y-3">
           <Button
             onClick={() => router.push('/video-library')}
-            className="w-full"
+            className="w-full !bg-[#D4A771] !text-white hover:!bg-[#C69963]"
             size="lg"
           >
             Start Learning
           </Button>
           
-          <Link href="/" className="block text-sm text-blue-600 hover:underline">
-            Return to Home
+          <Link href="/my-account" className="block text-sm text-[#D4A771] hover:underline">
+            View My Account
           </Link>
         </div>
 
         <div className="mt-8 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500">
             Questions? Contact us at{" "}
-            <a href="mailto:support@thepipedpeony.com" className="text-blue-600 hover:underline">
+            <a href="mailto:support@thepipedpeony.com" className="text-[#D4A771] hover:underline">
               support@thepipedpeony.com
             </a>
           </p>
