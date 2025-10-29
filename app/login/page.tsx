@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useSignIn } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
+import { PasswordResetNotification } from "@/components/password-reset-notification";
 
 function LoginContent() {
   const [email, setEmail] = useState("");
@@ -17,11 +18,54 @@ function LoginContent() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPasswordResetModal, setShowPasswordResetModal] = useState(false);
+  const [hasCheckedEmail, setHasCheckedEmail] = useState(false);
   
   const { signIn, isLoaded, setActive } = useSignIn();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get('redirect_url') || '/video-library';
+
+  // Check if user is a migrated WordPress user when email is entered
+  const checkUserMigrationStatus = async (emailToCheck: string) => {
+    if (!emailToCheck || hasCheckedEmail || !emailToCheck.includes('@')) {
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/check-user-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: emailToCheck }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Show modal if user exists and is migrated from WordPress
+        if (data.exists && data.migratedFromWordPress) {
+          setShowPasswordResetModal(true);
+          setHasCheckedEmail(true);
+        }
+      }
+    } catch (error) {
+      console.error('Error checking migration status:', error);
+      // Silently fail - don't block login
+    }
+  };
+
+  // Debounced email check when user stops typing
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (email && email.includes('@') && !hasCheckedEmail) {
+        checkUserMigrationStatus(email);
+      }
+    }, 800);
+
+    return () => clearTimeout(timeoutId);
+  }, [email]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +118,13 @@ function LoginContent() {
     >
       <div className="login-background-left"></div>
       <div className="login-background-right"></div>
+
+      {/* Password Reset Notification Modal */}
+      <PasswordResetNotification
+        open={showPasswordResetModal}
+        onClose={() => setShowPasswordResetModal(false)}
+        userEmail={email}
+      />
       
       <div className="login-container">
         <form onSubmit={handleSubmit} className="login-form">
@@ -83,7 +134,7 @@ function LoginContent() {
             </label>
             <Input
               id="email"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="login-input"

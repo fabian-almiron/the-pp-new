@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Webhook } from 'svix';
+import { clerkClient } from '@clerk/nextjs/server';
 
 const webhookSecret = process.env.CLERK_WEBHOOK_SECRET!;
 const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
   }
 
   const eventType = evt.type;
-  const { id, email_addresses, first_name, last_name, username } = evt.data;
+  const { id, email_addresses, first_name, last_name, username, public_metadata, password_enabled } = evt.data;
 
   console.log(`📨 Event type: ${eventType}`);
   
@@ -50,6 +51,12 @@ export async function POST(request: NextRequest) {
       case 'user.updated':
         console.log('🔄 Updating user in Strapi...');
         await handleUserUpdated(id, email_addresses, first_name, last_name, username);
+        
+        // Check if password was changed for migrated WordPress users
+        if (public_metadata?.migratedFromWordPress && password_enabled) {
+          console.log('🔐 Password reset detected for migrated user, removing migration flag...');
+          await handlePasswordReset(id);
+        }
         break;
       
       case 'user.deleted':
@@ -243,4 +250,65 @@ async function handleUserDeleted(clerkId: string) {
   });
 
   console.log('✅ Blocked Strapi user:', strapiUser.id);
+}
+
+/**
+ * Handle password reset for migrated WordPress users
+ * Removes the migratedFromWordPress flag from publicMetadata
+ */
+async function handlePasswordReset(clerkId: string) {
+  try {
+    const user = await clerkClient.users.getUser(clerkId);
+    
+    if (!user) {
+      console.error('❌ User not found:', clerkId);
+      return;
+    }
+
+    const publicMetadata = user.publicMetadata || {};
+    
+    // Remove the migration flag
+    const updatedMetadata = { ...publicMetadata };
+    delete updatedMetadata.migratedFromWordPress;
+    
+    // Update user metadata in Clerk
+    await clerkClient.users.updateUser(clerkId, {
+      publicMetadata: updatedMetadata,
+    });
+
+    console.log('✅ Removed migratedFromWordPress flag for user:', clerkId);
+  } catch (error) {
+    console.error('❌ Error removing migration flag:', error);
+  }
+}
+
+/**
+ * Map WordPress role to Clerk role
+ * Based on WordPress role mapping defined in Migration_Plan.plan
+ */
+function mapWordPressRole(wpRole: string): {
+  role: 'customer' | 'subscriber';
+  subscriptionTier?: string;
+  accountStatus?: string;
+} {
+  switch (wpRole.toLowerCase()) {
+    case 'subscriber':
+      return { role: 'subscriber', subscriptionTier: 'basic' };
+    
+    case 'wpfs_bronze':
+      return { role: 'subscriber', subscriptionTier: 'bronze' };
+    
+    case 'wpfs_gold':
+      return { role: 'subscriber', subscriptionTier: 'gold' };
+    
+    case 'pending':
+      return { role: 'customer', accountStatus: 'pending' };
+    
+    case 'wpfs_no_access':
+      return { role: 'customer', accountStatus: 'blocked' };
+    
+    case 'customer':
+    default:
+      return { role: 'customer' };
+  }
 }

@@ -1,0 +1,107 @@
+# Clerk Password Reset & User Migration Plan
+
+## Implementation Details
+
+### 1. Password Reset Notification Modal
+
+Create a modal that appears when a migrated WordPress user attempts to login.
+
+**Files to Create/Modify:**
+
+- `app/api/check-user-email/route.ts` - API endpoint to check user metadata
+- `components/password-reset-notification.tsx` - Modal component
+- `app/login/page.tsx` - Integrate metadata check and modal
+
+**Modal Behavior:**
+
+- Checks if user has `publicMetadata.migratedFromWordPress === true` when email is entered
+- Shows modal ONLY if migrated flag is true (no localStorage needed)
+- Modal includes friendly message about password reset requirement
+- "Got It" button dismisses modal and allows login attempt
+- "Reset Password Now" link triggers Clerk password reset flow
+- Uses Dialog UI component with login page styling
+
+**Metadata Flag Lifecycle:**
+
+1. User imported from WordPress → set `publicMetadata.migratedFromWordPress = true`
+2. Modal shows on first login attempt
+3. User resets password → Clerk webhook detects password change
+4. Webhook removes `migratedFromWordPress` flag from publicMetadata
+5. Future logins → no modal shown (flag is gone)
+
+**Styling:**
+
+- Match login container styling (#FBF9F6 background)
+- Use sofia-pro font family
+- Apply #D4A771 accent colors for CTA button
+- Border-radius: 8px
+- Same shadow as login form
+
+### 2. WordPress Role to Clerk Role Mapping
+
+Current Clerk roles: `customer` (free tier) and `subscriber` (premium tier)
+
+**WordPress → Clerk Role Mapping:**
+
+| WordPress Role | Clerk Role | Additional Metadata | Notes |
+|---------------|-----------|-------------------|-------|
+| `customer` | `customer` | None | Direct match - free tier |
+| `pending` | `customer` | `publicMetadata.accountStatus = "pending"` | Incomplete registration/payment |
+| `wpfs_no_access` | `customer` | `publicMetadata.accountStatus = "blocked"` | Suspended/blocked user |
+| `subscriber` | `subscriber` | `publicMetadata.subscriptionTier = "basic"` | Basic subscription |
+| `wpfs_bronze` | `subscriber` | `publicMetadata.subscriptionTier = "bronze"` | Bronze tier subscription |
+| `wpfs_gold` | `subscriber` | `publicMetadata.subscriptionTier = "gold"` | Gold tier subscription |
+
+**Migration Logic:**
+- All `subscriber`, `wpfs_bronze`, and `wpfs_gold` → Clerk `subscriber` role
+- Preserve original tier in `publicMetadata.subscriptionTier` for display/billing purposes
+- Store original WP role in `publicMetadata.originalWordPressRole` for reference
+- For `pending` and `wpfs_no_access` users, set appropriate `accountStatus` flag
+
+### 3. WordPress Field Mapping
+
+**Already Implemented:**
+
+- `user_email` → Clerk email
+- `first_name` → Clerk firstName
+- `last_name` → Clerk lastName
+- `user_registered` → Clerk createdAt
+- `role` → Clerk publicMetadata.role
+
+**High Priority to Add:**
+
+- `role` → `publicMetadata.originalWordPressRole` (preserve original)
+- `role` → `publicMetadata.subscriptionTier` (if wpfs_bronze/gold)
+- `role` → `publicMetadata.accountStatus` (if pending/wpfs_no_access)
+- `yuvqa__stripe_customer_id` → `privateMetadata.stripeCustomerId`
+- `_active_stripe_subscription_id` → `privateMetadata.activeSubscriptionId`
+- `paying_customer` → `publicMetadata.isPayingCustomer`
+- `billing_*` fields → `privateMetadata.billingInfo` object
+- `shipping_*` fields → `privateMetadata.shippingInfo` object
+
+**Medium Priority:**
+
+- `saved_courses` → publicMetadata.savedCourses
+- `wc_last_active` → publicMetadata.lastActive
+
+### 4. Webhook Enhancement
+
+Update `app/api/clerk-webhook/route.ts` to:
+
+- Listen for `user.updated` events
+- Detect password changes by comparing `passwordUpdatedAt` timestamps
+- Automatically remove `migratedFromWordPress` flag when password is reset
+- Handle WordPress role mapping during user import (apply mapping logic from section 2)
+- Set appropriate `subscriptionTier` based on original WP role
+- Handle `accountStatus` flags for pending/blocked users
+- Store additional WordPress metadata fields during import
+
+### 5. Documentation
+
+- Create `WORDPRESS_MIGRATION_FIELDS.md` with:
+- Complete WordPress → Clerk role mapping table
+- Field-by-field mapping for all priority fields
+- Subscription tier preservation strategy
+- Migration flag lifecycle (create → reset → remove)
+- Add user import guide for administrators with role mapping examples
+- Document how to handle blocked/pending users during migration

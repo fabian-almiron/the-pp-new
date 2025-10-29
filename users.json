@@ -1,0 +1,120 @@
+[
+  {
+    "userId": "554871",
+    "email": "fake@email.com",
+    "username": "jtest",
+    "password": "$P$6aS8Jk83rCkWGGwHrTUIqiHWx",
+    "passwordHasher": "phpass",
+    "firstName": "PHPASS",
+    "lastName": "TEST",
+    "publicMetadata": {
+      "role": "subscriber",
+      "migratedFromWordPress": true,
+      "originalWordPressRole": "subscriber",
+      "subscriptionTier": "basic",
+      "wpUserId": "554871",
+      "migrationDate": "2025-10-29"
+    },
+    "privateMetadata": {
+      "stripeCustomerId": "",
+      "activeSubscriptionId": ""
+    }
+  },
+  {
+    "userId": "554872",
+    "email": "goldmember@example.com",
+    "username": "golduser",
+    "password": "$P$BanotherHashExample123",
+    "passwordHasher": "phpass",
+    "firstName": "Gold",
+    "lastName": "Member",
+    "publicMetadata": {
+      "role": "subscriber",
+      "migratedFromWordPress": true,
+      "originalWordPressRole": "wpfs_gold",
+      "subscriptionTier": "gold",
+      "isPayingCustomer": true,
+      "wpUserId": "554872",
+      "migrationDate": "2025-10-29"
+    },
+    "privateMetadata": {
+      "stripeCustomerId": "cus_example123",
+      "activeSubscriptionId": "sub_example456"
+    }
+  },
+  {
+    "userId": "554873",
+    "email": "pending@example.com",
+    "username": "pendinguser",
+    "password": "$P$BpendingUserHash789",
+    "passwordHasher": "phpass",
+    "firstName": "Pending",
+    "lastName": "User",
+    "publicMetadata": {
+      "role": "customer",
+      "migratedFromWordPress": true,
+      "originalWordPressRole": "pending",
+      "accountStatus": "pending",
+      "wpUserId": "554873",
+      "migrationDate": "2025-10-29"
+    },
+    "privateMetadata": {}
+  },
+  {
+    "userId": "554874",
+    "email": "blocked@example.com",
+    "username": "blockeduser",
+    "password": "$P$BblockedUserHash321",
+    "passwordHasher": "phpass",
+    "firstName": "Blocked",
+    "lastName": "Access",
+    "publicMetadata": {
+      "role": "customer",
+      "migratedFromWordPress": true,
+      "originalWordPressRole": "wpfs_no_access",
+      "accountStatus": "blocked",
+      "wpUserId": "554874",
+      "migrationDate": "2025-10-29"
+    },
+    "privateMetadata": {}
+  },
+  {
+    "userId": "554875",
+    "email": "bronze@example.com",
+    "username": "bronzeuser",
+    "password": "$P$BbronzeUserHash654",
+    "passwordHasher": "phpass",
+    "firstName": "Bronze",
+    "lastName": "Member",
+    "publicMetadata": {
+      "role": "subscriber",
+      "migratedFromWordPress": true,
+      "originalWordPressRole": "wpfs_bronze",
+      "subscriptionTier": "bronze",
+      "isPayingCustomer": true,
+      "wpUserId": "554875",
+      "migrationDate": "2025-10-29"
+    },
+    "privateMetadata": {
+      "stripeCustomerId": "cus_bronze123",
+      "activeSubscriptionId": "sub_bronze456"
+    }
+  },
+  {
+    "userId": "554876",
+    "email": "customer@example.com",
+    "username": "regularuser",
+    "password": "$P$BregularUserHash987",
+    "passwordHasher": "phpass",
+    "firstName": "Regular",
+    "lastName": "Customer",
+    "publicMetadata": {
+      "role": "customer",
+      "migratedFromWordPress": true,
+      "originalWordPressRole": "customer",
+      "wpUserId": "554876",
+      "migrationDate": "2025-10-29"
+    },
+    "privateMetadata": {}
+  }
+]

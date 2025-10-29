@@ -47,7 +47,7 @@ const CUSTOMER_PERMISSIONS = [
 ] as const;
 
 // Define role-based permissions mapping (2025 best practice)
-export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
+export const ROLE_PERMISSIONS: Record<UserRole, readonly string[]> = {
   customer: CUSTOMER_PERMISSIONS,
   subscriber: [
     // Inherits all customer permissions
@@ -110,7 +110,7 @@ export function hasExactRole(user: User | null, requiredRole: UserRole): boolean
 /**
  * Get all permissions for a user's role
  */
-export function getUserPermissions(user: User | null): string[] {
+export function getUserPermissions(user: User | null): readonly string[] {
   const role = getUserRole(user);
   return ROLE_PERMISSIONS[role];
 }
