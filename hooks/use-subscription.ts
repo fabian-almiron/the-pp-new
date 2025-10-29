@@ -60,7 +60,7 @@ export function useSubscription() {
     fetchAvailableSubscriptions();
   }, []);
 
-  // Fetch user subscription status
+  // Fetch user subscription status from Clerk metadata
   useEffect(() => {
     const fetchSubscriptionStatus = async () => {
       if (!isLoaded || !user) {
@@ -69,24 +69,23 @@ export function useSubscription() {
       }
 
       try {
-        const response = await fetch('/api/subscription-status');
+        // Check Clerk public metadata for subscription status
+        const clerkRole = user.publicMetadata?.role as string || 'Customer';
+        const hasActiveSubscription = clerkRole === 'Subscriber';
         
-        if (response.ok) {
-          const data = await response.json();
-          setSubscriptionStatus(data);
-        } else if (response.status === 401) {
-          // User not authenticated
-          setSubscriptionStatus({
-            hasActiveSubscription: false,
-            subscriptions: [],
-            userRole: 'Customer'
-          });
-        } else {
-          setError('Failed to fetch subscription status');
-        }
+        setSubscriptionStatus({
+          hasActiveSubscription,
+          subscriptions: [],
+          userRole: clerkRole
+        });
       } catch (err) {
-        console.error('Error fetching subscription status:', err);
-        setError('Failed to fetch subscription status');
+        console.error('Error checking subscription status:', err);
+        // Default to Customer role if error
+        setSubscriptionStatus({
+          hasActiveSubscription: false,
+          subscriptions: [],
+          userRole: 'Customer'
+        });
       } finally {
         setLoading(false);
       }
@@ -126,11 +125,17 @@ export function useSubscription() {
 
     setLoading(true);
     try {
-      const response = await fetch('/api/subscription-status');
-      if (response.ok) {
-        const data = await response.json();
-        setSubscriptionStatus(data);
-      }
+      // Force reload user data from Clerk to get latest metadata
+      await user.reload();
+      
+      const clerkRole = user.publicMetadata?.role as string || 'Customer';
+      const hasActiveSubscription = clerkRole === 'Subscriber';
+      
+      setSubscriptionStatus({
+        hasActiveSubscription,
+        subscriptions: [],
+        userRole: clerkRole
+      });
     } catch (err) {
       console.error('Error refreshing subscription status:', err);
     } finally {
