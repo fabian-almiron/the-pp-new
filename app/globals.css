@@ -2453,17 +2453,488 @@ html {
   font-size: 0.875rem;
   color: #666;
   text-decoration: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
   transition: color 0.2s ease;
 }
 
 .login-forgot-password:hover,
 .login-back-home:hover {
-  color: #4285f4;
+  color: #D4A771;
 }
 
 .login-back-home {
   color: #999;
   font-size: 0.8rem;
+}
+
+/* Migration Notice Banner */
+.migration-notice {
+  background-color: #f6f5f3;
+  border: 2px solid #d4c5b9;
+  border-radius: 4px;
+  padding: 1.75rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.migration-notice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.migration-notice-header h3 {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0;
+  padding-right: 1rem;
+  color: #000000;
+}
+
+.migration-notice-close {
+  background: transparent;
+  border: none;
+  color: #515151;
+  font-size: 1.5rem;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.migration-notice-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+.migration-notice-text {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 1.25rem 0;
+  color: #515151;
+}
+
+.migration-notice-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.migration-notice-link {
+  background: transparent;
+  color: #000000;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-decoration: none;
+  border: 2px solid #d4c5b9;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.migration-notice-link:hover {
+  border-color: #D4A771;
+  color: #D4A771;
+}
+
+.migration-notice-divider {
+  color: #515151;
+  font-size: 0.9rem;
+  font-family: "sofia-pro", sans-serif;
+}
+
+/* Site-Wide Migration Banner (optional - for homepage/all pages) */
+.migration-site-banner {
+  background-color: #f6f5f3;
+  border-bottom: 2px solid #d4c5b9;
+  padding: 0.875rem 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.migration-site-banner-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.migration-site-banner-text {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  color: #515151;
+}
+
+.migration-site-banner-text strong {
+  font-weight: 600;
+  color: #000000;
+}
+
+.migration-site-banner-link {
+  color: #000000;
+  text-decoration: underline;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.migration-site-banner-link:hover {
+  color: #D4A771;
+}
+
+.migration-site-banner-close {
+  background: transparent;
+  border: none;
+  color: #515151;
+  padding: 0.25rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.migration-site-banner-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+/* Password Reset Modal */
+.password-reset-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.password-reset-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 101;
+  width: 90%;
+  max-width: 500px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.password-reset-modal-content {
+  background-color: white;
+  border: 2px solid #d4c5b9;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.password-reset-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem 1.5rem;
+  border-bottom: 1px solid #f6f5f3;
+}
+
+.password-reset-title {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0;
+}
+
+.password-reset-close {
+  background: transparent;
+  border: none;
+  color: #515151;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.password-reset-close:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000000;
+}
+
+.password-reset-body {
+  padding: 1.5rem;
+}
+
+.password-reset-description {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.95rem;
+  color: #515151;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.password-reset-form-group {
+  margin-bottom: 1.25rem;
+}
+
+.password-reset-label {
+  display: block;
+  font-family: "sofia-pro", sans-serif;
+  font-weight: 400;
+  font-size: 0.875rem;
+  color: #000000;
+  margin-bottom: 0.5rem;
+}
+
+.password-reset-input {
+  width: 100%;
+  padding: 0.625rem;
+  border: 2px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  font-family: "sofia-pro", sans-serif;
+  transition: border-color 0.2s;
+}
+
+.password-reset-input:focus {
+  outline: none;
+  border-color: #d4c5b9;
+}
+
+.password-reset-input:disabled {
+  background-color: #f6f5f3;
+  cursor: not-allowed;
+}
+
+.password-reset-error {
+  background-color: #fee;
+  border: 1px solid #fcc;
+  color: #c33;
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  font-family: "sofia-pro", sans-serif;
+}
+
+.password-reset-actions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.password-reset-submit {
+  flex: 1;
+  height: 2.75rem;
+  font-family: "sofia-pro", sans-serif;
+  font-size: 1rem;
+}
+
+.password-reset-cancel {
+  background: transparent;
+  color: #515151;
+  border: none;
+  padding: 0 1rem;
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.password-reset-cancel:hover {
+  color: #000000;
+}
+
+.password-reset-cancel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Success State */
+.password-reset-success {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.password-reset-success-icon {
+  width: 60px;
+  height: 60px;
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0 auto 1rem;
+  border: 2px solid #4caf50;
+}
+
+.password-reset-success-title {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #000000;
+  margin-bottom: 0.75rem;
+}
+
+.password-reset-success-text {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.95rem;
+  color: #515151;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.password-reset-success-text strong {
+  color: #000000;
+}
+
+.password-reset-success-note {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.85rem;
+  color: #999;
+  font-style: italic;
+}
+
+/* Code input specific styling */
+.password-reset-code-input {
+  text-align: center;
+  font-size: 1.5rem;
+  letter-spacing: 0.5rem;
+  font-weight: 600;
+  font-family: monospace;
+}
+
+/* Resend code button */
+.password-reset-resend {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.password-reset-resend-button {
+  background: transparent;
+  border: none;
+  color: #515151;
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.875rem;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.password-reset-resend-button:hover {
+  color: #D4A771;
+}
+
+.password-reset-resend-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Password hint */
+.password-reset-hint {
+  display: block;
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.8rem;
+  color: #999;
+  margin-top: 0.25rem;
+}
+
+/* Migration notice inside modal */
+.password-reset-migration-notice {
+  background-color: #f6f5f3;
+  border: 2px solid #d4c5b9;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.password-reset-migration-title {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #000000;
+  margin: 0 0 0.5rem 0;
+}
+
+.password-reset-migration-text {
+  font-family: "sofia-pro", sans-serif;
+  font-size: 0.875rem;
+  color: #515151;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .password-reset-modal {
+    width: 95%;
+    max-width: none;
+  }
+
+  .password-reset-header {
+    padding: 1.25rem 1.25rem 0.75rem 1.25rem;
+  }
+
+  .password-reset-title {
+    font-size: 1.25rem;
+  }
+
+  .password-reset-body {
+    padding: 1.25rem;
+  }
+
+  .password-reset-actions {
+    flex-direction: column;
+  }
+
+  .password-reset-cancel {
+    order: 2;
+    padding: 0.75rem;
+  }
 }
 
 /* Mobile responsiveness */
@@ -2472,7 +2943,7 @@ html {
     margin: 1rem;
     padding: 2rem 1.5rem;
   }
-  
+
   .login-background-left,
   .login-background-right {
     width: 100px;
@@ -2486,6 +2957,40 @@ html {
     flex-direction: column;
     gap: 1rem;
     text-align: center;
+  }
+
+  .migration-notice {
+    padding: 1rem;
+  }
+
+  .migration-notice-header h3 {
+    font-size: 1rem;
+  }
+
+  .migration-notice-text {
+    font-size: 0.875rem;
+  }
+
+  .migration-notice-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .migration-notice-link {
+    text-align: center;
+    width: 100%;
+  }
+
+  .migration-notice-divider {
+    text-align: center;
+  }
+
+  .migration-site-banner {
+    padding: 0.5rem;
+  }
+  
+  .migration-site-banner-text {
+    font-size: 0.85rem;
   }
 }
 

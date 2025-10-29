@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useSignIn } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
+import PasswordResetModal from "@/components/password-reset-modal";
 
 function LoginContent() {
   const [email, setEmail] = useState("");
@@ -17,6 +18,10 @@ function LoginContent() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showMigrationNotice, setShowMigrationNotice] = useState(true);
+  const [showResetModal, setShowResetModal] = useState(false);
+  const [resetModalEmail, setResetModalEmail] = useState("");
+  const [showResetMigrationMessage, setShowResetMigrationMessage] = useState(false);
   
   const { signIn, isLoaded, setActive } = useSignIn();
   const router = useRouter();
@@ -47,7 +52,31 @@ function LoginContent() {
         setError("Unable to complete sign in. Please try again.");
       }
     } catch (err: any) {
-      setError(err?.errors?.[0]?.message || "Invalid email or password. Please try again.");
+      const errorMessage = err?.errors?.[0]?.message || "";
+      const errorCode = err?.errors?.[0]?.code || "";
+      
+      // Check if user exists but has no password (migrated user scenario)
+      if (errorCode === 'form_password_incorrect' || 
+          errorMessage.toLowerCase().includes('password is incorrect') ||
+          errorMessage.toLowerCase().includes('no password') ||
+          errorMessage.toLowerCase().includes('password not set')) {
+        
+        // Automatically open the password reset modal for migrated users
+        setResetModalEmail(email);
+        setShowResetMigrationMessage(true);
+        setShowResetModal(true);
+        setError(
+          "It looks like you need to set up a password for our new system. We've opened the password reset form for you."
+        );
+      } else if (errorMessage.toLowerCase().includes('password') || 
+          errorMessage.toLowerCase().includes('credentials') ||
+          errorMessage.toLowerCase().includes('invalid')) {
+        setError(
+          "Unable to sign in. If you had an account before our recent upgrade, please reset your password or use social login."
+        );
+      } else {
+        setError(errorMessage || "Invalid email or password. Please try again.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -76,6 +105,54 @@ function LoginContent() {
       <div className="login-background-right"></div>
       
       <div className="login-container">
+        {/* Migration Notice Banner */}
+        {showMigrationNotice && (
+          <div className="migration-notice">
+            <div className="migration-notice-header">
+              <h3>Welcome to Our Improved Login System</h3>
+              <button 
+                onClick={() => setShowMigrationNotice(false)}
+                className="migration-notice-close"
+                aria-label="Close notice"
+              >
+                ×
+              </button>
+            </div>
+            <p className="migration-notice-text">
+              We've upgraded to a more secure authentication system. If you had an account with us before, 
+              you'll need to reset your password or use one of our convenient social login options below.
+            </p>
+            <div className="migration-notice-actions">
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowMigrationNotice(false);
+                  setResetModalEmail("");
+                  setShowResetMigrationMessage(false);
+                  setShowResetModal(true);
+                }}
+                className="migration-notice-link"
+              >
+                Reset Password
+              </button>
+              <span className="migration-notice-divider">or</span>
+              <button 
+                type="button"
+                onClick={() => {
+                  setShowMigrationNotice(false);
+                  // Scroll to OAuth buttons
+                  setTimeout(() => {
+                    document.querySelector('.oauth-buttons')?.scrollIntoView({ behavior: 'smooth' });
+                  }, 100);
+                }}
+                className="migration-notice-link"
+              >
+                Use Social Login
+              </button>
+            </div>
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="login-form">
           <div className="login-form-group">
             <label htmlFor="email" className="login-label">
@@ -156,7 +233,7 @@ function LoginContent() {
         </div>
 
         {/* OAuth Buttons */}
-        <div className="space-y-3 mb-6">
+        <div className="oauth-buttons space-y-3 mb-6">
           <button
             type="button"
             onClick={() => handleOAuthSignIn('oauth_google')}
@@ -198,6 +275,17 @@ function LoginContent() {
         </div>
 
         <div className="login-footer">
+          <button 
+            type="button"
+            onClick={() => {
+              setResetModalEmail("");
+              setShowResetMigrationMessage(false);
+              setShowResetModal(true);
+            }}
+            className="login-forgot-password"
+          >
+            Forgot your password?
+          </button>
           <Link href="/signup" className="login-forgot-password">
             Don't have an account? Sign up
           </Link>
@@ -206,6 +294,18 @@ function LoginContent() {
           </Link>
         </div>
       </div>
+      
+      {/* Password Reset Modal */}
+      <PasswordResetModal 
+        isOpen={showResetModal}
+        onClose={() => {
+          setShowResetModal(false);
+          setResetModalEmail("");
+          setShowResetMigrationMessage(false);
+        }}
+        prefilledEmail={resetModalEmail}
+        showMigrationMessage={showResetMigrationMessage}
+      />
     </div>
   );
 }
