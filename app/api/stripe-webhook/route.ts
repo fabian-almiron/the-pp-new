@@ -65,6 +65,10 @@ export async function POST(request: NextRequest) {
         await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice);
         break;
       
+      case 'invoice.created':
+        await handleInvoiceCreated(event.data.object as Stripe.Invoice);
+        break;
+      
       case 'payment_intent.succeeded':
         console.log('💰 Payment intent succeeded:', (event.data.object as Stripe.PaymentIntent).id);
         break;
@@ -307,6 +311,27 @@ async function updateClerkUserRole(clerkUserId: string, role: 'customer' | 'subs
 // ============================================
 // PRODUCT PURCHASE HANDLERS
 // ============================================
+
+async function handleInvoiceCreated(invoice: Stripe.Invoice) {
+  try {
+    // Only handle invoices from checkout sessions (not subscription invoices)
+    if (invoice.billing_reason === 'manual') {
+      console.log('📧 Finalizing and sending invoice:', invoice.id);
+      
+      // Finalize the invoice (makes it ready to send)
+      if (invoice.status === 'draft') {
+        await stripe.invoices.finalizeInvoice(invoice.id);
+      }
+      
+      // Send the invoice email to the customer
+      await stripe.invoices.sendInvoice(invoice.id);
+      
+      console.log('✅ Invoice sent successfully to:', invoice.customer_email);
+    }
+  } catch (error) {
+    console.error('❌ Error sending invoice:', error);
+  }
+}
 
 async function handleProductPurchase(session: Stripe.Checkout.Session) {
   console.log('🛒 Processing product purchase');
