@@ -41,13 +41,13 @@ function LoggedOutHeader() {
       <div className="header-container">
         <Link href="/" className="header-logo">
           <div className="relative">
-            {/* Mobile logo - smaller size */}
+            {/* Mobile logo - HD version */}
             <Image
-              src="/piped-peony-logo-1536x339.png"
+              src="/piped-peony-logo-2048x452.png"
               alt="The Piped Peony"
-              width={120}
-              height={40}
-              className="h-10 w-auto md:hidden"
+              width={160}
+              height={35}
+              className="h-12 w-auto md:hidden"
               priority
             />
             {/* Desktop logo - larger size */}
@@ -106,8 +106,8 @@ function LoggedOutHeader() {
         <div className="header-mobile-menu">
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
-              <Button variant="clean" size="icon">
-                <Menu className="h-6 w-6 text-gray-700" />
+              <Button variant="clean" size="icon" className="!border-0 hover:bg-transparent">
+                <Menu className="text-gray-700" style={{ width: '1.5rem', height: '1.5rem' }} />
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>

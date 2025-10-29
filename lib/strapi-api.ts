@@ -893,6 +893,17 @@ export async function fetchCourseSeries(): Promise<MockDatabaseResponse<string[]
   }
 }
 
+// Category interface
+export interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  image?: {
+    url: string;
+    alternativeText?: string;
+  };
+}
+
 // Get all unique categories
 export async function fetchCourseCategories(): Promise<MockDatabaseResponse<string[]>> {
   try {
@@ -909,6 +920,33 @@ export async function fetchCourseCategories(): Promise<MockDatabaseResponse<stri
     return {
       data: null,
       error: 'Failed to fetch course categories'
+    };
+  }
+}
+
+// Get all categories with full details
+export async function fetchAllCategories(): Promise<MockDatabaseResponse<Category[]>> {
+  try {
+    const response = await fetchFromStrapi('/categories?populate=*&sort=name:asc');
+    
+    const categories = response.data.map((cat: any) => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      image: cat.image ? {
+        url: cat.image.url,
+        alternativeText: cat.image.alternativeText
+      } : undefined
+    }));
+    
+    return {
+      data: categories,
+      error: null
+    };
+  } catch (error) {
+    return {
+      data: null,
+      error: 'Failed to fetch categories'
     };
   }
 }

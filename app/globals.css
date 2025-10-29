@@ -3102,7 +3102,13 @@ html {
 }
 
 section.featuredvl-section {
-  margin-top: -179px;
+  margin-top: 0;
+}
+
+@media (min-width: 768px) {
+  section.featuredvl-section {
+    margin-top: -179px;
+  }
 }
 
 @media (min-width: 768px) {
@@ -3339,7 +3345,7 @@ section.featuredvl-section {
 .flower-item-wrapper {
   background-color: #ffffff;
   border: 1px solid #000000;
-  border-radius: 0;
+  border-radius: 0.75rem;
   overflow: hidden;
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
@@ -3350,6 +3356,7 @@ section.featuredvl-section {
   aspect-ratio: 1 / 1;
   overflow: hidden;
   padding: 8px; /* space between image and outer card border */
+  border-radius: 0.5rem;
   background: #ffffff;
   box-sizing: border-box;
 }
@@ -3358,6 +3365,7 @@ section.featuredvl-section {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  border-radius: 0.5rem;
 }
 
 .flower-item-content {
@@ -3422,11 +3430,6 @@ section.featuredvl-section {
 /* Rectangular side nav buttons */
 .flower-nav-btn {
   position: absolute;
-  height: 48px;
-  width: 36px;
-  background-color: #374151; /* gray-700 */
-  color: white;
-  border-radius: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;

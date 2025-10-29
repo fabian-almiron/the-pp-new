@@ -27,17 +27,17 @@ export default async function HomePage() {
 
 function HeroSection() {
   return (
-    <section className="hero-section">
-      <div className="container">
+    <section className="hero-section !pt-4 md:!pt-8 lg:!pt-12">
+      <div className="container !px-4">
         <div className="hero-grid">
           <div className="hero-content">
-            <h1 className="hero-title">
+            <h1 className="hero-title !mb-4 md:!mb-6">
               The Piped Peony
             </h1>
-            <p className="hero-description">
+            <p className="hero-description !mb-6 md:!mb-12 !max-w-full md:!max-w-[75%]">
               The Piped Peony Academy is for everyone! We'll learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.
             </p>
-            <div className="hero-cta-wrapper">
+            <div className="hero-cta-wrapper !mb-8 md:!mb-0">
               <Link href="/signup">
                 <Button variant="cta">
                   Sign up for 7 free days
@@ -73,8 +73,8 @@ function FeaturesSection() {
   ];
 
   return (
-    <section className="features-section">
-      <div className="container">
+    <section className="features-section !py-8 md:!py-16">
+      <div className="container !px-4">
         <div className="features-grid">
           {features.map((feature) => (
             <div key={feature.title} className="feature-item">
@@ -90,8 +90,8 @@ function FeaturesSection() {
 
 function AboutSection() {
   return (
-    <section className="about-section">
-      <div className="container">
+    <section className="about-section !py-8 md:!py-16">
+      <div className="container !px-4">
         {/* Mobile: Centered content without line */}
         <div className="about-content-mobile">
           <h2 className="about-signature">Nice to meet you!</h2>
@@ -157,14 +157,14 @@ function getVimeoThumbnail(videoId: string, size: 'small' | 'medium' | 'large' =
 
 function LatestVideosSection({ courses }: { courses: any[] }) {
   return (
-    <section className="latest-videos-section">
-      <div className="container latest-videos-content">
+    <section className="latest-videos-section !py-8 md:!py-16">
+      <div className="container latest-videos-content !px-4">
         <h2 className="latest-videos-title">Our Latest Videos</h2>
       </div>
       <div className="latest-videos-divider">
         <div className="latest-videos-divider-line"></div>
       </div>
-      <div className="container latest-videos-content">
+      <div className="container latest-videos-content !px-4">
         <p className="latest-videos-description">Check out our most recent videos for our academy members!</p>
         <div className="latest-videos-grid">
           {courses.map((course) => (
@@ -212,8 +212,8 @@ function LatestVideosSection({ courses }: { courses: any[] }) {
 
 function FaqSection() {
   return (
-    <section className="faq-section">
-      <div className="container">
+    <section className="faq-section !py-8 md:!py-16">
+      <div className="container !px-4">
         <div className="faq-grid">
           <div className="faq-header">
             <h3 className="faq-signature">FAQs</h3>
@@ -237,7 +237,7 @@ function FaqSection() {
 
 function CtaSection() {
   return (
-    <section className="cta-section">
+    <section className="cta-section !py-12 md:!py-20">
       <Image
         src="/peak-though.jpeg"
         alt="Background of buttercream flowers"

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FlowerPipingCarousel } from "@/components/flower-piping-carousel";
-import { fetchCourses } from "@/lib/strapi-api";
+import { fetchCourses, fetchAllCategories } from "@/lib/strapi-api";
 import { NewestVideosCarousel } from "./newest-videos-carousel";
 
 export default async function VideoLibraryPage() {
@@ -15,13 +15,17 @@ export default async function VideoLibraryPage() {
   
   const courses = coursesResponse.data || [];
 
+  // Fetch all categories
+  const categoriesResponse = await fetchAllCategories();
+  const categories = categoriesResponse.data || [];
+
   return (
     <>
       <VideoLibraryHero />
       <DifficultyLevels />
       <NewestVideosCarousel courses={courses} />
       <VideoSeriesSection />
-      <FlowerPipingCarousel />
+      <FlowerPipingCarousel categories={categories} />
       <BusinessSeriesSection />
     </>
   );
@@ -76,11 +80,11 @@ function DifficultyLevels() {
           <Link 
             key={index}
             href={`/level/${level.slug}`}
-            className="group relative"
+            className="group block"
           >
-            <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-full flex flex-col">
+            <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-full flex flex-col group-hover:border-[#D4A771]">
               {/* Level Image */}
-              <div className="relative h-64 bg-[#FBF9F6]">
+              <div className="relative h-64 bg-[#FBF9F6] overflow-hidden">
                 <Image
                   src={level.image}
                   alt={level.alt}
@@ -93,7 +97,7 @@ function DifficultyLevels() {
               </div>
 
               {/* Level Title */}
-              <div className="p-5 flex items-center justify-center">
+              <div className="p-6 flex items-center justify-center bg-white">
                 <h3 className="font-playfair text-2xl text-black group-hover:text-[#D4A771] transition-colors font-normal">
                   {level.title}
                 </h3>
@@ -111,14 +115,14 @@ function DifficultyLevels() {
 function VideoSeriesSection() {
   return (
     <section className="w-full py-12 md:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <h2 className="font-playfair text-4xl md:text-5xl text-black font-normal mb-8 text-center">
+      <div className="container mx-auto px-4">
+        <h2 className="font-playfair text-4xl md:text-5xl text-black font-normal mb-12 text-center">
           Video Series
         </h2>
-        <div className="flex justify-center items-center">
-          <div className="max-w-4xl w-full bg-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              <div className="p-8 md:p-12 flex flex-col justify-center order-1">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              <div className="p-8 md:p-12 flex flex-col justify-center order-2 md:order-1">
                 <h3 className="font-playfair text-3xl md:text-4xl text-black font-normal mb-2">
                   Coloring
                 </h3>
@@ -132,11 +136,13 @@ function VideoSeriesSection() {
                 </p>
                 <div className="mt-auto">
                   <Link href="/category/coloring-series">
-                    <Button variant="clean">View Series</Button>
+                    <Button variant="clean" className="border border-black bg-white hover:bg-[#D4A771] hover:border-[#D4A771] hover:text-white transition-all">
+                      View Series
+                    </Button>
                   </Link>
                 </div>
               </div>
-              <div className="relative overflow-hidden order-2">
+              <div className="relative overflow-hidden order-1 md:order-2">
                 <div className="relative w-full h-80 md:h-96">
                   <Image
                     src="/coloring-300x161.jpg"
@@ -150,8 +156,12 @@ function VideoSeriesSection() {
             </div>
           </div>
         </div>
-        <div className="flex justify-center items-center mt-8">
-          <Button variant="default">View All Series</Button>
+        <div className="flex justify-center items-center mt-12">
+          <Link href="/courses">
+            <Button variant="default" className="bg-[#D4A771] hover:bg-[#C69963] text-white">
+              View All Series
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
@@ -161,14 +171,14 @@ function VideoSeriesSection() {
 function BusinessSeriesSection() {
   return (
     <section className="w-full py-12 md:py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-4 md:px-6">
-        <h2 className="font-playfair text-4xl md:text-5xl text-black font-normal mb-8 text-center">
+      <div className="container mx-auto px-4">
+        <h2 className="font-playfair text-4xl md:text-5xl text-black font-normal mb-12 text-center">
           Business Series
         </h2>
-        <div className="flex justify-center items-center">
-          <div className="max-w-4xl w-full bg-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-              <div className="p-8 md:p-12 flex flex-col justify-center order-1">
+        <div className="max-w-5xl mx-auto">
+          <div className="bg-white rounded-xl shadow-md border border-gray-200 overflow-hidden">
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              <div className="p-8 md:p-12 flex flex-col justify-center order-2 md:order-1">
                 <h3 className="font-playfair text-3xl md:text-4xl text-black font-normal mb-4">
                   Business Series
                 </h3>
@@ -177,11 +187,13 @@ function BusinessSeriesSection() {
                 </p>
                 <div className="mt-auto">
                   <Link href="/category/business-series">
-                    <Button variant="default">View Series</Button>
+                    <Button variant="default" className="bg-[#D4A771] hover:bg-[#C69963] text-white">
+                      View Series
+                    </Button>
                   </Link>
                 </div>
               </div>
-              <div className="relative overflow-hidden order-2">
+              <div className="relative overflow-hidden order-1 md:order-2">
                 <div className="relative w-full h-80 md:h-96">
                   <Image
                     src="/academy-dara.png"
