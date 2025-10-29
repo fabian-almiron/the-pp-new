@@ -73,6 +73,9 @@ export async function POST(request: NextRequest) {
     
     for (const subscription of allActiveSubscriptions) {
       console.log('❌ Cancelling subscription:', subscription.id);
+      console.log('   Status:', subscription.status);
+      console.log('   Trial end:', subscription.trial_end);
+      console.log('   Current period end:', subscription.current_period_end);
       
       // Cancel at period end (user keeps access until end of billing period)
       const cancelledSubscription = await stripe.subscriptions.update(subscription.id, {
@@ -84,10 +87,21 @@ export async function POST(request: NextRequest) {
 
       console.log('✅ Subscription cancelled:', subscription.id);
       
+      // Determine the end date (trial end or period end)
+      let endDate: string;
+      if (cancelledSubscription.trial_end) {
+        endDate = new Date(cancelledSubscription.trial_end * 1000).toISOString();
+      } else if (cancelledSubscription.current_period_end) {
+        endDate = new Date(cancelledSubscription.current_period_end * 1000).toISOString();
+      } else {
+        endDate = 'Unknown';
+      }
+      
       cancelledSubscriptions.push({
         id: cancelledSubscription.id,
+        status: cancelledSubscription.status,
         cancelAtPeriodEnd: cancelledSubscription.cancel_at_period_end,
-        currentPeriodEnd: new Date(cancelledSubscription.current_period_end * 1000).toISOString(),
+        accessUntil: endDate,
       });
     }
 
