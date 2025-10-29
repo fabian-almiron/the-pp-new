@@ -87,22 +87,45 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) {
-  console.log('🔍 Checkout session metadata:', session.metadata);
+  console.log('🔍 Checkout session completed:');
+  console.log('  - Session ID:', session.id);
+  console.log('  - Mode:', session.mode);
+  console.log('  - Customer:', session.customer);
+  console.log('  - Subscription:', session.subscription);
+  console.log('  - Metadata:', JSON.stringify(session.metadata, null, 2));
   
   if (session.mode === 'subscription' && session.subscription) {
     const subscription = await stripe.subscriptions.retrieve(session.subscription as string);
     
-    // Update Clerk user role to Subscriber
+    console.log('📋 Subscription details:');
+    console.log('  - Subscription ID:', subscription.id);
+    console.log('  - Status:', subscription.status);
+    console.log('  - Metadata:', JSON.stringify(subscription.metadata, null, 2));
+    
+    // Update Clerk user role to Subscriber (works for both 'active' and 'trialing')
     const clerkUserId = session.metadata?.clerkUserId;
     console.log('👤 Clerk User ID from metadata:', clerkUserId);
     
     if (clerkUserId) {
       console.log('🔄 Updating user role to Subscriber in Clerk...');
-      await updateClerkUserRole(clerkUserId, 'Subscriber');
-      console.log('✅ Clerk user role update completed');
+      console.log('  - User ID:', clerkUserId);
+      console.log('  - New Role: Subscriber');
+      
+      try {
+        await updateClerkUserRole(clerkUserId, 'Subscriber');
+        console.log('✅ Clerk user role update completed successfully');
+      } catch (error) {
+        console.error('❌ Failed to update Clerk user role:', error);
+        throw error;
+      }
     } else {
       console.error('❌ No clerkUserId found in session metadata');
+      console.error('Available metadata keys:', Object.keys(session.metadata || {}));
     }
+  } else {
+    console.log('ℹ️  Skipping subscription update:');
+    console.log('  - Mode:', session.mode);
+    console.log('  - Has subscription:', !!session.subscription);
   }
 }
 
