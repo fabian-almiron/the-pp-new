@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
     if (customers.data.length === 0) {
       return NextResponse.json({ 
         message: 'No Stripe customer found',
-        currentRole: clerkUser.publicMetadata?.role || 'Customer'
+        currentRole: clerkUser.publicMetadata?.role || 'customer'
       });
     }
 
@@ -61,11 +61,11 @@ export async function POST(request: NextRequest) {
       ['active', 'trialing'].includes(sub.status)
     );
 
-    let newRole = 'Customer';
+    let newRole = 'customer';
     let subscriptionDetails = null;
 
     if (activeSubscription) {
-      newRole = 'Subscriber';
+      newRole = 'subscriber';
       subscriptionDetails = {
         id: activeSubscription.id,
         status: activeSubscription.status,
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      previousRole: clerkUser.publicMetadata?.role || 'Customer',
+      previousRole: clerkUser.publicMetadata?.role || 'customer',
       newRole,
       subscriptionDetails,
       allSubscriptions: subscriptions.data.map(sub => ({

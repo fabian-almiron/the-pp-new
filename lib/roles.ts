@@ -73,7 +73,7 @@ export function getUserRole(user: User | null): UserRole {
   
   // 2025 best practice: Use publicMetadata for role (non-sensitive)
   // privateMetadata should be used for sensitive role data only
-  const role = user.publicMetadata?.role as UserRole;
+  const role = (user.publicMetadata?.role as string)?.toLowerCase() as UserRole;
   
   // Validate role and default to customer
   if (role && (role === "customer" || role === "subscriber")) {

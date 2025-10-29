@@ -112,7 +112,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       console.log('  - New Role: Subscriber');
       
       try {
-        await updateClerkUserRole(clerkUserId, 'Subscriber');
+        await updateClerkUserRole(clerkUserId, 'subscriber');
         console.log('✅ Clerk user role update completed successfully');
       } catch (error) {
         console.error('❌ Failed to update Clerk user role:', error);
@@ -134,7 +134,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
   // Update Clerk role if needed
   const clerkUserId = subscription.metadata?.clerkUserId;
   if (clerkUserId && ['active', 'trialing'].includes(subscription.status)) {
-    await updateClerkUserRole(clerkUserId, 'Subscriber');
+    await updateClerkUserRole(clerkUserId, 'subscriber');
   }
 }
 
@@ -146,7 +146,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
   
   if (clerkUserId) {
     const isActive = ['active', 'trialing'].includes(subscription.status);
-    const role = isActive ? 'Subscriber' : 'Customer';
+    const role = isActive ? 'subscriber' : 'customer';
     await updateClerkUserRole(clerkUserId, role);
   }
 }
@@ -154,11 +154,11 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
   console.log('❌ Subscription deleted:', subscription.id);
   
-  // Downgrade Clerk user role to Customer
+  // Downgrade Clerk user role to customer
   const clerkUserId = subscription.metadata?.clerkUserId;
   
   if (clerkUserId) {
-    await updateClerkUserRole(clerkUserId, 'Customer');
+    await updateClerkUserRole(clerkUserId, 'customer');
   }
 }
 
@@ -171,7 +171,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     const clerkUserId = subscription.metadata?.clerkUserId;
     
     if (clerkUserId && ['active', 'trialing'].includes(subscription.status)) {
-      await updateClerkUserRole(clerkUserId, 'Subscriber');
+      await updateClerkUserRole(clerkUserId, 'subscriber');
     }
   }
 }
@@ -186,13 +186,13 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     // Downgrade Clerk user role if payment failed
     const clerkUserId = subscription.metadata?.clerkUserId;
     if (clerkUserId && subscription.status === 'past_due') {
-      await updateClerkUserRole(clerkUserId, 'Customer');
+      await updateClerkUserRole(clerkUserId, 'customer');
     }
   }
 }
 
 
-async function updateClerkUserRole(clerkUserId: string, role: 'Customer' | 'Subscriber') {
+async function updateClerkUserRole(clerkUserId: string, role: 'customer' | 'subscriber') {
   try {
     console.log(`🔍 Updating Clerk user ${clerkUserId} to role ${role}`);
     

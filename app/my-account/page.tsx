@@ -3,9 +3,9 @@
 import { useUser } from "@clerk/nextjs"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { User, Mail, Calendar, LogOut, ShoppingBag, BookOpen, Crown, Star } from "lucide-react"
+import { User, Mail, Calendar, LogOut, ShoppingBag, BookOpen, Crown, Star, AlertTriangle } from "lucide-react"
 import Link from "next/link"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRole } from "@/hooks/use-role"
 import OrderHistory from "@/components/order-history"
 
@@ -13,12 +13,47 @@ export default function MyAccountPage() {
   const { isSignedIn, user, isLoaded } = useUser()
   const { role, roleDisplayName, roleBadgeColor, roleDescription, isSubscriber } = useRole()
   const router = useRouter()
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
+  const [isCancelling, setIsCancelling] = useState(false)
+  const [cancelError, setCancelError] = useState<string | null>(null)
+  const [cancelSuccess, setCancelSuccess] = useState(false)
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       router.push('/login?redirect_url=/my-account')
     }
   }, [isLoaded, isSignedIn, router])
+
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true)
+    setCancelError(null)
+
+    try {
+      const response = await fetch('/api/cancel-subscription', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setCancelSuccess(true)
+        setShowCancelDialog(false)
+        // Reload user data to get updated subscription status
+        if (user) {
+          await user.reload()
+        }
+      } else {
+        setCancelError(data.error || 'Failed to cancel subscription')
+      }
+    } catch (error: any) {
+      setCancelError(error.message || 'An error occurred')
+    } finally {
+      setIsCancelling(false)
+    }
+  }
 
   if (!isLoaded) {
     return (
@@ -223,14 +258,42 @@ export default function MyAccountPage() {
         <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-8 mt-8">
           <h3 className="text-xl font-serif text-gray-900 mb-6">Account Management</h3>
           
+          {/* Success Message */}
+          {cancelSuccess && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-green-900">Subscription Cancelled</h4>
+                  <p className="text-sm text-green-700 mt-1">
+                    Your subscription has been cancelled. You'll continue to have access until the end of your current billing period.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="space-y-4">
-            {!isSubscriber && (
+            {!isSubscriber ? (
               <Link href="/upgrade">
                 <Button className="w-full md:w-auto flex items-center gap-2 !bg-[#D4A771] !text-white hover:!bg-[#C69963] mb-4">
                   <Crown className="h-4 w-4" />
                   Upgrade to Subscriber
                 </Button>
               </Link>
+            ) : (
+              <Button
+                onClick={() => setShowCancelDialog(true)}
+                variant="outline"
+                className="w-full md:w-auto flex items-center gap-2 !border-orange-300 !text-orange-600 hover:!bg-orange-50 mb-4"
+              >
+                <AlertTriangle className="h-4 w-4" />
+                Cancel Subscription
+              </Button>
             )}
             
             <Button
@@ -247,6 +310,51 @@ export default function MyAccountPage() {
             </p>
           </div>
         </div>
+
+        {/* Cancel Subscription Dialog */}
+        {showCancelDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <AlertTriangle className="h-6 w-6 text-orange-600" />
+                </div>
+                <h3 className="text-xl font-serif text-gray-900">Cancel Subscription?</h3>
+              </div>
+              
+              <p className="text-gray-600 mb-6">
+                Are you sure you want to cancel your subscription? You'll continue to have access to all premium content until the end of your current billing period.
+              </p>
+
+              {cancelError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded">
+                  <p className="text-sm text-red-800">{cancelError}</p>
+                </div>
+              )}
+              
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => {
+                    setShowCancelDialog(false)
+                    setCancelError(null)
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                  disabled={isCancelling}
+                >
+                  Keep Subscription
+                </Button>
+                <Button
+                  onClick={handleCancelSubscription}
+                  className="flex-1 !bg-orange-600 !text-white hover:!bg-orange-700"
+                  disabled={isCancelling}
+                >
+                  {isCancelling ? 'Cancelling...' : 'Yes, Cancel'}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
