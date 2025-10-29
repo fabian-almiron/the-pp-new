@@ -85,29 +85,63 @@ export function LoggedInHeader() {
                 <span className="sr-only">Toggle menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-[#FBF9F6]">
+            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
               <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <nav className="flex flex-col pt-8">
-                <Navigation 
-                  menuSlug="logged-in-header" 
-                  className="flex flex-col space-y-4 mb-4"
-                  onLinkClick={() => setIsMobileMenuOpen(false)}
-                />
+              <nav className="flex flex-col h-full pt-8">
+                {/* Logo */}
+                <div className="mb-8 pb-6 border-b border-gray-200">
+                  <Image
+                    src="/piped-peony-logo-1536x339.png"
+                    alt="The Piped Peony"
+                    width={150}
+                    height={50}
+                    className="h-12 w-auto"
+                  />
+                </div>
+
+                {/* Navigation Links */}
+                <div className="flex-1 overflow-y-auto">
+                  <Navigation 
+                    menuSlug="logged-in-header" 
+                    className="flex flex-col space-y-2 mb-6"
+                    onLinkClick={() => setIsMobileMenuOpen(false)}
+                  />
+                </div>
 
                 {/* Mobile Actions */}
-                <div className="flex flex-col gap-4 pt-4 border-t border-gray-200">
-                  <Link href="/cart" className="flex items-center gap-2 text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900 transition-colors" onClick={() => setIsMobileMenuOpen(false)}>
-                    <ShoppingCart className="h-5 w-5" />
-                    Cart {cartItemCount > 0 && `(${cartItemCount})`}
+                <div className="flex flex-col gap-3 pt-6 border-t border-gray-200 mt-auto">
+                  <Link 
+                    href="/cart" 
+                    className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#FBF9F6] hover:bg-[#f1eae6] transition-colors group" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="flex items-center gap-3 font-medium text-gray-700 group-hover:text-gray-900">
+                      <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
+                      Cart
+                    </span>
+                    {cartItemCount > 0 && (
+                      <span className="bg-[#D4A771] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                        {cartItemCount}
+                      </span>
+                    )}
                   </Link>
-                  <Link href="/my-account" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="clean" className="!border-none w-full">
-                      my account
-                    </Button>
+
+                  <Link 
+                    href="/my-account" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="w-full"
+                  >
+                    <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
+                      My Account
+                    </button>
                   </Link>
-                  <Button variant="clean" className="!border-none w-full" onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}>
-                    logout
-                  </Button>
+
+                  <button 
+                    className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors"
+                    onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                  >
+                    Sign Out
+                  </button>
                 </div>
               </nav>
             </SheetContent>

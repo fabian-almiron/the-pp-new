@@ -1228,7 +1228,9 @@ html {
 
 .video-item-image-wrapper {
   overflow: hidden;
-  border: 1px solid #E5E7EB;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.3s ease;
 }
 
 .video-item-image {
@@ -1240,6 +1242,10 @@ html {
 
 .video-item:hover .video-item-image {
   transform: scale(1.05);
+}
+
+.video-item:hover .video-item-image-wrapper {
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .video-item-title {
@@ -3478,16 +3484,16 @@ section.featuredvl-section {
 .video-item-wrapper {
   position: relative;
   background-color: white;
-  border-radius: 0;
+  border-radius: 0.75rem;
   overflow: hidden;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
 }
 
 .video-item-wrapper:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .video-thumbnail-wrapper {

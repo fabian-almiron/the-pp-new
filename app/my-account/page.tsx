@@ -60,7 +60,7 @@ export default function MyAccountPage() {
         </div>
 
         {/* Account Info Card */}
-        <div className="bg-white shadow-sm border border-gray-200 rounded-none mb-8 overflow-hidden">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg mb-8 overflow-hidden">
           {/* Profile Header */}
           <div className="bg-gradient-to-r from-[#D4A771] to-[#C69963] p-8 text-white">
             <div className="flex items-center gap-6">
@@ -174,7 +174,7 @@ export default function MyAccountPage() {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Link href="/video-library" className="group">
-            <div className="bg-white border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#f1eae6] rounded-full flex items-center justify-center group-hover:bg-[#D4A771] transition-colors">
                   <BookOpen className="h-6 w-6 text-[#D4A771] group-hover:text-white transition-colors" />
@@ -188,7 +188,7 @@ export default function MyAccountPage() {
           </Link>
 
           <Link href="/cart" className="group">
-            <div className="bg-white border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#f1eae6] rounded-full flex items-center justify-center group-hover:bg-[#D4A771] transition-colors">
                   <ShoppingBag className="h-6 w-6 text-[#D4A771] group-hover:text-white transition-colors" />
@@ -202,7 +202,7 @@ export default function MyAccountPage() {
           </Link>
 
           <Link href="/shop" className="group">
-            <div className="bg-white border border-gray-200 p-6 hover:shadow-md transition-shadow">
+            <div className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-[#f1eae6] rounded-full flex items-center justify-center group-hover:bg-[#D4A771] transition-colors">
                   <ShoppingBag className="h-6 w-6 text-[#D4A771] group-hover:text-white transition-colors" />
@@ -220,7 +220,7 @@ export default function MyAccountPage() {
         <OrderHistory />
 
         {/* Account Management */}
-        <div className="bg-white shadow-sm border border-gray-200 rounded-none p-8 mt-8">
+        <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-8 mt-8">
           <h3 className="text-xl font-serif text-gray-900 mb-6">Account Management</h3>
           
           <div className="space-y-4">

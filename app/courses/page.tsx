@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SubscriberGate } from "@/components/subscriber-gate";
 import { useEffect, useState, useMemo } from "react";
-import { Video, Star, Search, X, Filter, Sparkles, Clock, TrendingUp, Award, Users } from "lucide-react";
+import { Video, Star, Search, X, Filter, Sparkles, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -166,28 +166,6 @@ function CoursesContent({ courses, error, loading }: { courses: any[], error: st
             Learn from expert instructor Dara with our comprehensive video courses. 
             From beginner techniques to advanced piping artistry.
           </p>
-          
-          {/* Trust Indicators */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto mt-12">
-            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-gray-200 shadow-md">
-              <div className="text-3xl font-bold mb-1 text-black">{courses.length}+</div>
-              <div className="text-sm text-gray-600">Video Courses</div>
-            </div>
-            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-gray-200 shadow-md">
-              <div className="text-3xl font-bold mb-1 text-black">
-                {courses.reduce((acc, c) => acc + (c.videoChapters?.length || 0), 0)}+
-              </div>
-              <div className="text-sm text-gray-600">Video Lessons</div>
-            </div>
-            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-gray-200 shadow-md">
-              <Clock className="w-6 h-6 mx-auto mb-2 text-[#D4A771]" />
-              <div className="text-sm text-gray-600">Learn at Your Pace</div>
-            </div>
-            <div className="bg-white/90 backdrop-blur-sm rounded-lg p-4 border border-gray-200 shadow-md">
-              <TrendingUp className="w-6 h-6 mx-auto mb-2 text-[#D4A771]" />
-              <div className="text-sm text-gray-600">Lifetime Access</div>
-            </div>
-          </div>
         </div>
       </div>
 

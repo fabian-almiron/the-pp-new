@@ -92,7 +92,7 @@ export default function OrderHistory() {
 
   if (isLoading) {
     return (
-      <div className="bg-white shadow-sm border border-gray-200 rounded-none p-8">
+      <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
         <h3 className="text-xl font-serif text-gray-900 mb-6">Order History</h3>
         <div className="text-center py-8">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#D4A771] mx-auto"></div>
@@ -104,7 +104,7 @@ export default function OrderHistory() {
 
   if (error) {
     return (
-      <div className="bg-white shadow-sm border border-gray-200 rounded-none p-8">
+      <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
         <h3 className="text-xl font-serif text-gray-900 mb-6">Order History</h3>
         <div className="text-center py-8">
           <p className="text-red-600">Error loading orders: {error}</p>
@@ -115,7 +115,7 @@ export default function OrderHistory() {
 
   if (orders.length === 0) {
     return (
-      <div className="bg-white shadow-sm border border-gray-200 rounded-none p-8">
+      <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
         <h3 className="text-xl font-serif text-gray-900 mb-6">Order History</h3>
         <div className="text-center py-12">
           <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
@@ -129,7 +129,7 @@ export default function OrderHistory() {
   }
 
   return (
-    <div className="bg-white shadow-sm border border-gray-200 rounded-none p-8">
+    <div className="bg-white shadow-sm border border-gray-200 rounded-lg p-8">
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-xl font-serif text-gray-900">Order History</h3>
         <span className="text-sm text-gray-500">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</span>
@@ -142,7 +142,7 @@ export default function OrderHistory() {
           return (
             <div 
               key={order.id}
-              className="border border-gray-200 rounded-none overflow-hidden hover:border-[#D4A771] transition-colors"
+              className="border border-gray-200 rounded-lg overflow-hidden hover:border-[#D4A771] transition-colors"
             >
               {/* Order Header */}
               <div 

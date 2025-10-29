@@ -1,3 +1,6 @@
+"use client"
+
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -6,6 +9,11 @@ import {
 } from "@/components/ui/accordion";
 
 export function FaqAccordion() {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const faqs = [
     {
       question: "Once you join, do you have to pay extra for each video?",
@@ -28,6 +36,10 @@ export function FaqAccordion() {
       answer: "We offer both monthly and annual subscription plans. The annual plan provides a discount compared to the monthly rate.",
     },
   ];
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <Accordion type="single" collapsible className="w-full">

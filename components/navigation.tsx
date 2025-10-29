@@ -56,18 +56,18 @@ function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem;
   
   const hasChildren = item.children && item.children.length > 0;
   const textSizes = [
-    "text-lg font-medium tracking-wider text-gray-600 hover:text-gray-900", // level 0
-    "text-base text-gray-500 hover:text-gray-900", // level 1
-    "text-sm text-gray-400 hover:text-gray-900" // level 2
+    "text-base font-medium text-gray-700 hover:text-[#D4A771]", // level 0
+    "text-sm text-gray-600 hover:text-[#D4A771]", // level 1
+    "text-sm text-gray-500 hover:text-[#D4A771]" // level 2
   ];
   
   const paddingClasses = [
-    "py-2", // level 0
-    "py-1", // level 1
-    "py-1" // level 2
+    "px-4 py-3 rounded-lg hover:bg-[#FBF9F6]", // level 0
+    "px-3 py-2 rounded-md hover:bg-gray-50", // level 1
+    "px-3 py-2 rounded-md hover:bg-gray-50" // level 2
   ];
 
-  const className = `block ${textSizes[level]} ${paddingClasses[level]} transition-colors`;
+  const className = `block ${textSizes[level]} ${paddingClasses[level]} transition-all`;
 
   if (!hasChildren) {
     return (
@@ -88,13 +88,13 @@ function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem;
         <span>{item.title}</span>
         {hasChildren && (
           isOpen ? 
-            <ChevronDown className="h-4 w-4" /> : 
-            <ChevronRight className="h-4 w-4" />
+            <ChevronDown className="h-4 w-4 text-[#D4A771]" /> : 
+            <ChevronRight className="h-4 w-4 text-gray-400" />
         )}
       </button>
       
       {hasChildren && isOpen && (
-        <ul className={`pl-4 mt-2 space-y-2`}>
+        <ul className={`pl-3 mt-1 space-y-1`}>
           {item.children?.map((child) => (
             <li key={child.id}>
               <CollapsibleMenuItem item={child} level={level + 1} onLinkClick={onLinkClick} />
@@ -110,8 +110,15 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
   const [menu, setMenu] = useState<Menu | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+
     // Check localStorage cache first (client-side only)
     const cached = localStorage.getItem(`menu_${menuSlug}`);
     if (cached) {
@@ -150,7 +157,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
     }
     
     loadMenu();
-  }, [menuSlug]);
+  }, [menuSlug, mounted]);
 
   if (loading) {
     return null; // Or a skeleton loader

@@ -3,15 +3,22 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { TestimonialsCarousel } from "@/components/testimonials-carousel";
+import { fetchCourses } from "@/lib/strapi-api";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // Fetch latest 3 courses
+  const { data: latestCourses } = await fetchCourses({
+    pageSize: 3,
+    sort: 'publishedAt:desc'
+  });
+
   return (
     <>
       <HeroSection />
       <FeaturesSection />
       <AboutSection />
       <TestimonialsSection />
-      <LatestVideosSection />
+      <LatestVideosSection courses={latestCourses || []} />
       <FaqSection />
       <CtaSection />
     </>
@@ -135,13 +142,20 @@ function TestimonialsSection() {
   return <TestimonialsCarousel />;
 }
 
-function LatestVideosSection() {
-  const videos = [
-    { title: "The Eucalyptus Sprig", image: "/eucasprigtn.png" },
-    { title: "The Full Bloom Rose", image: "/fullblorosetn.png" },
-    { title: "The Berry Bling", image: "/vidimgtn4.png" },
-  ];
+// Function to get Vimeo thumbnail URL
+function getVimeoThumbnail(videoId: string, size: 'small' | 'medium' | 'large' = 'large'): string {
+  if (!videoId) return '';
+  
+  const sizeMap = {
+    small: '200x150',
+    medium: '640x480', 
+    large: '1280x720'
+  };
+  
+  return `https://vumbnail.com/${videoId}_${sizeMap[size]}.jpg`;
+}
 
+function LatestVideosSection({ courses }: { courses: any[] }) {
   return (
     <section className="latest-videos-section">
       <div className="container latest-videos-content">
@@ -153,13 +167,37 @@ function LatestVideosSection() {
       <div className="container latest-videos-content">
         <p className="latest-videos-description">Check out our most recent videos for our academy members!</p>
         <div className="latest-videos-grid">
-          {videos.map((video) => (
-            <div key={video.title} className="video-item">
+          {courses.map((course) => (
+            <Link 
+              key={course.id} 
+              href={`/courses/${course.slug}`}
+              className="video-item"
+            >
               <div className="video-item-image-wrapper">
-                <Image src={video.image} alt={video.title} width={400} height={400} className="video-item-image" />
+                {course.featuredImage ? (
+                  <Image 
+                    src={course.featuredImage.url} 
+                    alt={course.title} 
+                    width={400} 
+                    height={400} 
+                    className="video-item-image" 
+                  />
+                ) : course.videoId ? (
+                  <Image 
+                    src={getVimeoThumbnail(course.videoId)} 
+                    alt={course.title} 
+                    width={400} 
+                    height={400} 
+                    className="video-item-image" 
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-[#FBF9F6]">
+                    <span className="text-6xl">🌸</span>
+                  </div>
+                )}
               </div>
-              <h3 className="video-item-title">{video.title}</h3>
-            </div>
+              <h3 className="video-item-title">{course.title}</h3>
+            </Link>
           ))}
         </div>
         <Link href="/video-library">
