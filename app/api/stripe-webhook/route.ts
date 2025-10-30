@@ -256,7 +256,6 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
           stripeSessionId: session.id,
           stripeCustomerId: session.customer,
           clerkUserId: session.metadata?.clerkUserId,
-          strapiUserId: session.metadata?.strapiUserId ? parseInt(session.metadata.strapiUserId) : null,
           customerEmail: session.customer_email,
           totalAmount: session.amount_total ? session.amount_total / 100 : 0,
           currency: session.currency?.toUpperCase() || 'USD',

@@ -104,15 +104,6 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Fetch user from Strapi using Clerk ID
-    const strapiUser = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL}/api/users?filters[clerkId][$eq]=${user.id}`, {
-      headers: {
-        'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`,
-      },
-    }).then(res => res.json());
-
-    const strapiUserId = strapiUser[0]?.id;
-
     // Create or retrieve Stripe customer
     const userEmail = user.emailAddresses[0]?.emailAddress;
     let stripeCustomerId = user.privateMetadata?.stripeCustomerId as string | undefined;
@@ -178,13 +169,11 @@ export async function POST(request: NextRequest) {
           footer: 'Thank you for your purchase!',
           metadata: {
             clerkUserId: user.id,
-            strapiUserId: strapiUserId?.toString() || '',
           },
         },
       },
       metadata: {
         clerkUserId: user.id,
-        strapiUserId: strapiUserId?.toString() || '',
         userEmail: user.emailAddresses[0]?.emailAddress || '',
       },
     });
