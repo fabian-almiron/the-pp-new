@@ -3,7 +3,6 @@
 import { fetchCourses } from "@/lib/strapi-api";
 import Link from "next/link";
 import Image from "next/image";
-import { SubscriberGate } from "@/components/subscriber-gate";
 import { useEffect, useState, useMemo } from "react";
 import { Video, Star, Search, X, Filter, Sparkles, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -47,11 +46,7 @@ export default function AllCoursesPage() {
     loadCourses();
   }, []);
 
-  return (
-    <SubscriberGate>
-      <CoursesContent courses={courses} error={error} loading={loading} />
-    </SubscriberGate>
-  );
+  return <CoursesContent courses={courses} error={error} loading={loading} />;
 }
 
 function CoursesContent({ courses, error, loading }: { courses: any[], error: string | null, loading: boolean }) {
@@ -401,7 +396,7 @@ function CoursesContent({ courses, error, loading }: { courses: any[], error: st
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {seriesCourses.map((course) => (
+                {(seriesCourses as any[]).map((course: any) => (
                   <Link
                     key={course.id}
                     href={`/courses/${course.slug}`}

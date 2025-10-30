@@ -1,0 +1,237 @@
+export default function TermsPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="container mx-auto px-4 py-16 lg:py-24">
+        <div className="max-w-4xl mx-auto">
+          <h1 
+            style={{ 
+              fontFamily: 'Playfair Display, serif', 
+              fontSize: 'clamp(3rem, 8vw, 4.5rem)', 
+              color: '#000000',
+              lineHeight: '1.1',
+              marginBottom: '3rem',
+              fontWeight: 'normal'
+            }}
+          >
+            TERMS & CONDITIONS
+          </h1>
+          
+          <div className="prose prose-lg max-w-none" style={{ fontFamily: 'sofia-pro, sans-serif' }}>
+            <p className="text-gray-600 mb-6">
+              <strong>Effective as of March 21, 2022</strong>
+            </p>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Agreement between User and The Piped Peony, LLC.</h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Welcome to The Piped Peony Academy (the "Academy.") The Academy website (the "Site") is comprised of various web pages operated by The Piped Peony ("The Piped Peony"). The Academy is offered to you conditioned on your acceptance without modification of the terms, conditions, and notices contained herein (the "Terms"). Your use of the Academy's Site constitutes your agreement to all such Terms. Please read these terms carefully, and keep a copy of them for your reference.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                <strong>The Academy is an E-Commerce Site.</strong>
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Subscription Terms</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The website offers 30-day memberships for subscribers to receive decorative culinary tutorials and other related-content, in exchange for a monthly automatically renewing fee of $15.00. After signing up and unless otherwise cancelled, monthly billings will occur after a 7-day trial period, and will continue via automatic and recurring billing every 30-days to the original payment method. Upon cancellation, access to the Academy will cease immediately. No refunds will be issued unless otherwise specified. If you have questions about the billing policy of the Academy, please contact: <a href="mailto:dara@thepipedpeony.com" className="text-black underline">dara@thepipedpeony.com</a>.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Results</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony Academy does not guarantee results of any kind. Improvement of skills are driven heavily by the amount of practice and effort a member contributes towards the achievement of their individual goals, specific to flower piping and cake decorating.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Cancellation Terms</h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                Members of The Piped Peony Academy can cancel their membership at any time. Cancellations will take place prior to the next billing cycle, so long as the member has attempted to cancel prior to the next billing cycle. To cancel a membership, a member must log in to their respective account, and cancel online through their customer portal. Questions regarding billing and cancellations should be sent to The Piped Peony through the Site's contact form.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                Cancellation requests through social media platforms, or any other indirect methods of contact, will not be accepted.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Free Trials</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The website also offers a free 7-day trial, that The Piped Peony can cancel anytime. Members will be billed each month, without notice of billing. Members can cancel anytime through their membership portal. The website also sells various cake decorating supplies. The website sells piping tip kits that are tuned and untuned. The website also sells piping blocks. Return of piping tip kits is not allowed. All sales are final.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Membership Use & Sharing Accounts</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Memberships are not to be shared with anyone outside of a residential household. Commercial users will need separate accounts for any employees participating in The Piped Peony Academy; sharing a membership among employees, or outside of a residential household, will result in immediate cancellation of said membership, without a refund being issued. Further, any person(s) determined to be sharing a membership, will be unable to rejoin as a member to The Piped Peony Academy.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Electronic Communications</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Visiting The Academy or sending emails to The Piped Peony constitutes electronic communications. You consent to receive electronic communications and you agree that all agreements, notices, disclosures and other communications that we provide to you electronically, via email and on the Site, satisfy any legal requirement that such communications be in writing.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Your Account</h2>
+              <p className="text-gray-700 leading-relaxed">
+                If you use this site, you are responsible for maintaining the confidentiality of your account and password and for restricting access to your computer, and you agree to accept responsibility for all activities that occur under your account or password. You may not assign or otherwise transfer your account to any other person or entity. You acknowledge that The Piped Peony is not responsible for third party access to your account that results from theft or misappropriation of your account. The Piped Peony and its associates reserve the right to refuse or cancel service, terminate accounts, or remove or edit content in our sole discretion.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Children Under Thirteen</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony does not knowingly collect, either online or offline, personal information from persons under the age of thirteen. If you are under 18, you may use The Academy only with permission of a parent or guardian.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Links to Third Party Sites/Third Party Services</h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                The Academy may contain links to other websites ("Linked Sites"). The Linked Sites are not under the control of The Piped Peony and The Piped Peony is not responsible for the contents of any Linked Site, including without limitation any link contained in a Linked Site, or any changes or updates to a Linked Site. The Piped Peony is providing these links to you only as a convenience, and the inclusion of any link does not imply endorsement by The Piped Peony of the site or any association with its operators.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                Certain services made available via the Academy are delivered by third party sites and organizations. By using any product, service or functionality originating from the Academy domain, you hereby acknowledge and consent that The Piped Peony may share such information and data with any third party with whom The Piped Peony has a contractual relationship to provide the requested product, service or functionality on behalf of the Academy's users and customers.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">No Unlawful or Prohibited Use/Intellectual Property</h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                You are granted a non-exclusive, non-transferable, revocable license to access and use the Academy strictly in accordance with these terms of use. As a condition of your use of the Site, you warrant to The Piped Peony that you will not use the Site for any purpose that is unlawful or prohibited by these Terms. You may not use the Site in any manner which could damage, disable, overburden, or impair the Site or interfere with any other party's use and enjoyment of the Site. You may not obtain or attempt to obtain any materials or information through any means not intentionally made available or provided for through the Site.
+              </p>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                All content included as part of the Service, such as text, graphics, logos, images, as well as the compilation thereof, and any software used on the Site, is the property of The Piped Peony or its suppliers and protected by copyright and other laws that protect intellectual property and proprietary rights. You agree to observe and abide by all copyright and other proprietary notices, legends or other restrictions contained in any such content and will not make any changes thereto.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                You will not modify, publish, transmit, reverse engineer, participate in the transfer or sale, create derivative works, or in any way exploit any of the content, in whole or in part, found on the Site. The Piped Peony content is not for resale. Your use of the Site does not entitle you to make any unauthorized use of any protected content, and in particular you will not delete or alter any proprietary rights or attribution notices in any content. You will use protected content solely for your personal use, and will make no other use of the content without the express written permission of The Piped Peony and the copyright owner. You agree that you do not acquire any ownership rights in any protected content. We do not grant you any licenses, express or implied, to the intellectual property of The Piped Peony or our licensors except as expressly authorized by these Terms.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">International Users</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Service is controlled, operated and administered by The Piped Peony from our offices within the USA. If you access the Service from a location outside the USA, you are responsible for compliance with all local laws. You agree that you will not use the The Piped Peony Content accessed through the Academy in any country or in any manner prohibited by any applicable laws, restrictions or regulations.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Indemnification</h2>
+              <p className="text-gray-700 leading-relaxed">
+                You agree to indemnify, defend and hold harmless The Piped Peony, its officers, directors, employees, agents and third parties, for any losses, costs, liabilities and expenses (including reasonable attorney's fees) relating to or arising out of your use of or inability to use the Site or services, any user postings made by you, your violation of any terms of this Agreement or your violation of any rights of a third party, or your violation of any applicable laws, rules or regulations. The Piped Peony reserves the right, at its own cost, to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you will fully cooperate with The Piped Peony in asserting any available defenses.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Arbitration</h2>
+              <p className="text-gray-700 leading-relaxed">
+                In the event the parties are not able to resolve any dispute between them arising out of or concerning these Terms and Conditions, or any provisions hereof, whether in contract, tort, or otherwise at law or in equity for damages or any other relief, then such dispute shall be resolved only by final and binding arbitration pursuant to the Federal Arbitration Act, conducted by a single neutral arbitrator and administered by the American Arbitration Association, or a similar arbitration service selected by the parties, in a location mutually agreed upon by the parties. The arbitrator's award shall be final, and judgment may be entered upon it in any court having jurisdiction. In the event that any legal or equitable action, proceeding or arbitration arises out of or concerns these Terms and Conditions, the prevailing party shall be entitled to recover its costs and reasonable attorney's fees. The parties agree to arbitrate all disputes and claims in regards to these Terms and Conditions or any disputes arising as a result of these Terms and Conditions, whether directly or indirectly, including Tort claims that are a result of these Terms and Conditions. The parties agree that the Federal Arbitration Act governs the interpretation and enforcement of this provision. The entire dispute, including the scope and enforceability of this arbitration provision shall be determined by the Arbitrator. This arbitration provision shall survive the termination of these Terms and Conditions.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Class Action Waiver</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Any arbitration under these Terms and Conditions will take place on an individual basis; class arbitrations and class/representative/collective actions are not permitted. THE PARTIES AGREE THAT A PARTY MAY BRING CLAIMS AGAINST THE OTHER ONLY IN EACH'S INDIVIDUAL CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PUTATIVE CLASS, COLLECTIVE AND/ OR REPRESENTATIVE PROCEEDING, SUCH AS IN THE FORM OF A PRIVATE ATTORNEY GENERAL ACTION AGAINST THE OTHER. Further, unless both you and The Piped Peony agree otherwise, the arbitrator may not consolidate more than one person's claims, and may not otherwise preside over any form of a representative or class proceeding.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Liability Disclaimer</h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                THE INFORMATION, SOFTWARE, PRODUCTS, AND SERVICES INCLUDED IN OR AVAILABLE THROUGH THE SITE MAY INCLUDE INACCURACIES OR TYPOGRAPHICAL ERRORS. CHANGES ARE PERIODICALLY ADDED TO THE INFORMATION HEREIN. THE PIPED PEONY AND/OR ITS SUPPLIERS MAY MAKE IMPROVEMENTS AND/OR CHANGES IN THE SITE AT ANY TIME.
+              </p>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                THE PIPED PEONY AND/OR ITS SUPPLIERS MAKE NO REPRESENTATIONS ABOUT THE SUITABILITY, RELIABILITY, AVAILABILITY, TIMELINESS, AND ACCURACY OF THE INFORMATION, SOFTWARE, PRODUCTS, SERVICES AND RELATED GRAPHICS CONTAINED ON THE SITE FOR ANY PURPOSE. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ALL SUCH INFORMATION, SOFTWARE, PRODUCTS, SERVICES AND RELATED GRAPHICS ARE PROVIDED "AS IS" WITHOUT WARRANTY OR CONDITION OF ANY KIND. THE PIPED PEONY AND/OR ITS SUPPLIERS HEREBY DISCLAIM ALL WARRANTIES AND CONDITIONS WITH REGARD TO THIS INFORMATION, SOFTWARE, PRODUCTS, SERVICES AND RELATED GRAPHICS, INCLUDING ALL IMPLIED WARRANTIES OR CONDITIONS OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND NON-INFRINGEMENT.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE PIPED PEONY AND/OR ITS SUPPLIERS BE LIABLE FOR ANY DIRECT, INDIRECT, PUNITIVE, INCIDENTAL, SPECIAL, CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF USE, DATA OR PROFITS, ARISING OUT OF OR IN ANY WAY CONNECTED WITH THE USE OR PERFORMANCE OF THE SITE, WITH THE DELAY OR INABILITY TO USE THE SITE OR RELATED SERVICES, THE PROVISION OF OR FAILURE TO PROVIDE SERVICES, OR FOR ANY INFORMATION, SOFTWARE, PRODUCTS, SERVICES AND RELATED GRAPHICS OBTAINED THROUGH THE SITE, OR OTHERWISE ARISING OUT OF THE USE OF THE SITE, WHETHER BASED ON CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY OR OTHERWISE, EVEN IF THE PIPED PEONY OR ANY OF ITS SUPPLIERS HAS BEEN ADVISED OF THE POSSIBILITY OF DAMAGES. BECAUSE SOME STATES/JURISDICTIONS DO NOT ALLOW THE EXCLUSION OR LIMITATION OF LIABILITY FOR CONSEQUENTIAL OR INCIDENTAL DAMAGES, THE ABOVE LIMITATION MAY NOT APPLY TO YOU. IF YOU ARE DISSATISFIED WITH ANY PORTION OF THE SITE, OR WITH ANY OF THESE TERMS OF USE, YOUR SOLE AND EXCLUSIVE REMEDY IS TO DISCONTINUE USING THE SITE.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Termination/Access Restriction</h2>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                The Piped Peony reserves the right, in its sole discretion, to terminate your access to the Site and the related services or any portion thereof at any time, without notice. To the maximum extent permitted by law, this agreement is governed by the laws of the Commonwealth of Pennsylvania and you hereby consent to the exclusive jurisdiction and venue of courts in Pennsylvania in all disputes arising out of or relating to the use of the Site. Use of the Site is unauthorized in any jurisdiction that does not give effect to all provisions of these Terms, including, without limitation, this section.
+              </p>
+              <p className="text-gray-700 leading-relaxed mb-4">
+                You agree that no joint venture, partnership, employment, or agency relationship exists between you and The Piped Peony as a result of this agreement or use of the Site. The Piped Peony's performance of this agreement is subject to existing laws and legal process, and nothing contained in this agreement is in derogation of The Piped Peony's right to comply with governmental, court and law enforcement requests or requirements relating to your use of the Site or information provided to or gathered by The Piped Peony with respect to such use. If any part of this agreement is determined to be invalid or unenforceable pursuant to applicable law including, but not limited to, the warranty disclaimers and liability limitations set forth above, then the invalid or unenforceable provision will be deemed superseded by a valid, enforceable provision that most closely matches the intent of the original provision and the remainder of the agreement shall continue in effect.
+              </p>
+              <p className="text-gray-700 leading-relaxed">
+                Unless otherwise specified herein, this agreement constitutes the entire agreement between the user and The Piped Peony with respect to the Site and it supersedes all prior or contemporaneous communications and proposals, whether electronic, oral or written, between the user and The Piped Peony with respect to the Site. A printed version of this agreement and of any notice given in electronic form shall be admissible in judicial or administrative proceedings based upon or relating to this agreement to the same extent and subject to the same conditions as other business documents and records originally generated and maintained in printed form. It is the express wish to the parties that this agreement and all related documents be written in English.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Changes to Terms</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony reserves the right, in its sole discretion, to change the Terms under which the Academy is offered. The most current version of the Terms will supersede all previous versions. The Piped Peony encourages you to periodically review the Terms to stay informed of our updates.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Price Increases</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony may raise the monthly fee of The Academy. In the event of a price increase, The Piped Peony will provide notice of any such increases thirty (30) days prior to the price increase, by way of sending an email to all active members advising them of the upcoming price increase and providing cancellation instructions, in the event that the member does not want to continue their membership at the proposed fee.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Payment</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Payment shall be made to The Piped Peony through the Website, on the date of the online purchase of any of The Piped Peony's retail offerings, collectively referred to as the Goods (the "Goods").
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Order Fulfillment, Shipping and Delivery</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony will arrange for delivery, by carrier chosen by The Piped Peony. Please allow three (3) to five (5) business days for order fulfillment, plus additional time for shipment of the Goods.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Payment of Taxes</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony may, at any time and in its sole discretion, choose to apply the sales tax to the price of purchase.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Returns, Refunds, Damaged Goods, Exchanges, and Warranties</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Due to the nature of our business, all sales are final. As such, The Piped Peony will not accept returns or exchanges. In the event of an error, or a damaged product, The Piped Peony may, at its sole discretion, choose to refund or exchange all or part of the Goods. If there is an issue, the buyer shall reach out to The Piped Peony Academy, within thirty (30) days by way of an email to <a href="mailto:dara@thepipedpeony.com" className="text-black underline">dara@thepipedpeony.com</a> or by using the Website's contact form, to advise of such damage or error, and provide pictures of any damages or errors to The Piped Peony. If the buyer does not reach out to The Piped Peony Academy, or does not provide pictures of damage or errors, within thirty (30) days, no refund or exchanges will be provided. No warranties are made as to the condition or quality of the Goods, and all Goods sold are sold on an "as is" basis, which includes any modified (tuned) piping tips. No refunds or exchanges are obligated to be made for unsatisfactory expectations or conditions. The Piped Peony Academy does not guarantee any results due to the purchase of any of the Goods.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Changes to the Goods Pricing</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Our product prices are subject to change without prior notice. We reserve the right to modify or discontinue the Goods (or any part or content thereof) at any time and without notice. Please note that we are not liable to you or any third-party for any modification, price change, or discontinuation of the Goods.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Limitation and Expectation of Goods</h2>
+              <p className="text-gray-700 leading-relaxed">
+                Certain products or services may only be available online through our website. These products or services may have limited quantities and can only be returned or exchanged in accordance with our Return Policy. We reserve the right, at our sole discretion, to limit the sales of our products or services to any person, geographic region, or jurisdiction. Please keep in mind that any offers for products or services made on this site are void where prohibited. We do not guarantee that the quality of any products, services, information, or other materials purchased or obtained by you will meet your expectations. We also do not guarantee that any errors in the Goods will be corrected.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold mb-4 text-black">Contact Us</h2>
+              <p className="text-gray-700 leading-relaxed">
+                The Piped Peony welcomes your questions or comments regarding the Terms. If you have any questions or concerns, please email dara@thepipedpeony.com.
+              </p>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

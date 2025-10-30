@@ -249,7 +249,7 @@ function VideoSeriesSection() {
 
 function FaqSection() {
   return (
-    <section className="faq-section">
+    <section id="faq" className="faq-section">
       <div className="container">
         <div className="faq-grid">
           <div className="faq-header">

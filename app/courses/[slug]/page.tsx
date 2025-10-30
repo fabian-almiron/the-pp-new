@@ -1,5 +1,6 @@
 import { Course, CarouselItem } from "@/data/types";
 import { CoursePageClient } from "@/components/course-page-client";
+import { SubscriberGate } from "@/components/subscriber-gate";
 import { notFound } from "next/navigation";
 import { fetchCourseBySlug, fetchCoursesBySeries } from "@/lib/strapi-api";
 
@@ -115,10 +116,12 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   return (
-    <CoursePageClient 
-      course={course} 
-      relatedCourses={relatedCourses}
-    />
+    <SubscriberGate>
+      <CoursePageClient 
+        course={course} 
+        relatedCourses={relatedCourses}
+      />
+    </SubscriberGate>
   );
 }
 
