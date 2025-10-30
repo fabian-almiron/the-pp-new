@@ -7,11 +7,13 @@ import { User, Mail, Calendar, LogOut, ShoppingBag, BookOpen, Crown, Star, Alert
 import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRole } from "@/hooks/use-role"
+import { useStripeCustomer } from "@/hooks/use-stripe-customer"
 import OrderHistory from "@/components/order-history"
 
 export default function MyAccountPage() {
   const { isSignedIn, user, isLoaded } = useUser()
   const { role, roleDisplayName, roleBadgeColor, roleDescription, isSubscriber } = useRole()
+  const { isLinked: isStripeLinked } = useStripeCustomer() // Auto-link Stripe customer
   const router = useRouter()
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [isCancelling, setIsCancelling] = useState(false)

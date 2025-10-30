@@ -3,7 +3,7 @@ import { currentUser } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-09-30.clover',
 });
 
 export async function GET(request: NextRequest) {
@@ -19,18 +19,66 @@ export async function GET(request: NextRequest) {
 
     console.log('📦 Fetching orders for user:', user.id);
 
-    // Get all checkout sessions for this user
-    const sessions = await stripe.checkout.sessions.list({
-      limit: 100,
-    });
-
-    // Filter sessions by user email and payment mode
+    // Get Stripe customer ID from Clerk metadata
+    const stripeCustomerId = user.privateMetadata?.stripeCustomerId as string | undefined;
     const userEmail = user.emailAddresses[0]?.emailAddress;
-    const userSessions = sessions.data.filter(session => 
-      session.customer_email === userEmail && 
-      session.mode === 'payment' && 
-      session.payment_status === 'paid'
-    );
+
+    let userSessions: Stripe.Checkout.Session[];
+
+    // Method 1: Use Stripe Customer ID if available (most reliable)
+    if (stripeCustomerId) {
+      console.log('✅ Using Stripe Customer ID:', stripeCustomerId);
+      const sessions = await stripe.checkout.sessions.list({
+        customer: stripeCustomerId,
+        limit: 100,
+      });
+      
+      console.log(`📊 Found ${sessions.data.length} total sessions for customer`);
+      
+      // Filter for both payment and subscription modes
+      userSessions = sessions.data.filter(session => {
+        const isPayment = session.mode === 'payment' && session.payment_status === 'paid';
+        const isSubscription = session.mode === 'subscription' && session.payment_status === 'paid';
+        return isPayment || isSubscription;
+      });
+      
+      console.log(`💳 Payment sessions: ${sessions.data.filter(s => s.mode === 'payment').length}`);
+      console.log(`📅 Subscription sessions: ${sessions.data.filter(s => s.mode === 'subscription').length}`);
+      console.log(`✅ Paid sessions: ${userSessions.length}`);
+    } 
+    // Method 2: Fallback to email matching (for users not yet migrated)
+    else {
+      console.log('⚠️  No Stripe Customer ID found, using email fallback:', userEmail);
+      const sessions = await stripe.checkout.sessions.list({
+        limit: 100,
+      });
+      
+      userSessions = sessions.data.filter(session => {
+        const emailMatches = session.customer_email === userEmail;
+        const isPayment = session.mode === 'payment' && session.payment_status === 'paid';
+        const isSubscription = session.mode === 'subscription' && session.payment_status === 'paid';
+        return emailMatches && (isPayment || isSubscription);
+      });
+      
+      // If we found sessions and a customer, save the customer ID for next time
+      if (userSessions.length > 0 && userSessions[0].customer) {
+        try {
+          const { createClerkClient } = await import('@clerk/nextjs/server');
+          const clerkClient = createClerkClient({
+            secretKey: process.env.CLERK_SECRET_KEY!,
+          });
+          
+          await clerkClient.users.updateUserMetadata(user.id, {
+            privateMetadata: {
+              stripeCustomerId: userSessions[0].customer as string,
+            },
+          });
+          console.log('✅ Auto-saved Stripe Customer ID:', userSessions[0].customer);
+        } catch (error) {
+          console.error('⚠️  Could not save customer ID:', error);
+        }
+      }
+    }
 
     console.log(`✅ Found ${userSessions.length} orders`);
 

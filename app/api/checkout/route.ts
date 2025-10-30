@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { currentUser } from '@clerk/nextjs/server';
+import { createClerkClient } from '@clerk/nextjs/server';
 import Stripe from 'stripe';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-09-30.clover',
+});
+
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY!,
 });
 
 export async function POST(request: NextRequest) {
@@ -108,6 +113,49 @@ export async function POST(request: NextRequest) {
 
     const strapiUserId = strapiUser[0]?.id;
 
+    // Create or retrieve Stripe customer
+    const userEmail = user.emailAddresses[0]?.emailAddress;
+    let stripeCustomerId = user.privateMetadata?.stripeCustomerId as string | undefined;
+    
+    if (!stripeCustomerId && userEmail) {
+      console.log('🔍 Looking for Stripe customer:', userEmail);
+      
+      const customers = await stripe.customers.list({
+        email: userEmail,
+        limit: 1,
+      });
+      
+      if (customers.data.length > 0) {
+        stripeCustomerId = customers.data[0].id;
+        console.log('✅ Found existing Stripe customer:', stripeCustomerId);
+        
+        // Update metadata if clerkUserId is not set
+        if (!customers.data[0].metadata?.clerkUserId) {
+          await stripe.customers.update(stripeCustomerId, {
+            metadata: { clerkUserId: user.id },
+          });
+        }
+      } else {
+        const customer = await stripe.customers.create({
+          email: userEmail,
+          name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+          metadata: { clerkUserId: user.id },
+        });
+        stripeCustomerId = customer.id;
+        console.log('✅ Created new Stripe customer:', stripeCustomerId);
+      }
+      
+      // Save to Clerk metadata
+      try {
+        await clerkClient.users.updateUserMetadata(user.id, {
+          privateMetadata: { stripeCustomerId },
+        });
+        console.log('✅ Saved Stripe customer ID to Clerk metadata');
+      } catch (metadataError) {
+        console.error('⚠️  Failed to save customer ID to Clerk:', metadataError);
+      }
+    }
+
     // Create Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -115,7 +163,8 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
-      customer_email: user.emailAddresses[0]?.emailAddress,
+      customer: stripeCustomerId,
+      customer_email: stripeCustomerId ? undefined : userEmail, // Use email only if no customer ID
       client_reference_id: user.id,
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'AU', 'NZ'], // Add more countries as needed

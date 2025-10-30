@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createClerkClient } from '@clerk/nextjs/server';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2025-09-30.clover',
+});
+
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY!,
 });
 
 export async function POST(request: NextRequest) {
@@ -82,6 +87,16 @@ export async function POST(request: NextRequest) {
       if (customers.data.length > 0) {
         customer = customers.data[0];
         console.log('✅ Found existing Stripe customer:', customer.id);
+        
+        // Update metadata if clerkUserId is not set
+        if (!customer.metadata?.clerkUserId) {
+          await stripe.customers.update(customer.id, {
+            metadata: {
+              clerkUserId: userId,
+            },
+          });
+          console.log('📝 Updated Stripe customer with Clerk user ID');
+        }
       } else {
         console.log('➕ Creating new Stripe customer');
         customer = await stripe.customers.create({
@@ -91,6 +106,19 @@ export async function POST(request: NextRequest) {
           },
         });
         console.log('✅ Created Stripe customer:', customer.id);
+      }
+      
+      // Save customer ID to Clerk metadata
+      try {
+        await clerkClient.users.updateUserMetadata(userId, {
+          privateMetadata: {
+            stripeCustomerId: customer.id,
+          },
+        });
+        console.log('✅ Saved Stripe customer ID to Clerk metadata');
+      } catch (metadataError) {
+        console.error('⚠️  Failed to save customer ID to Clerk:', metadataError);
+        // Don't fail the checkout if metadata update fails
       }
     } catch (error) {
       console.error('❌ Error creating/retrieving Stripe customer:', error);
