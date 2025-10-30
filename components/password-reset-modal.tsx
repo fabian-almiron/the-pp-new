@@ -46,7 +46,7 @@ export default function PasswordResetModal({
     
     if (!isLoaded) return;
     if (!email.trim()) {
-      setErrorMessage('Please enter your email address.');
+      setErrorMessage('Please enter your username or email address.');
       return;
     }
     
@@ -70,7 +70,7 @@ export default function PasswordResetModal({
       if (clerkError.toLowerCase().includes('not found') || 
           clerkError.toLowerCase().includes('no account') ||
           clerkError.toLowerCase().includes('identifier')) {
-        setErrorMessage('No account found with this email address.');
+        setErrorMessage('No account found with this username or email address.');
       } else {
         setErrorMessage(clerkError || 'Unable to send reset code. Please try again.');
       }
@@ -227,20 +227,20 @@ export default function PasswordResetModal({
             )}
 
             <p className="password-reset-description">
-              Enter your email address and we'll send you a 6-digit code to reset your password.
+              Enter your username or email address and we'll send you a 6-digit code to reset your password.
             </p>
 
             <div className="password-reset-form-group">
               <label htmlFor="reset-email" className="password-reset-label">
-                Email Address
+                Username or Email Address
               </label>
               <Input
                 id="reset-email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="password-reset-input"
-                placeholder="your@email.com"
+                placeholder="Enter username or email"
                 required
                 disabled={isLoading}
                 autoFocus
@@ -278,7 +278,7 @@ export default function PasswordResetModal({
         return (
           <form onSubmit={handleCodeSubmit}>
             <p className="password-reset-description">
-              We've sent a 6-digit code to <strong>{email}</strong>. Please enter it below.
+              We've sent a 6-digit code to the email address associated with <strong>{email}</strong>. Please enter it below.
             </p>
 
             <div className="password-reset-form-group">

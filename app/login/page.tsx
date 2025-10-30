@@ -75,7 +75,7 @@ function LoginContent() {
           "Unable to sign in. If you had an account before our recent upgrade, please reset your password or use social login."
         );
       } else {
-        setError(errorMessage || "Invalid email or password. Please try again.");
+        setError(errorMessage || "Invalid username, email, or password. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -160,10 +160,11 @@ function LoginContent() {
             </label>
             <Input
               id="email"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="login-input"
+              placeholder="Enter username or email"
               required
             />
           </div>
