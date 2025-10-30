@@ -56,19 +56,19 @@ function DifficultyLevels() {
     {
       title: "Beginner",
       slug: "beginner",
-      image: "/placeholder_daisy.jpg",
+      image: "/sunflower.png",
       alt: "Beginner level tutorials featuring simple cake decorating techniques"
     },
     {
       title: "Intermediate",
       slug: "intermediate", 
-      image: "/placeholder_lily.jpg",
+      image: "/Video-Library-Intermediate-thumbnail.jpg",
       alt: "Intermediate level tutorials with advanced piping techniques"
     },
     {
       title: "Advanced",
       slug: "advanced",
-      image: "/placeholder_rose-pink.jpg", 
+      image: "/Persian-Buttercup-scaled.jpg", 
       alt: "Advanced level tutorials for expert cake decoration"
     }
   ];
