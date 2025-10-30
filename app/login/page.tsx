@@ -55,11 +55,24 @@ function LoginContent() {
       const errorMessage = err?.errors?.[0]?.message || "";
       const errorCode = err?.errors?.[0]?.code || "";
       
-      // Check if user exists but has no password (migrated user scenario)
-      if (errorCode === 'form_password_incorrect' || 
-          errorMessage.toLowerCase().includes('password is incorrect') ||
-          errorMessage.toLowerCase().includes('no password') ||
-          errorMessage.toLowerCase().includes('password not set')) {
+      // Check if this is a "user not found" error (account doesn't exist)
+      const isUserNotFound = 
+        errorCode === 'form_identifier_not_found' ||
+        errorMessage.toLowerCase().includes('not found') ||
+        errorMessage.toLowerCase().includes('no account') ||
+        errorMessage.toLowerCase().includes('couldn\'t find') ||
+        errorMessage.toLowerCase().includes('identifier');
+      
+      // Only open password reset modal if:
+      // 1. User attempted login (we're in handleSubmit) ✓
+      // 2. Login failed (we're in catch block) ✓
+      // 3. Account EXISTS in database (NOT a "user not found" error) ✓
+      // 4. Issue is password-specific ✓
+      if (!isUserNotFound && 
+          (errorCode === 'form_password_incorrect' || 
+           errorMessage.toLowerCase().includes('password is incorrect') ||
+           errorMessage.toLowerCase().includes('no password') ||
+           errorMessage.toLowerCase().includes('password not set'))) {
         
         // Automatically open the password reset modal for migrated users
         setResetModalEmail(email);
@@ -68,14 +81,19 @@ function LoginContent() {
         setError(
           "It looks like you need to set up a password for our new system. We've opened the password reset form for you."
         );
-      } else if (errorMessage.toLowerCase().includes('password') || 
-          errorMessage.toLowerCase().includes('credentials') ||
-          errorMessage.toLowerCase().includes('invalid')) {
+      } else if (!isUserNotFound && 
+                 (errorMessage.toLowerCase().includes('password') || 
+                  errorMessage.toLowerCase().includes('credentials'))) {
+        // User exists but generic password/credential error
         setError(
           "Unable to sign in. If you had an account before our recent upgrade, please reset your password or use social login."
         );
+      } else if (isUserNotFound) {
+        // User doesn't exist - don't suggest password reset
+        setError("No account found with that username or email. Please check your credentials or sign up.");
       } else {
-        setError(errorMessage || "Invalid username, email, or password. Please try again.");
+        // Generic error fallback
+        setError(errorMessage || "Unable to sign in. Please try again.");
       }
     } finally {
       setIsLoading(false);
