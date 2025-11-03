@@ -1,4 +1,4 @@
-import { fetchProductBySlug } from "@/lib/strapi-api";
+import { fetchProductBySlug, fetchProducts } from "@/lib/strapi-api";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ProductPageClient from "./ProductPageClient";
@@ -8,6 +8,20 @@ export const dynamic = 'force-dynamic';
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Generate static params for all products
+export async function generateStaticParams() {
+  try {
+    const { data: products } = await fetchProducts();
+    if (!products) return [];
+    return products.map((product) => ({
+      slug: product.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params for products:', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {

@@ -1,7 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchBlogBySlug } from "@/lib/strapi-api";
+import { fetchBlogBySlug, fetchBlogs } from "@/lib/strapi-api";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArticleSchema } from "@/components/structured-data";
@@ -12,6 +12,19 @@ export const dynamic = 'force-dynamic';
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
+}
+
+// Generate static params for all blog posts
+export async function generateStaticParams() {
+  try {
+    const blogs = await fetchBlogs();
+    return blogs.map((blog) => ({
+      slug: blog.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params for blogs:', error);
+    return [];
+  }
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
