@@ -1,0 +1,14 @@
+# *
+User-agent: *
+Allow: /
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+Disallow: /my-account
+Disallow: /cart
+Disallow: /checkout
+
+# Sitemap
+Sitemap: https://thepipedpeony.com/sitemap.xml
+

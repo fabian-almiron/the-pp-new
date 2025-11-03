@@ -1327,6 +1327,30 @@ html {
   }
 }
 
+/* Signature font utility class */
+.signature-text {
+  color: #374151;
+  font-family: lindsey-signature, sans-serif;
+  font-size: 60px;
+  line-height: 0;
+}
+
+/* Shop page title */
+.shop-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.25rem;
+  color: #1F2937;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+@media (min-width: 768px) {
+  .shop-title {
+    font-size: 90px;
+    text-transform: uppercase;
+  }
+}
+
 /* CTA Section */
 .cta-section {
   position: relative;

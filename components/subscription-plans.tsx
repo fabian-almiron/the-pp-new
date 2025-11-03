@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, Loader2 } from "lucide-react";
 import { useSubscription } from "@/hooks/use-subscription";
+import { sanitizeHTML } from "@/lib/sanitize";
 
 interface SubscriptionPlansProps {
   onSubscriptionSelect?: (subscriptionDocumentId: string) => void;
@@ -82,7 +83,7 @@ export default function SubscriptionPlans({ onSubscriptionSelect, showTitle = tr
 
                 <div 
                   className="text-gray-700 text-sm leading-relaxed mb-8 min-h-[200px]"
-                  dangerouslySetInnerHTML={{ __html: subscription.description }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(subscription.description) }}
                 />
 
                 <Button

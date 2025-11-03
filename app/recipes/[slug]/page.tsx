@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { Clock, ChefHat, Users, Star, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { RecipeSchema } from "@/components/structured-data";
+import { sanitizeHTML } from "@/lib/sanitize";
 
 // Mark this page as dynamic
 export const dynamic = 'force-dynamic';
@@ -24,8 +26,43 @@ export default async function RecipePage({ params }: RecipePageProps) {
     notFound();
   }
 
+  // Extract ingredients and instructions for structured data
+  const ingredients = recipe.ingredients 
+    ? (Array.isArray(recipe.ingredients) 
+        ? recipe.ingredients.map((item: any) => 
+            typeof item === 'string' ? item : (item.ingredients_item || item.ingredientsItem || '')
+          ).filter(Boolean)
+        : []
+      )
+    : [];
+
+  const instructions = recipe.important || recipe.instructions
+    ? (Array.isArray(recipe.important) 
+        ? recipe.important.map((item: any) => 
+            typeof item === 'string' ? item : (item.important_items || item.importantItems || '')
+          ).filter(Boolean)
+        : (Array.isArray(recipe.instructions)
+            ? recipe.instructions.map((item: any) =>
+                typeof item === 'string' ? item : (item.instruction || '')
+              ).filter(Boolean)
+            : []
+          )
+      )
+    : [];
+
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
+      <RecipeSchema
+        name={recipe.title}
+        description={recipe.shortDescription || recipe.excerpt || ''}
+        image={(recipe.featuredImage || recipe.coverImage)?.url}
+        prepTime={recipe.prepTime}
+        totalTime={recipe.time}
+        recipeIngredient={ingredients}
+        recipeInstructions={instructions}
+        author={recipe.author || "Dara"}
+        datePublished={recipe.publishedAt}
+      />
       {/* Content */}
       <div className="container mx-auto px-4 py-12 max-w-6xl">
         {/* Back Button */}
@@ -70,7 +107,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
             {recipe.shortDescription && (
               <div 
                 className="mb-8 text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: recipe.shortDescription }}
+                dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.shortDescription) }}
               />
             )}
 
@@ -95,13 +132,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
                   {Array.isArray(recipe.ingredients) ? (
                     <ul className="space-y-2 text-gray-700">
                       {recipe.ingredients.map((item: any, index: number) => (
-                        <li key={index} dangerouslySetInnerHTML={{ __html: typeof item === 'string' ? item : item.ingredients_item || item.ingredientsItem }} />
+                        <li key={index} dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.ingredients_item || item.ingredientsItem) }} />
                       ))}
                     </ul>
                   ) : (
                     <div 
                       className="prose prose-gray max-w-none"
-                      dangerouslySetInnerHTML={{ __html: recipe.ingredients }}
+                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.ingredients) }}
                     />
                   )}
                 </div>
@@ -115,7 +152,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 <ol className="list-decimal list-inside space-y-3 text-gray-700">
                   {recipe.important.map((item: any, index: number) => (
                     <li key={index} className="pl-2">
-                      <span dangerouslySetInnerHTML={{ __html: typeof item === 'string' ? item : item.important_items || item.importantItems }} />
+                      <span dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.important_items || item.importantItems) }} />
                     </li>
                   ))}
                 </ol>
@@ -129,13 +166,13 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 {Array.isArray(recipe.instructions) ? (
                   <ol className="list-decimal list-inside space-y-3 text-gray-700">
                     {recipe.instructions.map((item: any, index: number) => (
-                      <li key={index} className="pl-2" dangerouslySetInnerHTML={{ __html: typeof item === 'string' ? item : item.instruction }} />
+                      <li key={index} className="pl-2" dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.instruction) }} />
                     ))}
                   </ol>
                 ) : (
                   <div 
                     className="prose prose-gray max-w-none"
-                    dangerouslySetInnerHTML={{ __html: recipe.instructions }}
+                    dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.instructions) }}
                   />
                 )}
               </div>
@@ -148,7 +185,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 <ol className="list-decimal list-inside space-y-3 text-gray-700">
                   {recipe.notes.map((item: any, index: number) => (
                     <li key={index} className="pl-2">
-                      <span dangerouslySetInnerHTML={{ __html: typeof item === 'string' ? item : item.note_item || item.noteItem }} />
+                      <span dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.note_item || item.noteItem) }} />
                     </li>
                   ))}
                 </ol>
@@ -160,7 +197,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <div className="mb-8 bg-pink-50 border-l-4 border-pink-500 p-6 rounded">
                 <div 
                   className="text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: recipe.notice }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.notice) }}
                 />
               </div>
             )}
@@ -170,7 +207,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
               <div className="mb-8">
                 <div 
                   className="prose prose-gray max-w-none"
-                  dangerouslySetInnerHTML={{ __html: recipe.content }}
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.content) }}
                 />
               </div>
             )}

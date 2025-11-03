@@ -3,7 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchProducts } from "@/lib/strapi-api";
 import { Product } from "@/data/types";
 import { PeonyLoader } from "@/components/ui/peony-loader";
 
@@ -12,27 +11,32 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch products from mock database
+  // Fetch products from API
   useEffect(() => {
     const loadProducts = async () => {
       setLoading(true);
       setError(null);
       
-      const response = await fetchProducts();
-      
-      if (response.error) {
-        setError(response.error);
+      try {
+        const response = await fetch('/api/products');
+        const result = await response.json();
+        
+        if (!response.ok || result.error) {
+          setError(result.error || 'Failed to load products');
+          setLoading(false);
+          return;
+        }
+        
+        if (result.data) {
+          console.log('🛍️ Loaded products:', result.data.length);
+          console.log('📋 Product slugs:', result.data.map((p: Product) => p.slug));
+          setProducts(result.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load products');
+      } finally {
         setLoading(false);
-        return;
       }
-      
-      if (response.data) {
-        console.log('🛍️ Loaded products:', response.data.length);
-        console.log('📋 Product slugs:', response.data.map(p => p.slug));
-        setProducts(response.data);
-      }
-      
-      setLoading(false);
     };
 
     loadProducts();
@@ -44,14 +48,9 @@ export default function ShopPage() {
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
           <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <img 
-                src="/shop-welcome.png" 
-                alt="Welcome to the Shop" 
-                width={280} 
-                height={216}
-                style={{ width: '280px', height: '216px', objectFit: 'contain' }}
-              />
+            <div className="mb-6">
+              <h3 className="signature-text mb-2">Welcome to the</h3>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gray-900 mb-4">Shop</h1>
             </div>
             <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
             <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
@@ -70,14 +69,9 @@ export default function ShopPage() {
       <div className="bg-white min-h-screen">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
           <div className="text-center mb-12">
-            <div className="flex justify-center mb-6">
-              <img 
-                src="/shop-welcome.png" 
-                alt="Welcome to the Shop" 
-                width={280} 
-                height={216}
-                style={{ width: '280px', height: '216px', objectFit: 'contain' }}
-              />
+            <div className="mb-6">
+              <h3 className="signature-text mb-2">Welcome to the</h3>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gray-900 mb-4">Shop</h1>
             </div>
             <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
             <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
@@ -101,16 +95,11 @@ export default function ShopPage() {
 
   return (
     <div className="bg-white">
-      <div className="container mx-auto" style={{ margin: "0px 159.583px", padding: "32px 16px 96px" }}>
+      <div className="container mx-auto" style={{ margin: "0px 159.583px", padding: "80px 16px 96px" }}>
         <div className="text-center mb-12">
-          <div className="flex justify-center mb-6">
-            <Image 
-              src="/shop-welcome.png" 
-              alt="Welcome to the Shop" 
-              width={400} 
-              height={200}
-              className="object-contain"
-            />
+          <div className="mb-6">
+            <h1 className="signature-text mb-2">Welcome to the</h1>
+            <h1 className="shop-title">Shop</h1>
           </div>
           <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
           <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>

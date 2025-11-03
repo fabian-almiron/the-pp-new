@@ -9,7 +9,8 @@ import { useCart } from "@/contexts/cart-context";
 import { LoggedInHeader } from "@/components/logged-in-header";
 import { useUser as useClerkUser, useClerk } from "@clerk/nextjs";
 import Navigation from '@/components/navigation';
-import { useState } from 'react';
+import { SearchDialog } from '@/components/search-dialog';
+import { useState, useEffect } from 'react';
 
 export function SiteHeader() {
   const { isSignedIn, isLoaded } = useClerkUser();
@@ -27,10 +28,15 @@ export function SiteHeader() {
 
 function LoggedOutHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { getItemCount } = useCart();
   const { isSignedIn } = useClerkUser();
   const { signOut } = useClerk();
   const cartItemCount = getItemCount();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -66,6 +72,7 @@ function LoggedOutHeader() {
           className="header-nav"
         />
         <div className="header-actions">
+          <SearchDialog />
           <Link href="/cart">
             <Button variant="clean" size="icon" className="relative !border-none">
               <ShoppingCart className="h-5 w-5 text-gray-700" />
@@ -104,100 +111,108 @@ function LoggedOutHeader() {
           )}
         </div>
         <div className="header-mobile-menu">
-          <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <SheetTrigger asChild>
-              <Button variant="clean" size="icon" className="!border-0 hover:bg-transparent">
-                <Menu className="text-gray-700" style={{ width: '1.5rem', height: '1.5rem' }} />
-                <span className="sr-only">Toggle menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
-              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-              <nav className="flex flex-col h-full pt-8">
-                {/* Logo */}
-                <div className="mb-8 pb-6 border-b border-gray-200">
-                  <Image
-                    src="/piped-peony-logo-1536x339.png"
-                    alt="The Piped Peony"
-                    width={150}
-                    height={50}
-                    className="h-12 w-auto"
-                  />
-                </div>
+          {mounted && (
+            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <SheetTrigger asChild>
+                <Button variant="clean" size="icon" className="!border-0 hover:bg-transparent">
+                  <Menu className="text-gray-700" style={{ width: '1.5rem', height: '1.5rem' }} />
+                  <span className="sr-only">Toggle menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
+                <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+                <nav className="flex flex-col h-full pt-8">
+                  {/* Logo */}
+                  <div className="mb-8 pb-6 border-b border-gray-200">
+                    <Image
+                      src="/piped-peony-logo-1536x339.png"
+                      alt="The Piped Peony"
+                      width={150}
+                      height={50}
+                      className="h-12 w-auto"
+                    />
+                  </div>
 
-                {/* Navigation Links */}
-                <div className="flex-1 overflow-y-auto">
-                  <Navigation 
-                    menuSlug="logged-out-header" 
-                    className="flex flex-col space-y-2 mb-6"
-                    onLinkClick={() => setIsMobileMenuOpen(false)}
-                  />
-                </div>
+                  {/* Navigation Links */}
+                  <div className="flex-1 overflow-y-auto">
+                    <Navigation 
+                      menuSlug="logged-out-header" 
+                      className="flex flex-col space-y-2 mb-6"
+                      onLinkClick={() => setIsMobileMenuOpen(false)}
+                    />
+                  </div>
 
-                {/* Mobile Actions */}
-                <div className="flex flex-col gap-3 pt-6 border-t border-gray-200 mt-auto">
-                  <Link 
-                    href="/cart" 
-                    className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#FBF9F6] hover:bg-[#f1eae6] transition-colors group" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <span className="flex items-center gap-3 font-medium text-gray-700 group-hover:text-gray-900">
-                      <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
-                      Cart
-                    </span>
-                    {cartItemCount > 0 && (
-                      <span className="bg-[#D4A771] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                        {cartItemCount}
+                  {/* Mobile Actions */}
+                  <div className="flex flex-col gap-3 pt-6 border-t border-gray-200 mt-auto">
+                    <Link 
+                      href="/cart" 
+                      className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#FBF9F6] hover:bg-[#f1eae6] transition-colors group" 
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <span className="flex items-center gap-3 font-medium text-gray-700 group-hover:text-gray-900">
+                        <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
+                        Cart
                       </span>
+                      {cartItemCount > 0 && (
+                        <span className="bg-[#D4A771] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                          {cartItemCount}
+                        </span>
+                      )}
+                    </Link>
+
+                    {isSignedIn ? (
+                      <>
+                        <Link 
+                          href="/my-account" 
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="w-full"
+                        >
+                          <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
+                            My Account
+                          </button>
+                        </Link>
+
+                        <button 
+                          className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors"
+                          onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                        >
+                          Sign Out
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <Link 
+                          href="/signup" 
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="w-full"
+                        >
+                          <button className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors">
+                            Sign Up
+                          </button>
+                        </Link>
+
+                        <Link 
+                          href="/login" 
+                          onClick={() => setIsMobileMenuOpen(false)}
+                          className="w-full"
+                        >
+                          <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
+                            Login
+                          </button>
+                        </Link>
+                      </>
                     )}
-                  </Link>
-
-                  {isSignedIn ? (
-                    <>
-                      <Link 
-                        href="/my-account" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="w-full"
-                      >
-                        <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
-                          My Account
-                        </button>
-                      </Link>
-
-                      <button 
-                        className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors"
-                        onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                      >
-                        Sign Out
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link 
-                        href="/signup" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="w-full"
-                      >
-                        <button className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors">
-                          Sign Up
-                        </button>
-                      </Link>
-
-                      <Link 
-                        href="/login" 
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="w-full"
-                      >
-                        <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
-                          Login
-                        </button>
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </nav>
-            </SheetContent>
-          </Sheet>
+                  </div>
+                </nav>
+              </SheetContent>
+            </Sheet>
+          )}
+          {!mounted && (
+            <Button variant="clean" size="icon" className="!border-0 hover:bg-transparent">
+              <Menu className="text-gray-700" style={{ width: '1.5rem', height: '1.5rem' }} />
+              <span className="sr-only">Toggle menu</span>
+            </Button>
+          )}
         </div>
       </div>
     </header>

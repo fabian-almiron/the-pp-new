@@ -1,6 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { sanitizeHTML } from "@/lib/sanitize";
 
 interface CourseTabsProps {
   aboutContent: string;
@@ -20,7 +21,7 @@ export function CourseTabs({ aboutContent, whatYouNeedContent }: CourseTabsProps
           <div className="p-4 border border-gray-200 rounded-b-md">
             <div 
               className="prose prose-sm max-w-none text-gray-700"
-              dangerouslySetInnerHTML={{ __html: aboutContent }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(aboutContent) }}
             />
           </div>
         </TabsContent>
@@ -29,7 +30,7 @@ export function CourseTabs({ aboutContent, whatYouNeedContent }: CourseTabsProps
           <div className="p-4 border border-gray-200 rounded-b-md">
             <div 
               className="prose prose-sm max-w-none text-gray-700"
-              dangerouslySetInnerHTML={{ __html: whatYouNeedContent }}
+              dangerouslySetInnerHTML={{ __html: sanitizeHTML(whatYouNeedContent) }}
             />
           </div>
         </TabsContent>

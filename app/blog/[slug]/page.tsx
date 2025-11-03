@@ -1,74 +1,88 @@
-"use client"
-
-import React, { useState, useEffect, use } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchBlogBySlug, BlogPost } from "@/lib/strapi-api";
-import { PeonyLoader } from "@/components/ui/peony-loader";
+import { fetchBlogBySlug } from "@/lib/strapi-api";
+import { notFound } from "next/navigation";
+import type { Metadata } from "next";
+import { ArticleSchema } from "@/components/structured-data";
+import { sanitizeHTML } from "@/lib/sanitize";
 
-export default function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  // Unwrap the params promise for Next.js 15
-  const { slug } = use(params);
+// Mark as dynamic
+export const dynamic = 'force-dynamic';
+
+interface BlogPostPageProps {
+  params: Promise<{ slug: string }>;
+}
+
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const result = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs/${slug}`).then(res => res.json());
+  const post = result.data;
   
-  const [post, setPost] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadBlog = async () => {
-      setLoading(true);
-      setError(null);
-      
-      try {
-        const blogPost = await fetchBlogBySlug(slug);
-        
-        if (!blogPost) {
-          setError('Blog post not found');
-        } else {
-          setPost(blogPost);
-        }
-      } catch (err) {
-        setError('Failed to load blog post. Please make sure Strapi is running.');
-      }
-      
-      setLoading(false);
+  if (!post) {
+    return {
+      title: 'Blog Post Not Found | The Piped Peony',
     };
-
-    loadBlog();
-  }, [slug]);
-
-  if (loading) {
-    return (
-      <div className="bg-white min-h-screen">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
-          <div className="flex justify-center items-center py-16">
-            <PeonyLoader />
-          </div>
-        </div>
-      </div>
-    );
   }
 
-  if (error || !post) {
-    return (
-      <div className="bg-white min-h-screen">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
-          <div className="max-w-3xl mx-auto">
-            <div className="bg-yellow-100 border border-yellow-400 text-yellow-800 px-4 py-3 rounded mb-8">
-              <p className="font-bold">Notice</p>
-              <p>{error || 'Blog post not found'}</p>
-            </div>
-            <Link href="/blog" className="text-[#D4A771] hover:underline">
-              ← Back to Blog
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+  const description = post.excerpt || post.content?.replace(/<[^>]*>/g, '').substring(0, 160) || `Read ${post.title} on The Piped Peony blog`;
+
+  return {
+    title: `${post.title} | The Piped Peony Blog`,
+    description,
+    keywords: post.tags || [],
+    authors: [{ name: post.author || 'Dara' }],
+    openGraph: {
+      title: post.title,
+      description,
+      url: `https://thepipedpeony.com/blog/${slug}`,
+      siteName: "The Piped Peony",
+      images: post.coverImage ? [
+        {
+          url: post.coverImage.url,
+          width: 1200,
+          height: 630,
+          alt: post.coverImage.alternativeText || post.title,
+        },
+      ] : [],
+      locale: "en_US",
+      type: "article",
+      publishedTime: post.publishedAt,
+      authors: [post.author || 'Dara'],
+      tags: post.tags || [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description,
+      images: post.coverImage ? [post.coverImage.url] : [],
+    },
+    alternates: {
+      canonical: `https://thepipedpeony.com/blog/${slug}`,
+    },
+  };
+}
+
+export default async function BlogPostPage({ params }: BlogPostPageProps) {
+  const { slug } = await params;
+  
+  const post = await fetchBlogBySlug(slug);
+
+  if (!post) {
+    notFound();
   }
 
   return (
     <div className="bg-white min-h-screen">
+      <ArticleSchema
+        headline={post.title}
+        description={post.excerpt}
+        image={post.coverImage?.url}
+        datePublished={post.publishedAt}
+        dateModified={post.updatedAt || post.publishedAt}
+        author={post.author || "Dara"}
+        url={`https://thepipedpeony.com/blog/${slug}`}
+      />
       {/* Header */}
       <div className="bg-gradient-to-b from-[#FBF9F6] to-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24">
@@ -151,7 +165,7 @@ export default function BlogPostPage({ params }: { params: Promise<{ slug: strin
               prose-ul:my-6 prose-li:text-gray-700
               prose-img:rounded-lg prose-img:shadow-md
             "
-            dangerouslySetInnerHTML={{ __html: post.content }}
+            dangerouslySetInnerHTML={{ __html: sanitizeHTML(post.content) }}
           />
 
           {/* Author & Date Footer */}

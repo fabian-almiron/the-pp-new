@@ -48,8 +48,21 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
   useImperativeHandle(ref, () => ({
     playVideo: () => {
       if (player && typeof player.play === 'function') {
-        // First unmute the video, then play it
+        // First ensure the video is unmuted, then play it
         Promise.resolve()
+          .then(() => {
+            // Get current muted state
+            if (typeof player.getMuted === 'function') {
+              return player.getMuted();
+            }
+            return false;
+          })
+          .then((isMuted) => {
+            // If muted, unmute it
+            if (isMuted && typeof player.setMuted === 'function') {
+              return player.setMuted(false);
+            }
+          })
           .then(() => {
             // Set volume to 100% (unmuted)
             if (typeof player.setVolume === 'function') {
@@ -62,6 +75,12 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
           })
           .catch((error: any) => {
             console.error('Error playing/unmuting video:', error);
+            // Try to play anyway, even if unmuting failed
+            if (player && typeof player.play === 'function') {
+              player.play().catch((e: any) => {
+                console.error('Final play attempt failed:', e);
+              });
+            }
           });
       }
     }
@@ -119,30 +138,49 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
     // Clear the container
     containerRef.current.innerHTML = '';
 
+    // Detect if mobile device
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     // Create new Vimeo player
     const newPlayer = new window.Vimeo.Player(containerRef.current, {
       id: videoId,
       width: '100%',
       height: '100%',
       responsive: true,
+      muted: false, // Explicitly set to unmuted
+      autopause: false,
     });
 
     // Set up event listeners
     newPlayer.ready().then(() => {
       setIsLoading(false);
       setPlayer(newPlayer);
-      // Jump to timestamp if specified (after player is set)
-      if (timestamp > 0) {
-        return newPlayer.setCurrentTime(timestamp).then(() => {
-          // Set volume to 100% (unmuted) before auto-playing
-          if (typeof newPlayer.setVolume === 'function') {
-            return newPlayer.setVolume(1);
+      
+      // Ensure video is unmuted
+      return Promise.resolve()
+        .then(() => {
+          if (typeof newPlayer.setMuted === 'function') {
+            return newPlayer.setMuted(false);
           }
-        }).then(() => {
-          // Auto-play after jumping to initial timestamp and unmuting
-          return newPlayer.play();
+        })
+        .then(() => {
+          // Set volume to 100%
+          return newPlayer.setVolume(1);
+        })
+        .then(() => {
+          // Jump to timestamp if specified (after player is set)
+          if (timestamp > 0) {
+            return newPlayer.setCurrentTime(timestamp).then(() => {
+              // Only auto-play on desktop, not on mobile
+              if (!isMobile) {
+                return newPlayer.play();
+              }
+            });
+          } else if (!isMobile) {
+            // Auto-play on desktop only
+            return newPlayer.play();
+          }
         });
-      }
     }).catch((error: any) => {
       console.error('Error loading Vimeo player:', error);
       setIsLoading(false);
@@ -160,14 +198,22 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
           return;
         }
 
+        // Detect if mobile device
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
         player.setCurrentTime(timestamp).then(() => {
-          // Set volume to 100% (unmuted) before auto-playing
+          // Ensure video is unmuted
+          if (typeof player.setMuted === 'function') {
+            return player.setMuted(false);
+          }
+        }).then(() => {
+          // Set volume to 100% (unmuted)
           if (typeof player.setVolume === 'function') {
             return player.setVolume(1);
           }
         }).then(() => {
-          // Auto-play after jumping to timestamp and unmuting
-          if (player && typeof player.play === 'function') {
+          // Only auto-play on desktop, not on mobile
+          if (!isMobile && player && typeof player.play === 'function') {
             return player.play();
           }
         }).catch((error: any) => {

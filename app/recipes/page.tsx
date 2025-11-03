@@ -63,11 +63,15 @@ export default function RecipeLibraryPage() {
     const cats = new Set<string>();
     recipes.forEach(recipe => {
       // If recipe has categories array, add all of them
-      if (recipe.categories && recipe.categories.length > 0) {
-        recipe.categories.forEach(cat => cats.add(cat));
+      if (recipe.categories && Array.isArray(recipe.categories) && recipe.categories.length > 0) {
+        recipe.categories.forEach(cat => {
+          if (cat && typeof cat === 'string') {
+            cats.add(cat);
+          }
+        });
       }
       // Fallback to single category field for backward compatibility
-      else if (recipe.category) {
+      else if (recipe.category && typeof recipe.category === 'string') {
         cats.add(recipe.category);
       }
     });
@@ -83,13 +87,13 @@ export default function RecipeLibraryPage() {
   const filteredRecipes = useMemo(() => {
     return recipes.filter(recipe => {
       // Search filter
-      if (searchQuery && !recipe.title.toLowerCase().includes(searchQuery.toLowerCase())) {
+      if (searchQuery && !recipe.title?.toLowerCase().includes(searchQuery.toLowerCase())) {
         return false;
       }
       
       // Category filter
       if (selectedCategory !== "all") {
-        const hasCategory = recipe.categories 
+        const hasCategory = (recipe.categories && Array.isArray(recipe.categories))
           ? recipe.categories.includes(selectedCategory)
           : recipe.category === selectedCategory;
         if (!hasCategory) {

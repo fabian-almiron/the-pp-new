@@ -42,7 +42,12 @@ async function fetchCategoryBySlug(slug: string) {
   try {
     const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
     const response = await fetch(`${strapiUrl}/api/categories?filters[slug][$eq]=${slug}`, {
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.STRAPI_API_TOKEN && {
+          'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
+        }),
+      },
       cache: 'no-store'
     });
     

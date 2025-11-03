@@ -1,9 +1,32 @@
 import Image from "next/image";
 import Link from "next/link";
 import { fetchBlogs } from "@/lib/strapi-api";
+import type { Metadata } from "next";
 
 // Mark this page as dynamic (always server-rendered)
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: "The Piped Peony Blog | Cake Decorating Tips & Tutorials",
+  description: "Tips, tutorials, and inspiration for buttercream artists and bakers. Learn from expert instructor Dara and discover the latest cake decorating techniques.",
+  keywords: ["cake decorating blog", "buttercream tips", "piping tutorials", "baking blog", "cake decorating inspiration"],
+  openGraph: {
+    title: "The Piped Peony Blog | Cake Decorating Tips & Tutorials",
+    description: "Tips, tutorials, and inspiration for buttercream artists and bakers.",
+    url: "https://thepipedpeony.com/blog",
+    siteName: "The Piped Peony",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Piped Peony Blog",
+    description: "Cake decorating tips, tutorials, and inspiration",
+  },
+  alternates: {
+    canonical: "https://thepipedpeony.com/blog",
+  },
+};
 
 export default async function BlogPage() {
   let posts;

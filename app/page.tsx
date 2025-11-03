@@ -4,6 +4,39 @@ import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { TestimonialsCarousel } from "@/components/testimonials-carousel";
 import { fetchCourses } from "@/lib/strapi-api";
+import { OrganizationSchema } from "@/components/structured-data";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "The Piped Peony Academy | Learn Buttercream Flower Piping",
+  description: "Learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights. Join The Piped Peony Academy for on-demand cake decorating classes, exclusive recipes, and supportive community.",
+  keywords: ["buttercream flowers", "cake decorating", "piping tutorials", "buttercream piping", "flower cake", "cake decorating classes", "online baking courses"],
+  openGraph: {
+    title: "The Piped Peony Academy | Learn Buttercream Flower Piping",
+    description: "Join The Piped Peony Academy for expert cake decorating tutorials, exclusive Blooming Buttercream™ recipes, and a supportive community.",
+    url: "https://thepipedpeony.com",
+    siteName: "The Piped Peony",
+    images: [
+      {
+        url: "/archy-header-image.webp",
+        width: 1200,
+        height: 630,
+        alt: "Beautiful buttercream flower cake",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "The Piped Peony Academy | Learn Buttercream Flower Piping",
+    description: "Learn buttercream flower piping with expert tutorials and exclusive recipes.",
+    images: ["/archy-header-image.webp"],
+  },
+  alternates: {
+    canonical: "https://thepipedpeony.com",
+  },
+};
 
 export default async function HomePage() {
   // Fetch latest 3 courses
@@ -14,6 +47,16 @@ export default async function HomePage() {
 
   return (
     <>
+      <OrganizationSchema
+        name="The Piped Peony Academy"
+        url="https://thepipedpeony.com"
+        logo="https://thepipedpeony.com/piped-peony-logo-2048x452.png"
+        description="Learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights. Expert cake decorating and buttercream flower piping courses."
+        socialProfiles={[
+          "https://www.facebook.com/thepipedpeony",
+          "https://www.instagram.com/thepipedpeony",
+        ]}
+      />
       <HeroSection />
       <FeaturesSection />
       <AboutSection />

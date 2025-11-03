@@ -1,7 +1,7 @@
 "use client"
 
 import Link from 'next/link';
-import { fetchMenu, Menu, MenuItem } from '@/lib/strapi-api';
+import { Menu, MenuItem } from '@/lib/strapi-api';
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
@@ -54,7 +54,7 @@ function MenuItemComponent({ item, className = "", showArrow = false, arrowDirec
 function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem; level?: number; onLinkClick?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const hasChildren = item.children && item.children.length > 0;
+  const hasChildren = item.children && Array.isArray(item.children) && item.children.length > 0;
   const textSizes = [
     "text-base font-medium text-gray-700 hover:text-[#D4A771]", // level 0
     "text-sm text-gray-600 hover:text-[#D4A771]", // level 1
@@ -95,7 +95,7 @@ function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem;
       
       {hasChildren && isOpen && (
         <ul className={`pl-3 mt-1 space-y-1`}>
-          {item.children?.map((child) => (
+          {item.children?.filter(child => child).map((child) => (
             <li key={child.id}>
               <CollapsibleMenuItem item={child} level={level + 1} onLinkClick={onLinkClick} />
             </li>
@@ -135,17 +135,19 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
       }
     }
 
-    // Fetch from API if no valid cache
+    // Fetch from API route if no valid cache
     async function loadMenu() {
       try {
-        const { data, error } = await fetchMenu(menuSlug);
-        if (error || !data) {
-          setError(error || 'Menu not found');
+        const response = await fetch(`/api/menu?slug=${menuSlug}`);
+        const result = await response.json();
+        
+        if (!response.ok || result.error || !result.data) {
+          setError(result.error || 'Menu not found');
         } else {
-          setMenu(data);
+          setMenu(result.data);
           // Cache the menu data
           localStorage.setItem(`menu_${menuSlug}`, JSON.stringify({
-            data,
+            data: result.data,
             timestamp: Date.now()
           }));
         }
@@ -163,8 +165,8 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
     return null; // Or a skeleton loader
   }
 
-  if (error || !menu) {
-    console.warn(`Menu "${menuSlug}" not found:`, error);
+  if (error || !menu || !menu.menuItems || !Array.isArray(menu.menuItems)) {
+    console.warn(`Menu "${menuSlug}" not found or invalid:`, error);
     return null;
   }
 
@@ -176,7 +178,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
       {isHeaderNav ? (
         // Header navigation layout - render only top-level items
         <>
-          {menu.menuItems.map((item) => (
+          {menu.menuItems.filter(item => item).map((item) => (
               <div key={item.id} className="relative group">
                 <MenuItemComponent 
                   item={item} 
@@ -187,9 +189,9 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
                 />
                 
                 {/* Dropdown for children */}
-                {item.children && item.children.length > 0 && (
+                {item.children && Array.isArray(item.children) && item.children.length > 0 && (
                   <div className="absolute left-0 top-full mt-2 bg-white shadow-lg rounded-md py-2 min-w-48 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                    {item.children.map((child) => (
+                    {item.children.filter(child => child).map((child) => (
                       <div key={child.id} className="relative group/nested">
                         <MenuItemComponent 
                           item={child} 
@@ -199,9 +201,9 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
                         />
                         
                         {/* Nested dropdown for grandchildren (3rd level) */}
-                        {child.children && child.children.length > 0 && (
+                        {child.children && Array.isArray(child.children) && child.children.length > 0 && (
                           <div className="absolute left-full top-0 ml-1 bg-white shadow-lg rounded-md py-2 min-w-48 opacity-0 invisible group-hover/nested:opacity-100 group-hover/nested:visible transition-all duration-200 z-50">
-                            {child.children.map((grandchild) => (
+                            {child.children.filter(grandchild => grandchild).map((grandchild) => (
                               <MenuItemComponent 
                                 key={grandchild.id}
                                 item={grandchild} 
@@ -221,7 +223,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
       ) : (
         // Default navigation layout (mobile/sidebar) - collapsible
         <ul className="flex flex-col space-y-2">
-          {menu.menuItems.map((item) => (
+          {menu.menuItems.filter(item => item).map((item) => (
               <li key={item.id}>
                 <CollapsibleMenuItem item={item} level={0} onLinkClick={onLinkClick} />
               </li>

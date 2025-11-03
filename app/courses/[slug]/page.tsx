@@ -3,6 +3,7 @@ import { CoursePageClient } from "@/components/course-page-client";
 import { SubscriberGate } from "@/components/subscriber-gate";
 import { notFound } from "next/navigation";
 import { fetchCourseBySlug, fetchCoursesBySeries } from "@/lib/strapi-api";
+import { CourseSchema } from "@/components/structured-data";
 
 // Mark this page as dynamic (always server-rendered)
 export const dynamic = 'force-dynamic';
@@ -117,6 +118,14 @@ export default async function CoursePage({ params }: CoursePageProps) {
 
   return (
     <SubscriberGate>
+      <CourseSchema
+        name={strapiCourse.title}
+        description={strapiCourse.excerpt || strapiCourse.about || strapiCourse.content || ''}
+        provider="The Piped Peony Academy"
+        url={`https://thepipedpeony.com/courses/${slug}`}
+        image={strapiCourse.featuredImage?.url}
+        instructor={strapiCourse.instructor || "Dara"}
+      />
       <CoursePageClient 
         course={course} 
         relatedCourses={relatedCourses}
