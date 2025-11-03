@@ -21,7 +21,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://*.google-analytics.com https://*.clerk.accounts.dev https://clerk.*.lcl.dev https://challenges.cloudflare.com https://use.typekit.net https://p.typekit.net; style-src 'self' 'unsafe-inline' https://use.typekit.net https://p.typekit.net; img-src 'self' data: https: blob:; font-src 'self' data: https://use.typekit.net https://p.typekit.net; connect-src 'self' https://dazzling-friends-80757c9c53.strapiapp.com https://*.strapiapp.com https://api.stripe.com https://*.stripe.com https://*.clerk.accounts.dev https://clerk.*.lcl.dev https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.googletagmanager.com https://use.typekit.net https://performance.typekit.net https://player.vimeo.com; frame-src 'self' https://player.vimeo.com https://*.vimeo.com https://js.stripe.com https://*.stripe.com https://*.clerk.accounts.dev https://clerk.*.lcl.dev https://challenges.cloudflare.com https://www.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'self';"
+          "value": "default-src 'self' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https: wss:; frame-src 'self' https:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self' https:;"
         }
       ]
     },
