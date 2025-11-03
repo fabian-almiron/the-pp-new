@@ -16,8 +16,7 @@ interface BlogPostPageProps {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const result = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/blogs/${slug}`).then(res => res.json());
-  const post = result.data;
+  const post = await fetchBlogBySlug(slug);
   
   if (!post) {
     return {

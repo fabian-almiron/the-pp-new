@@ -14,9 +14,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
   const { slug } = await params;
   
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/products/${slug}`);
-    const result = await response.json();
-    const product = result.data;
+    const { data: product } = await fetchProductBySlug(slug);
     
     if (!product) {
       return {
@@ -66,36 +64,27 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   
-  try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/products/${slug}`, {
-      cache: 'no-store'
-    });
-    const result = await response.json();
-    
-    if (!result.data) {
-      notFound();
-    }
-
-    const product = result.data;
-
-    return (
-      <>
-        <ProductSchema
-          name={product.name}
-          description={product.shortDescription || product.longDescription || product.description || ''}
-          image={product.images?.map((img: any) => img.src) || []}
-          sku={product.sku || product.id.toString()}
-          brand="The Piped Peony"
-          price={product.price}
-          priceCurrency="USD"
-          availability={product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
-          url={`https://thepipedpeony.com/shop/item/${slug}`}
-        />
-        <ProductPageClient product={product} />
-      </>
-    );
-  } catch (error) {
+  const { data: product, error } = await fetchProductBySlug(slug);
+  
+  if (error || !product) {
     notFound();
   }
+
+  return (
+    <>
+      <ProductSchema
+        name={product.name}
+        description={product.shortDescription || product.longDescription || product.description || ''}
+        image={product.images?.map((img: any) => img.src) || []}
+        sku={product.sku || product.id.toString()}
+        brand="The Piped Peony"
+        price={product.price}
+        priceCurrency="USD"
+        availability={product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
+        url={`https://thepipedpeony.com/shop/item/${slug}`}
+      />
+      <ProductPageClient product={product} />
+    </>
+  );
 }
 
