@@ -94,7 +94,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       notFound();
     }
 
-  return (
+    return (
     <div className="bg-white min-h-screen">
       <ArticleSchema
         headline={post.title}
@@ -218,7 +218,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         </div>
       </div>
     </div>
-  );
+    );
   } catch (error) {
     console.error('Error loading blog post:', error);
     notFound();
