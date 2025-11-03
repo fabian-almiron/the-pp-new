@@ -16,15 +16,17 @@ interface BlogPostPageProps {
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const post = await fetchBlogBySlug(slug);
   
-  if (!post) {
-    return {
-      title: 'Blog Post Not Found | The Piped Peony',
-    };
-  }
+  try {
+    const post = await fetchBlogBySlug(slug);
+    
+    if (!post) {
+      return {
+        title: 'Blog Post Not Found | The Piped Peony',
+      };
+    }
 
-  const description = post.excerpt || post.content?.replace(/<[^>]*>/g, '').substring(0, 160) || `Read ${post.title} on The Piped Peony blog`;
+    const description = post.excerpt || post.content?.replace(/<[^>]*>/g, '').substring(0, 160) || `Read ${post.title} on The Piped Peony blog`;
 
   return {
     title: `${post.title} | The Piped Peony Blog`,
@@ -60,16 +62,24 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
       canonical: `https://thepipedpeony.com/blog/${slug}`,
     },
   };
+  } catch (error) {
+    console.error('Error generating blog metadata:', error);
+    return {
+      title: 'Blog Post | The Piped Peony',
+      description: 'Read our latest blog post on The Piped Peony',
+    };
+  }
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
   const { slug } = await params;
   
-  const post = await fetchBlogBySlug(slug);
+  try {
+    const post = await fetchBlogBySlug(slug);
 
-  if (!post) {
-    notFound();
-  }
+    if (!post) {
+      notFound();
+    }
 
   return (
     <div className="bg-white min-h-screen">
@@ -196,4 +206,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
       </div>
     </div>
   );
+  } catch (error) {
+    console.error('Error loading blog post:', error);
+    notFound();
+  }
 }

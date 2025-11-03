@@ -64,27 +64,32 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   
-  const { data: product, error } = await fetchProductBySlug(slug);
-  
-  if (error || !product) {
+  try {
+    const { data: product, error } = await fetchProductBySlug(slug);
+    
+    if (error || !product) {
+      notFound();
+    }
+
+    return (
+      <>
+        <ProductSchema
+          name={product.name}
+          description={product.shortDescription || product.longDescription || product.description || ''}
+          image={product.images?.map((img: any) => img.src) || []}
+          sku={product.sku || product.id.toString()}
+          brand="The Piped Peony"
+          price={product.price}
+          priceCurrency="USD"
+          availability={product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
+          url={`https://thepipedpeony.com/shop/item/${slug}`}
+        />
+        <ProductPageClient product={product} />
+      </>
+    );
+  } catch (error) {
+    console.error('Error loading product:', error);
     notFound();
   }
-
-  return (
-    <>
-      <ProductSchema
-        name={product.name}
-        description={product.shortDescription || product.longDescription || product.description || ''}
-        image={product.images?.map((img: any) => img.src) || []}
-        sku={product.sku || product.id.toString()}
-        brand="The Piped Peony"
-        price={product.price}
-        priceCurrency="USD"
-        availability={product.inStock ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"}
-        url={`https://thepipedpeony.com/shop/item/${slug}`}
-      />
-      <ProductPageClient product={product} />
-    </>
-  );
 }
 
