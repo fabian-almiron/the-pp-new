@@ -14,18 +14,8 @@ interface BlogPostPageProps {
   params: Promise<{ slug: string }>;
 }
 
-// Generate static params for all blog posts
-export async function generateStaticParams() {
-  try {
-    const blogs = await fetchBlogs();
-    return blogs.map((blog) => ({
-      slug: blog.slug,
-    }));
-  } catch (error) {
-    console.error('Error generating static params for blogs:', error);
-    return [];
-  }
-}
+// Note: generateStaticParams removed because we're using force-dynamic
+// The page will be rendered on-demand for any slug
 
 export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
   const { slug } = await params;
