@@ -5,7 +5,7 @@ import { fetchBlogBySlug, fetchBlogs } from "@/lib/strapi-api";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArticleSchema } from "@/components/structured-data";
-import { sanitizeHTML } from "@/lib/sanitize";
+import { BlogContent } from "@/components/blog-content";
 
 // Mark as dynamic
 export const dynamic = 'force-dynamic';
@@ -166,7 +166,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           )}
 
           {/* Rich Text Content */}
-          <div 
+          <BlogContent
+            content={post.content}
             className="prose prose-lg max-w-none
               prose-headings:font-serif prose-headings:text-gray-900
               prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6
@@ -177,7 +178,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
               prose-ul:my-6 prose-li:text-gray-700
               prose-img:rounded-lg prose-img:shadow-md
             "
-            dangerouslySetInnerHTML={{ __html: sanitizeHTML(post.content) }}
           />
 
           {/* Author & Date Footer */}
