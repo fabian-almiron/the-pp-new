@@ -1,17 +1,4 @@
 {
-  "redirects": [
-    {
-      "source": "/:path*",
-      "destination": "https://the-pp-new-opal.vercel.app/:path*",
-      "permanent": true,
-      "has": [
-        {
-          "type": "host",
-          "value": "the-pp-new.vercel.app"
-        }
-      ]
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",
