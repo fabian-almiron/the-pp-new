@@ -46,6 +46,9 @@ function LoginContent() {
       if (signInAttempt.status === 'complete') {
         await setActive({ session: signInAttempt.createdSessionId });
         
+        // Wait a bit for session to be fully set, especially important on mobile/incognito
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
         // Force a hard navigation to ensure session is picked up
         window.location.href = redirectUrl;
       } else {
