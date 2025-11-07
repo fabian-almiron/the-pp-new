@@ -196,7 +196,7 @@ function BusinessSeriesSection() {
               <div className="relative overflow-hidden order-1 md:order-2">
                 <div className="relative w-full h-80 md:h-96">
                   <Image
-                    src="/academy-dara.png"
+                    src="/academy-dara.webp"
                     alt="Instructor smiling while working on a decorated cake"
                     width={655}
                     height={400}

@@ -75,7 +75,7 @@ export default function CartPage() {
         className="min-h-screen"
         style={{
           backgroundColor: '#f6f5f3',
-          backgroundImage: 'url(/background_peony-petals.png)',
+          backgroundImage: 'url(/background_peony-petals.webp)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
@@ -102,7 +102,7 @@ export default function CartPage() {
       className="min-h-screen"
       style={{
         backgroundColor: '#f6f5f3',
-        backgroundImage: 'url(/background_peony-petals.png)',
+        backgroundImage: 'url(/background_peony-petals.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

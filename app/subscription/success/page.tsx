@@ -118,7 +118,7 @@ function SubscriptionSuccessContent() {
       className="min-h-screen flex items-center justify-center"
       style={{
         backgroundColor: '#f6f5f3',
-        backgroundImage: 'url(/background_peony-petals.png)',
+        backgroundImage: 'url(/background_peony-petals.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'

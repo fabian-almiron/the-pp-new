@@ -9,9 +9,11 @@ export default function AboutPage() {
         <div className="about-hero-grid">
           <div className="about-hero-image">
             <Image
-              src="/about-header.png"
+              src="/about-header.webp"
               alt="Beautiful floral arrangement and Dana sitting with flowers"
               fill
+              priority
+              sizes="(max-width: 768px) 100vw, 50vw"
               className="object-cover"
             />
           </div>

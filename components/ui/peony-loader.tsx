@@ -12,7 +12,7 @@ export const PeonyLoader: React.FC<PeonyLoaderProps> = ({ className = "" }) => {
         <div 
           className="w-full h-full bg-contain bg-no-repeat bg-center animate-pulse"
           style={{
-            backgroundImage: 'url(/loading_peony.png)',
+            backgroundImage: 'url(/loading_peony.webp)',
             filter: 'grayscale(0%) contrast(1.1)',
             opacity: 0.7,
             animationDuration: '2s'

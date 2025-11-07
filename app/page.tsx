@@ -98,6 +98,8 @@ function HeroSection() {
                   src="/archy-header-image.webp"
                   alt="Beautifully decorated cake with buttercream flowers"
                   fill
+                  priority
+                  quality={85}
                   style={{ objectFit: 'cover' }}
                   className="hero-image"
                 />
