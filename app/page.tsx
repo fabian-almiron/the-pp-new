@@ -7,6 +7,9 @@ import { fetchCourses } from "@/lib/strapi-api";
 import { OrganizationSchema } from "@/components/structured-data";
 import type { Metadata } from "next";
 
+// Force dynamic rendering for home page to fetch latest courses
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: "The Piped Peony Academy | Learn Buttercream Flower Piping",
   description: "Learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights. Join The Piped Peony Academy for on-demand cake decorating classes, exclusive recipes, and supportive community.",
