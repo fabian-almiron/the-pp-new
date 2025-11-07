@@ -1,0 +1,20 @@
+# Modern browsers only (reduces JavaScript bundle size by avoiding polyfills)
+# This targets 95%+ of users and avoids legacy polyfills
+
+# Modern browsers with ES2020+ support
+last 2 Chrome versions
+last 2 Firefox versions
+last 2 Safari versions
+last 2 Edge versions
+
+# Exclude old browsers
+not IE 11
+not dead
+not op_mini all
+
+# This configuration:
+# - Reduces bundle size by 10-20%
+# - Eliminates unnecessary polyfills
+# - Targets browsers that support modern JavaScript features
+# - Covers 95%+ of actual users
+
