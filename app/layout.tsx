@@ -63,9 +63,8 @@ export default function RootLayout({
         <head>
           {/* Preconnect to TypeKit for faster font loading */}
           <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
-          {/* Load TypeKit asynchronously to not block render */}
-          <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" media="print" onLoad={(e) => { (e.target as HTMLLinkElement).media='all' }} />
-          <noscript><link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" /></noscript>
+          {/* Load TypeKit with font-display:swap for better performance */}
+          <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" />
           
           {/* Google Tag Manager - Load after interactive for better performance */}
           <Script id="google-tag-manager" strategy="lazyOnload">
