@@ -16,17 +16,20 @@ import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair-display",
+  display: "swap", // Prevent invisible text while loading
 });
 
 const lato = Lato({
   subsets: ["latin"],
   weight: ["300", "400", "700"],
   variable: "--font-lato",
+  display: "swap",
 });
 
 const dancingScript = Dancing_Script({
   subsets: ["latin"],
   variable: "--font-dancing-script",
+  display: "swap",
 });
 
 const inter = Inter({
@@ -39,6 +42,7 @@ const lindseySignature = localFont({
   src: '../public/fonts/LindseySignature.woff',
   variable: '--font-lindsey-signature',
   display: 'swap',
+  preload: true, // Preload for better performance
 });
 
 export const metadata: Metadata = {
@@ -57,9 +61,14 @@ export default function RootLayout({
     >
       <html lang="en">
         <head>
-          <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" />
-          {/* Google Tag Manager */}
-          <Script id="google-tag-manager" strategy="afterInteractive">
+          {/* Preconnect to TypeKit for faster font loading */}
+          <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
+          {/* Load TypeKit asynchronously to not block render */}
+          <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" media="print" onLoad={(e) => { (e.target as HTMLLinkElement).media='all' }} />
+          <noscript><link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" /></noscript>
+          
+          {/* Google Tag Manager - Load after interactive for better performance */}
+          <Script id="google-tag-manager" strategy="lazyOnload">
             {`
               (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
               new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
