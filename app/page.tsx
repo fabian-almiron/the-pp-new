@@ -99,7 +99,9 @@ function HeroSection() {
                   alt="Beautifully decorated cake with buttercream flowers"
                   fill
                   priority
+                  fetchPriority="high"
                   quality={85}
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   style={{ objectFit: 'cover' }}
                   className="hero-image"
                 />

@@ -63,8 +63,17 @@ export default function RootLayout({
         <head>
           {/* Preconnect to TypeKit for faster font loading */}
           <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
-          {/* Load TypeKit with font-display:swap for better performance */}
-          <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" />
+          <link rel="preconnect" href="https://p.typekit.net" crossOrigin="anonymous" />
+          {/* Load TypeKit asynchronously - load as print media then switch to all */}
+          <link 
+            rel="stylesheet" 
+            href="https://use.typekit.net/apz5gqr.css" 
+            media="print"
+          />
+          {/* Inline script to switch media to 'all' after load */}
+          <script dangerouslySetInnerHTML={{ __html: `
+            document.querySelector('link[href*="typekit"]').media='all';
+          ` }} />
         </head>
         <body
           className={cn(
