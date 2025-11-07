@@ -72,6 +72,7 @@ export function SiteFooter() {
           <div className="footer-nav-section order-5 md:order-3">
             <Link href="/privacy-policy" className="footer-nav-link">Privacy Policy</Link>
             <Link href="/terms-subscription" className="footer-nav-link md:block hidden">Terms & Conditions</Link>
+            <Link href="/accessibility" className="footer-nav-link">Accessibility</Link>
           </div>
           
           {/* Terms & Conditions - order 6 on mobile, hidden on desktop (shown in privacy section) */}

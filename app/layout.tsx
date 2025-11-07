@@ -91,12 +91,19 @@ export default function RootLayout({
           {/* End Google Tag Manager (noscript) */}
           
           <div className="keyword-uptime" style={{ display: 'none' }}>c-squared-uptime</div>
+          {/* Skip to main content link for accessibility */}
+          <a 
+            href="#main-content" 
+            className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:p-4 focus:bg-[#D4A771] focus:text-white focus:top-4 focus:left-4 focus:rounded-md"
+          >
+            Skip to main content
+          </a>
           <div className="relative flex min-h-screen flex-col">
             <CartProvider>
               <HomePageLines />
               <ShopShadowBorders />
               <SiteHeader />
-              <main className="flex-1">{children}</main>
+              <main id="main-content" className="flex-1">{children}</main>
               <SiteFooter />
             </CartProvider>
           </div>
