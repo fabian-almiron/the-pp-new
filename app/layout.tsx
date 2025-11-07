@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Lato, Dancing_Script, Inter } from 'next/font/google';
 import localFont from 'next/font/local';
-import Script from 'next/script';
 import "./globals.css";
 import "./mobile-header-fix.css";
 import { SiteHeader } from "@/components/site-header";
@@ -12,6 +11,7 @@ import { HomePageLines } from "@/components/home-page-lines";
 import { ShopShadowBorders } from "@/components/shop-shadow-borders";
 import { ClerkProvider } from '@clerk/nextjs';
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { Analytics } from "@vercel/analytics/next";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -65,17 +65,6 @@ export default function RootLayout({
           <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
           {/* Load TypeKit with font-display:swap for better performance */}
           <link rel="stylesheet" href="https://use.typekit.net/apz5gqr.css" />
-          
-          {/* Google Tag Manager - Load after interactive for better performance */}
-          <Script id="google-tag-manager" strategy="lazyOnload">
-            {`
-              (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-              new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-              j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-              'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-WX96X4D');
-            `}
-          </Script>
         </head>
         <body
           className={cn(
@@ -87,17 +76,6 @@ export default function RootLayout({
             lindseySignature.variable
           )}
         >
-          {/* Google Tag Manager (noscript) */}
-          <noscript>
-            <iframe
-              src="https://www.googletagmanager.com/ns.html?id=GTM-WX96X4D"
-              height="0"
-              width="0"
-              style={{ display: 'none' }}
-            />
-          </noscript>
-          {/* End Google Tag Manager (noscript) */}
-          
           <div className="keyword-uptime" style={{ display: 'none' }}>c-squared-uptime</div>
           {/* Skip to main content link for accessibility */}
           <a 
@@ -116,6 +94,7 @@ export default function RootLayout({
             </CartProvider>
           </div>
           <CookieConsentBanner />
+          <Analytics />
         </body>
       </html>
     </ClerkProvider>
