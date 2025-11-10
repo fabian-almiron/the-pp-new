@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import ProductPageClient from "./ProductPageClient";
 import { ProductSchema } from "@/components/structured-data";
 
-export const dynamic = 'force-dynamic';
+// Use ISR: Revalidate every 10 minutes (products don't change often)
+export const revalidate = 600; // 10 minutes
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;

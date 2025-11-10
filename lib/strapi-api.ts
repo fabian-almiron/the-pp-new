@@ -219,7 +219,7 @@ async function fetchFromStrapi(endpoint: string, cacheOptions?: { revalidate?: n
     const url = `${STRAPI_URL}/api${endpoint}`;
     console.log('🔍 Fetching from Strapi:', url);
     
-    // Default to no caching, but allow specific endpoints to cache
+    // Default to 5 minute cache for better performance
     const fetchOptions: RequestInit = {
       headers: {
         'Content-Type': 'application/json',
@@ -227,13 +227,18 @@ async function fetchFromStrapi(endpoint: string, cacheOptions?: { revalidate?: n
           'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
         }),
       },
-      cache: 'no-store', // Default: Always get fresh data
+      next: { revalidate: 300 }, // Default: 5 minutes cache
     };
 
-    // If revalidate is specified, use it instead
+    // If revalidate is specified, override the default
     if (cacheOptions?.revalidate !== undefined) {
-      delete fetchOptions.cache;
       fetchOptions.next = { revalidate: cacheOptions.revalidate };
+    }
+    
+    // If explicitly set to false, use no-store
+    if (cacheOptions?.revalidate === false) {
+      delete fetchOptions.next;
+      fetchOptions.cache = 'no-store';
     }
     
     const response = await fetch(url, fetchOptions);

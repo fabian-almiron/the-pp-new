@@ -5,8 +5,8 @@ import { notFound } from "next/navigation";
 import { fetchCourseBySlug, fetchCoursesBySeries } from "@/lib/strapi-api";
 import { CourseSchema } from "@/components/structured-data";
 
-// Mark this page as dynamic (always server-rendered)
-export const dynamic = 'force-dynamic';
+// Use ISR: Revalidate every 30 minutes (courses rarely change)
+export const revalidate = 1800; // 30 minutes
 
 interface CoursePageProps {
   params: {

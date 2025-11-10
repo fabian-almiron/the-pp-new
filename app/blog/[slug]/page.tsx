@@ -7,8 +7,8 @@ import type { Metadata } from "next";
 import { ArticleSchema } from "@/components/structured-data";
 import { BlogContent } from "@/components/blog-content";
 
-// Mark as dynamic
-export const dynamic = 'force-dynamic';
+// Use ISR: Revalidate every 5 minutes (no cold starts!)
+export const revalidate = 300; // 5 minutes
 
 interface BlogPostPageProps {
   params: Promise<{ slug: string }>;

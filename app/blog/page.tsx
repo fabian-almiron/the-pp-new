@@ -3,8 +3,8 @@ import Link from "next/link";
 import { fetchBlogs } from "@/lib/strapi-api";
 import type { Metadata } from "next";
 
-// Mark this page as dynamic (always server-rendered)
-export const dynamic = 'force-dynamic';
+// Use ISR: Revalidate every 5 minutes (no cold starts!)
+export const revalidate = 300; // 5 minutes
 
 export const metadata: Metadata = {
   title: "The Piped Peony Blog | Cake Decorating Tips & Tutorials",

@@ -6,8 +6,8 @@ import { Video, Star, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
-// Mark this page as dynamic (always server-rendered)
-export const dynamic = 'force-dynamic';
+// Use ISR: Revalidate every 10 minutes
+export const revalidate = 600; // 10 minutes
 
 // Function to get Vimeo thumbnail URL
 function getVimeoThumbnail(videoId: string, size: 'small' | 'medium' | 'large' = 'large'): string {

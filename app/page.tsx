@@ -7,8 +7,8 @@ import { fetchCourses } from "@/lib/strapi-api";
 import { OrganizationSchema } from "@/components/structured-data";
 import type { Metadata } from "next";
 
-// Force dynamic rendering for home page to fetch latest courses
-export const dynamic = 'force-dynamic';
+// Use ISR: Revalidate every 5 minutes for fresh content without cold starts
+export const revalidate = 300; // 5 minutes
 
 export const metadata: Metadata = {
   title: "The Piped Peony Academy | Learn Buttercream Flower Piping",
