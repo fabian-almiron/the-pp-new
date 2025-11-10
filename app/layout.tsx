@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { Playfair_Display, Lato, Dancing_Script, Inter } from 'next/font/google';
-import localFont from 'next/font/local';
+import { Playfair_Display, Lato, Dancing_Script, Inter, Alex_Brush } from 'next/font/google';
 import "./globals.css";
 import "./mobile-header-fix.css";
 import { SiteHeader } from "@/components/site-header";
@@ -38,11 +37,11 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
-const lindseySignature = localFont({
-  src: '../public/fonts/LindseySignature.woff',
-  variable: '--font-lindsey-signature',
-  display: 'swap',
-  preload: true, // Preload for better performance
+const alexBrush = Alex_Brush({
+  subsets: ["latin"],
+  weight: "400", // Alex Brush only has one weight
+  variable: "--font-alex-brush",
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -82,7 +81,7 @@ export default function RootLayout({
             lato.variable,
             dancingScript.variable,
             inter.variable,
-            lindseySignature.variable
+            alexBrush.variable
           )}
         >
           <div className="keyword-uptime" style={{ display: 'none' }}>c-squared-uptime</div>

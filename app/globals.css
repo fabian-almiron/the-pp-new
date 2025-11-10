@@ -363,8 +363,8 @@ html {
   .font-logo {
     font-family: var(--font-dancing-script);
   }
-  .font-lindsey-signature {
-    font-family: "lindsey-signature", sans-serif;
+  .font-alex-brush {
+    font-family: var(--font-alex-brush), cursive;
     font-weight: 400;
     font-style: normal;
   }
@@ -1093,7 +1093,7 @@ html {
 }
 
 .about-signature {
-  font-family: 'lindsey-signature', sans-serif;
+  font-family: var(--font-alex-brush), cursive;
   font-size: 2.25rem;
   color: #374151;
   margin-bottom: 1rem;
@@ -1293,7 +1293,7 @@ html {
 }
 
 .faq-signature {
-  font-family: 'lindsey-signature', sans-serif;
+  font-family: var(--font-alex-brush), cursive;
   font-size: 1.875rem;
   color: #374151;
   margin-bottom: 0.5rem;
@@ -1330,7 +1330,7 @@ html {
 /* Signature font utility class */
 .signature-text {
   color: #374151;
-  font-family: lindsey-signature, sans-serif;
+  font-family: var(--font-alex-brush), cursive;
   font-size: 60px;
   line-height: 0;
 }
@@ -1633,7 +1633,7 @@ html {
 }
 
 .about-dana-title {
-  font-family: 'lindsey-signature', sans-serif;
+  font-family: var(--font-alex-brush), cursive;
   font-size: 75px;
   color: #000000;
   margin-bottom: 1.5rem;
@@ -2023,7 +2023,7 @@ html {
 }
 
 .recipe-signature {
-  font-family: 'lindsey-signature', sans-serif;
+  font-family: var(--font-alex-brush), cursive;
   font-size: 47.3866px;
   color: #707070;
   margin-bottom: 0.5rem;

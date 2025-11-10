@@ -27,7 +27,7 @@ const config = {
 				'var(--font-inter)'
 			],
 			signature: [
-				'var(--font-lindsey-signature)'
+				'var(--font-alex-brush)'
 			]
 		},
   		colors: {
