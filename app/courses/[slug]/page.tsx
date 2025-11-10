@@ -2,7 +2,7 @@ import { Course, CarouselItem } from "@/data/types";
 import { CoursePageClient } from "@/components/course-page-client";
 import { SubscriberGate } from "@/components/subscriber-gate";
 import { notFound } from "next/navigation";
-import { fetchCourseBySlug, fetchCoursesBySeries } from "@/lib/strapi-api";
+import { fetchCourseBySlug, fetchCoursesBySeries, fetchCourses } from "@/lib/strapi-api";
 import { CourseSchema } from "@/components/structured-data";
 
 // Use ISR: Revalidate every 30 minutes (courses rarely change)
@@ -12,6 +12,22 @@ interface CoursePageProps {
   params: {
     slug: string;
   };
+}
+
+// Pre-generate all course pages at build time
+export async function generateStaticParams() {
+  try {
+    const { data: courses } = await fetchCourses({ pageSize: 100 });
+    if (courses) {
+      return courses.map((course) => ({
+        slug: course.slug,
+      }));
+    }
+    return [];
+  } catch (error) {
+    console.error('Error generating static params for courses:', error);
+    return [];
+  }
 }
 
 // Helper function to convert timestamp format "00.00.01" to seconds

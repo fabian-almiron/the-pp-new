@@ -7,8 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SubscriberGate } from "@/components/subscriber-gate";
 
-// Use ISR: Revalidate every 10 minutes
-export const revalidate = 600; // 10 minutes
+// Keep levels dynamic for now
+export const dynamic = 'force-dynamic';
 
 // Function to get Vimeo thumbnail URL
 function getVimeoThumbnail(videoId: string, size: 'small' | 'medium' | 'large' = 'large'): string {

@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button";
 import { RecipeSchema } from "@/components/structured-data";
 import { sanitizeHTML } from "@/lib/sanitize";
 
-// Use ISR: Revalidate every 30 minutes (recipes rarely change)
-export const revalidate = 1800; // 30 minutes
+// Keep recipes dynamic for now due to complex HTML sanitization
+export const dynamic = 'force-dynamic';
 
 interface RecipePageProps {
   params: Promise<{
