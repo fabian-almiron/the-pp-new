@@ -11,6 +11,7 @@ import { ShopShadowBorders } from "@/components/shop-shadow-borders";
 import { ClerkProvider } from '@clerk/nextjs';
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
@@ -103,6 +104,7 @@ export default function RootLayout({
           </div>
           <CookieConsentBanner />
           <Analytics />
+          <SpeedInsights />
         </body>
       </html>
     </ClerkProvider>
