@@ -1926,7 +1926,7 @@ html {
 }
 
 .featured-video-wrapper {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
   aspect-ratio: 16/9;
   background-color: #ddd;

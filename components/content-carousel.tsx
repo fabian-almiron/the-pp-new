@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Video } from "lucide-react";
 import { CarouselItem } from "@/data/types";
+import { VimeoThumbnail } from "@/components/vimeo-thumbnail";
 import {
   Carousel,
   CarouselContent,
@@ -43,12 +44,21 @@ export function ContentCarousel({ items, title = "Continue the Series" }: Conten
                   <div className="bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-200 h-full flex flex-col">
                     {/* Course Image */}
                     <div className="relative h-44 bg-[#FBF9F6]">
-                      <Image
-                        src={item.thumbnailUrl}
-                        alt={item.title}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
+                      {item.videoId ? (
+                        <VimeoThumbnail
+                          videoId={item.videoId}
+                          alt={item.title}
+                          fallbackUrl={item.thumbnailUrl}
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <Image
+                          src={item.thumbnailUrl}
+                          alt={item.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      )}
                       
                       {/* Overlay on hover */}
                       <div className="absolute inset-0 bg-gradient-to-t from-[#D4A771]/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -67,12 +77,26 @@ export function ContentCarousel({ items, title = "Continue the Series" }: Conten
                         {item.title}
                       </h3>
 
+                      {/* Course Description */}
+                      {item.excerpt && (
+                        <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
+                          {item.excerpt}
+                        </p>
+                      )}
+
                       {/* Course Meta */}
                       <div className="flex items-center justify-between pt-3 border-t border-gray-100 mt-auto">
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                          <Video className="w-4 h-4 text-[#D4A771]" />
-                          <span className="font-medium">Course</span>
-                        </div>
+                        {item.chapterCount && item.chapterCount > 0 ? (
+                          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                            <Video className="w-4 h-4 text-[#D4A771]" />
+                            <span className="font-medium">{item.chapterCount} chapter{item.chapterCount !== 1 ? 's' : ''}</span>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                            <Video className="w-4 h-4 text-[#D4A771]" />
+                            <span className="font-medium">Course</span>
+                          </div>
+                        )}
                         <span className="text-sm font-medium text-[#D4A771] group-hover:translate-x-1 transition-transform">
                           View →
                         </span>

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { TestimonialsCarousel } from "@/components/testimonials-carousel";
 import { ScrollToHash } from "@/components/scroll-to-hash";
+import { LazyVideoPlayer } from "@/components/lazy-video-player";
 
 export default function AcademyDetailsPage() {
   return (
@@ -139,15 +140,10 @@ function FeaturedVideoSection() {
       <div className="container">
         <h2 className="featured-video-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>Featured Video</h2>
         <div className="featured-video-wrapper">
-          {/* Placeholder for video - will be replaced with actual video embed */}
-          <div className="featured-video-placeholder">
-            <div className="featured-video-play-button">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" fill="white" fillOpacity="0.9"/>
-                <polygon points="10,8 16,12 10,16" fill="black"/>
-              </svg>
-            </div>
-          </div>
+          <LazyVideoPlayer 
+            videoId="1133888486"
+            title="Featured Academy Video"
+          />
         </div>
       </div>
     </section>

@@ -112,6 +112,9 @@ export interface CarouselItem {
   title: string;
   thumbnailUrl: string;
   series?: string;
+  videoId?: string;
+  excerpt?: string;
+  chapterCount?: number;
 }
 
 // Strapi Course Types (from WordPress import)

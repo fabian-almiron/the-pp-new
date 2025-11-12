@@ -772,7 +772,7 @@ export async function fetchCourseById(id: number): Promise<MockDatabaseResponse<
 export async function fetchCoursesBySeries(series: string): Promise<MockDatabaseResponse<StrapiCourse[]>> {
   try {
     const response: StrapiCourseResponse = await fetchFromStrapi(
-      `/courses?filters[series][$eq]=${encodeURIComponent(series)}&populate=*&sort=title:asc`
+      `/courses?filters[series][$eq]=${encodeURIComponent(series)}&populate=*&sort=title:asc&pagination[pageSize]=100`
     );
     
     const courses = response.data.map(convertStrapiCourse);

@@ -105,16 +105,21 @@ export default async function CoursePage({ params }: CoursePageProps) {
   let relatedCourses: CarouselItem[] = [];
   if (strapiCourse.series) {
     const { data: seriesCourses } = await fetchCoursesBySeries(strapiCourse.series);
+    console.log(`📊 Fetched ${seriesCourses?.length || 0} courses from series "${strapiCourse.series}"`);
     if (seriesCourses) {
       relatedCourses = seriesCourses
         .filter(c => c.slug !== slug) // Exclude current course
-        .slice(0, 4) // Limit to 4 related courses
+        // Show all courses from the series (no limit)
         .map(c => ({
           slug: c.slug,
           title: c.title,
           thumbnailUrl: c.featuredImage?.url || '/placeholder_peony.jpg',
           series: c.series,
+          videoId: c.videoId,
+          excerpt: c.excerpt,
+          chapterCount: c.videoChapters?.length || 0,
         }));
+      console.log(`✅ After filtering current course, showing ${relatedCourses.length} related courses`);
     }
   }
 
@@ -128,6 +133,9 @@ export default async function CoursePage({ params }: CoursePageProps) {
         title: c.title,
         thumbnailUrl: c.featuredImage?.url || '/placeholder_peony.jpg',
         series: c.series,
+        videoId: c.videoId,
+        excerpt: c.excerpt,
+        chapterCount: c.videoChapters?.length || 0,
       }));
     }
   }
