@@ -42,6 +42,10 @@ const nextConfig = {
         protocol: 'https',
         hostname: '*.strapiapp.com', // Wildcard for Strapi Cloud
       },
+      {
+        protocol: 'https',
+        hostname: 'content.thepipedpeony.com', // New Strapi server domain
+      },
     ],
     formats: ['image/webp', 'image/avif'],
     dangerouslyAllowSVG: true,

@@ -982,9 +982,10 @@ export async function fetchMenu(slug: string): Promise<MockDatabaseResponse<Menu
   try {
     // Populate nested children (3 levels deep)
     // Cache menus for 1 hour since they rarely change
+    // Strapi 5: Explicit populate for menuItems and nested children
     const response = await fetchFromStrapi(
-      `/menus?filters[slug][$eq]=${slug}&populate[menuItems][populate][0]=children.children&populate[menuItems][populate][1]=parent&sort[menuItems][order]=asc`,
-      { revalidate: 3600 } // Cache for 1 hour
+      `/menus?filters[slug][$eq]=${slug}&populate[menuItems][populate][0]=children&populate[menuItems][populate][1]=children.children&populate[menuItems][populate][2]=parent&sort[menuItems][order]=asc`,
+      { revalidate: 10 } // Cache for 10 seconds during development
     );
     
     if (response.data && response.data.length > 0) {
@@ -1045,10 +1046,10 @@ export async function fetchMenu(slug: string): Promise<MockDatabaseResponse<Menu
 
 export async function fetchAllMenus(): Promise<MockDatabaseResponse<Menu[]>> {
   try {
-    // Cache menus for 1 hour since they rarely change
+    // Cache menus for 10 seconds during development
     const response = await fetchFromStrapi(
-      `/menus?populate[menuItems][populate][0]=children&populate[menuItems][populate][1]=parent&sort[menuItems][order]=asc`,
-      { revalidate: 3600 } // Cache for 1 hour
+      `/menus?populate[menuItems][populate][0]=children&populate[menuItems][populate][1]=children.children&populate[menuItems][populate][2]=parent`,
+      { revalidate: 10 } // Cache for 10 seconds during development
     );
     
     const menus: Menu[] = response.data?.map((strapiMenu: any) => {

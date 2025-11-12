@@ -124,8 +124,8 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
     if (cached) {
       try {
         const { data, timestamp } = JSON.parse(cached);
-        // Cache is valid for 1 hour
-        if (Date.now() - timestamp < 3600000) {
+        // Cache is valid for 10 seconds during development
+        if (Date.now() - timestamp < 10000) {
           setMenu(data);
           setLoading(false);
           return; // Use cached data, don't fetch
