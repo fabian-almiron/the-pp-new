@@ -124,10 +124,12 @@ export default function ProductPageClient({ product }: ProductPageClientProps) {
             </div>
 
             {/* Product Description */}
-            <div className="prose prose-gray max-w-none">
-              <p className="text-gray-700 leading-relaxed">{product.shortDescription}</p>
+            <div className="prose prose-gray max-w-none [&>ul]:list-disc [&>ul]:pl-6 [&>ol]:list-decimal [&>ol]:pl-6">
               {product.longDescription && (
-                <p className="text-gray-600 leading-relaxed mt-4">{product.longDescription}</p>
+                <div 
+                  className="text-gray-700 leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(product.longDescription) }}
+                />
               )}
             </div>
 
