@@ -2,6 +2,13 @@
 
 import DOMPurify from 'dompurify';
 
+// Initialize DOMPurify with window on client-side
+let purify: typeof DOMPurify | null = null;
+
+if (typeof window !== 'undefined') {
+  purify = DOMPurify(window);
+}
+
 /**
  * Sanitizes HTML content to prevent XSS attacks
  * Uses DOMPurify with a strict allowlist of safe tags and attributes
@@ -11,8 +18,9 @@ import DOMPurify from 'dompurify';
  */
 export function sanitizeHTML(html: string | undefined | null): string {
   if (!html) return '';
+  if (!purify) return html; // Fallback if DOMPurify isn't initialized
   
-  return DOMPurify.sanitize(html, {
+  return purify.sanitize(html, {
     ALLOWED_TAGS: [
       'p', 'br', 'strong', 'em', 'u', 'i', 'b', 'a', 
       'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
@@ -40,8 +48,9 @@ export function sanitizeHTML(html: string | undefined | null): string {
  */
 export function sanitizeForStructuredData(html: string | undefined | null): string {
   if (!html) return '';
+  if (!purify) return html.replace(/<[^>]*>/g, ''); // Simple tag stripping fallback
   
-  return DOMPurify.sanitize(html, {
+  return purify.sanitize(html, {
     ALLOWED_TAGS: [],
     ALLOWED_ATTR: [],
   });

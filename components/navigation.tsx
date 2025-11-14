@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Menu, MenuItem } from '@/lib/strapi-api';
 import { useEffect, useState } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useUser } from '@clerk/nextjs';
 
 interface NavigationProps {
   menuSlug: string;
@@ -14,6 +15,23 @@ interface NavigationProps {
 interface MenuItemComponentProps {
   item: MenuItem;
   className?: string;
+}
+
+// Helper function to filter menu items based on visibility and login status
+function filterMenuItemsByVisibility(items: MenuItem[], isSignedIn: boolean): MenuItem[] {
+  return items
+    .filter(item => {
+      const visibility = item.visibility || 'always';
+      if (visibility === 'always') return true;
+      if (visibility === 'loggedIn') return isSignedIn;
+      if (visibility === 'loggedOut') return !isSignedIn;
+      return true; // Default to showing the item
+    })
+    .map(item => ({
+      ...item,
+      // Recursively filter children
+      children: item.children ? filterMenuItemsByVisibility(item.children, isSignedIn) : undefined,
+    }));
 }
 
 function MenuItemComponent({ item, className = "", showArrow = false, arrowDirection = "right", onLinkClick }: MenuItemComponentProps & { showArrow?: boolean; arrowDirection?: "down" | "right"; onLinkClick?: () => void }) {
@@ -111,6 +129,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
+  const { isSignedIn, isLoaded: userLoaded } = useUser();
 
   useEffect(() => {
     setMounted(true);
@@ -161,7 +180,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
     loadMenu();
   }, [menuSlug, mounted]);
 
-  if (loading) {
+  if (loading || !userLoaded) {
     return null; // Or a skeleton loader
   }
 
@@ -169,6 +188,9 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
     console.warn(`Menu "${menuSlug}" not found or invalid:`, error);
     return null;
   }
+
+  // Filter menu items based on visibility and login status
+  const filteredMenuItems = filterMenuItemsByVisibility(menu.menuItems, isSignedIn || false);
 
   // Check if this is a header navigation (has header-nav class)
   const isHeaderNav = className?.includes('header-nav');
@@ -178,7 +200,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
       {isHeaderNav ? (
         // Header navigation layout - render only top-level items
         <>
-          {menu.menuItems.filter(item => item).map((item) => (
+          {filteredMenuItems.filter(item => item).map((item) => (
               <div key={item.id} className="relative group">
                 <MenuItemComponent 
                   item={item} 
@@ -223,7 +245,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
       ) : (
         // Default navigation layout (mobile/sidebar) - collapsible
         <ul className="flex flex-col space-y-2">
-          {menu.menuItems.filter(item => item).map((item) => (
+          {filteredMenuItems.filter(item => item).map((item) => (
               <li key={item.id}>
                 <CollapsibleMenuItem item={item} level={0} onLinkClick={onLinkClick} />
               </li>

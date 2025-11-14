@@ -75,11 +75,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   // Fetch courses by category name
   const { data: courses, error } = await fetchCoursesByCategory(category.name);
 
-  if (error || !courses || courses.length === 0) {
-    notFound();
-  }
+  // Show empty state instead of 404 if no courses found
+  const coursesToDisplay = courses || [];
 
-  return renderCategoryPage(category.name, courses, slug);
+  return renderCategoryPage(category.name, coursesToDisplay, slug);
 }
 
 function renderCategoryPage(title: string, courses: any[], slug: string) {
@@ -105,9 +104,28 @@ function renderCategoryPage(title: string, courses: any[], slug: string) {
 
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-7xl mx-auto">
-          {/* Course Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
-          {courses.map((course) => (
+          {/* Empty State */}
+          {courses.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-6">🌸</div>
+              <h2 className="text-2xl font-serif text-gray-800 mb-4">No Courses Yet</h2>
+              <p className="text-gray-600 mb-8 max-w-md mx-auto">
+                We're working on adding courses to this category. Check back soon for new content!
+              </p>
+              <Link href="/courses">
+                <Button 
+                  variant="default" 
+                  className="bg-[#D4A771] hover:bg-[#C69963] text-white"
+                >
+                  Browse All Courses
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <>
+              {/* Course Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+                {courses.map((course) => (
             <Link
               key={course.id}
               href={`/courses/${course.slug}`}
@@ -191,20 +209,22 @@ function renderCategoryPage(title: string, courses: any[], slug: string) {
               </div>
             </Link>
           ))}
-        </div>
+              </div>
 
-          {/* Back to All Courses */}
-          <div className="text-center">
-            <Link href="/courses">
-              <Button 
-                variant="outline" 
-                className="border-2 border-[#D4A771] text-[#D4A771] hover:bg-[#D4A771] hover:text-white transition-all"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back to All Courses
-              </Button>
-            </Link>
-          </div>
+              {/* Back to All Courses */}
+              <div className="text-center">
+                <Link href="/courses">
+                  <Button 
+                    variant="outline" 
+                    className="border-2 border-[#D4A771] text-[#D4A771] hover:bg-[#D4A771] hover:text-white transition-all"
+                  >
+                    <ArrowLeft className="w-4 h-4 mr-2" />
+                    Back to All Courses
+                  </Button>
+                </Link>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </div>

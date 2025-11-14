@@ -56,7 +56,8 @@ export function SearchDialog() {
         const courseMatches = coursesRes.data.filter((course: any) =>
           course.title?.toLowerCase().includes(trimmedQuery) ||
           course.description?.toLowerCase().includes(trimmedQuery) ||
-          course.instructor?.toLowerCase().includes(trimmedQuery)
+          course.instructor?.toLowerCase().includes(trimmedQuery) ||
+          course.tags?.some((tag: string) => tag.toLowerCase().includes(trimmedQuery))
         ).map((course: any) => ({
           type: 'course' as const,
           id: course.id,
@@ -301,9 +302,6 @@ export function SearchDialog() {
               <div className="text-center py-8 text-gray-400 text-sm">
                 <Search className="h-12 w-12 mx-auto mb-2 opacity-20" />
                 <p>Start typing to search courses, recipes, and products</p>
-                <p className="mt-2 text-xs">
-                  Tip: Press <kbd className="px-2 py-1 bg-gray-100 rounded text-xs">⌘K</kbd> to open search
-                </p>
               </div>
             )}
           </div>

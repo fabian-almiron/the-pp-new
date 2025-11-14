@@ -6,7 +6,9 @@ html {
   scroll-behavior: smooth;
 }
 
-
+.container-small {
+  max-width: 1250px !important;
+}
 
 @layer utilities {
   .text-balance {
@@ -353,6 +355,7 @@ html {
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;
+    line-height: 1;
   }
   body {
     @apply font-sans;
@@ -844,7 +847,7 @@ html {
   font-weight: 400;
   color: #000000;
   font-family: 'sofia-pro', sans-serif;
-  padding: 6px 18px;
+  padding: 6px 12px;
   margin-right: 4px;
   transition: color 0.2s ease;
   text-decoration: none;
@@ -881,8 +884,8 @@ html {
    FOOTER FOUNDATION CLASSES
    ======================================== */
 
-.footer-container {
-  background-color: #FBF9F6;
+  .footer-container {
+    background-color: #f6f5f3;
   padding: 3rem 0;
   font-family: 'sofia-pro', sans-serif;
 }
@@ -2010,7 +2013,6 @@ html {
 /* Recipe Section */
 .recipe-section {
   padding: 5rem 0;
-  background-color: #f8f8f8;
 }
 
 .recipe-grid {
@@ -2026,7 +2028,6 @@ html {
   font-family: var(--font-alex-brush), cursive;
   font-size: 47.3866px;
   color: #707070;
-  margin-bottom: 0.5rem;
 }
 
 .recipe-title {
@@ -2066,7 +2067,7 @@ html {
 /* Video Series Section */
 .video-series-section {
   padding: 5rem 0;
-  background-color: white;
+  background-color: #F3ECE6;
 }
 
 .video-series-grid {
@@ -2099,6 +2100,8 @@ html {
 }
 
 .video-series-item {
+  display: flex;
+  align-items: center;
   font-family: "Sofia Light", sans-serif;
   font-size: 1rem;
   color: #515151;

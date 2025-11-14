@@ -48,7 +48,7 @@ function HeroAcademySection() {
               </Link>
             </div>
             <p className="hero-academy-description">
-              By signing up you agree to The Piped Peony's <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.
+              By signing up you agree to The Piped Peony's <a href="/terms-subscription">Terms of Service</a> and <a href="/privacy-policy">Privacy Policy</a>.
             </p>
           </div>
         </div>
@@ -213,14 +213,14 @@ function RecipeSection() {
 function VideoSeriesSection() {
   return (
     <section className="video-series-section">
-      <div className="container">
+      <div className="container container-small">
         <div className="video-series-grid">
           <div className="video-series-image">
             <Image
-              src="/video-series-cutting-cake-235x300.png"
+              src="/video-series-cutting-cake.webp"
               alt="Instructor cutting decorated cake"
-              width={300}
-              height={400}
+              width={450}
+              height={574}
               className="video-series-img"
             />
           </div>
@@ -230,11 +230,56 @@ function VideoSeriesSection() {
               Follow along with our comprehensive video series that takes you step-by-step through each technique. From basic piping to advanced flower arrangements, our videos are designed to help you learn at your own pace.
             </p>
             <div className="video-series-list">
-              <div className="video-series-item">• The Foundations Series</div>
-              <div className="video-series-item">• Flower Fundamentals</div>
-              <div className="video-series-item">• Advanced Arrangements</div>
-              <div className="video-series-item">• Seasonal Specials</div>
-              <div className="video-series-item">• Troubleshooting Guide</div>
+              <div className="video-series-item">
+                <Image
+                  src="/checkmark.svg"
+                  alt="Checkmark"
+                  width={21.5}
+                  height={21.5}
+                  className="why-piped-peony-checkmark"
+                />
+                The Foundations Series
+              </div>
+              <div className="video-series-item">
+                <Image
+                  src="/checkmark.svg"
+                  alt="Checkmark"
+                  width={21.5}
+                  height={21.5}
+                  className="why-piped-peony-checkmark"
+                />
+                Flower Fundamentals
+              </div>
+              <div className="video-series-item">
+                <Image
+                  src="/checkmark.svg"
+                  alt="Checkmark"
+                  width={21.5}
+                  height={21.5}
+                  className="why-piped-peony-checkmark"
+                />
+                Advanced Arrangements
+              </div>
+              <div className="video-series-item">
+                <Image
+                  src="/checkmark.svg"
+                  alt="Checkmark"
+                  width={21.5}
+                  height={21.5}
+                  className="why-piped-peony-checkmark"
+                />
+                Seasonal Specials
+              </div>
+              <div className="video-series-item">
+                <Image
+                  src="/checkmark.svg"
+                  alt="Checkmark"
+                  width={21.5}
+                  height={21.5}
+                  className="why-piped-peony-checkmark"
+                />
+                Troubleshooting Guide
+              </div>
             </div>
           </div>
         </div>

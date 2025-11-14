@@ -90,8 +90,8 @@ export function FlowerPipingCarousel({ categories }: FlowerPipingCarouselProps) 
                       </div>
                       
                       {/* Category Title */}
-                      <div className="p-5 flex items-center justify-center">
-                        <h3 className="font-playfair text-xl text-black group-hover:text-[#D4A771] transition-colors text-center font-normal">
+                      <div className="p-5 flex items-center justify-center min-h-[80px]">
+                        <h3 className="font-playfair text-xl text-black group-hover:text-[#D4A771] transition-colors text-center font-normal line-clamp-2">
                           {item.name}
                         </h3>
                       </div>

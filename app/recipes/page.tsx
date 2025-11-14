@@ -3,7 +3,7 @@
 import { useState, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, ChefHat, Star, Search } from "lucide-react";
+import { Clock, ChefHat, Star, Search, Filter, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -161,58 +161,11 @@ export default function RecipeLibraryPage() {
       </div>
 
       {/* Filter Section */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
-        <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-6">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <Input
-                  type="text"
-                  placeholder="Search recipes..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 border-gray-300 focus:border-[#D4A771] focus:ring-[#D4A771]"
-                />
-              </div>
-            </div>
-
-            {/* Category Filter */}
-            <div className="w-full lg:w-48">
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:border-[#D4A771] focus:ring-[#D4A771] focus:outline-none"
-              >
-                <option value="all">All Categories</option>
-                {categories.map((cat) => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-
-            {/* Difficulty Filter */}
-            <div className="w-full lg:w-48">
-              <select
-                value={selectedDifficulty}
-                onChange={(e) => setSelectedDifficulty(e.target.value)}
-                className="w-full h-10 px-3 border border-gray-300 rounded-md focus:border-[#D4A771] focus:ring-[#D4A771] focus:outline-none"
-              >
-                <option value="all">All Difficulties</option>
-                {difficulties.map((diff) => (
-                  <option key={diff} value={diff} className="capitalize">{diff}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Active Filters & Results Count */}
-          <div className="mt-4 flex items-center justify-between">
-            <p className="text-sm text-gray-600">
-              Showing <span className="font-semibold text-black">{filteredRecipes.length}</span> of <span className="font-semibold text-black">{recipes.length}</span> recipes
-            </p>
-            
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12">
+        <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Filter className="w-5 h-5 text-gray-600" />
+            <h2 className="text-lg font-semibold text-gray-800">Filter Recipes</h2>
             {(searchQuery || selectedCategory !== "all" || selectedDifficulty !== "all") && (
               <Button
                 variant="ghost"
@@ -222,17 +175,93 @@ export default function RecipeLibraryPage() {
                   setSelectedCategory("all");
                   setSelectedDifficulty("all");
                 }}
-                className="text-[#D4A771] hover:text-[#C19660]"
+                className="ml-auto text-xs"
               >
-                Clear all filters
+                <X className="w-3 h-3 mr-1" />
+                Clear All
               </Button>
             )}
+          </div>
+
+          {/* Inline Filters */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Search Bar */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Search recipes..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+
+              {/* Category Filter */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#D4A771] text-sm"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Difficulty Filter Buttons */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Difficulty</label>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedDifficulty('all')}
+                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
+                    selectedDifficulty === 'all'
+                      ? 'bg-[#D4A771] text-white shadow-md'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  All Difficulties
+                </button>
+                {difficulties.map(diff => (
+                  <button
+                    key={diff}
+                    onClick={() => setSelectedDifficulty(diff)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all capitalize ${
+                      selectedDifficulty === diff
+                        ? diff === 'easy' ? 'bg-green-500 text-white shadow-md' :
+                          diff === 'medium' ? 'bg-yellow-500 text-white shadow-md' :
+                          'bg-red-500 text-white shadow-md'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {diff}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Results count */}
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <p className="text-sm text-gray-600">
+              Showing <span className="font-semibold text-black">{filteredRecipes.length}</span> of {recipes.length} recipes
+              {(searchQuery || selectedCategory !== "all" || selectedDifficulty !== "all") && <span className="text-black"> (filtered)</span>}
+            </p>
           </div>
         </div>
       </div>
 
       {/* Recipes Grid */}
-      <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-16">
+      <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 pb-12 md:pb-16">
         {filteredRecipes.length === 0 ? (
           <div className="text-center py-12">
             <ChefHat className="w-16 h-16 text-gray-300 mx-auto mb-4" />

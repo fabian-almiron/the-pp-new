@@ -1,13 +1,13 @@
 "use client"
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff, ArrowLeft } from "lucide-react";
-import { useSignUp } from "@clerk/nextjs";
+import { useSignUp, useUser } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
 import SubscriptionPlans from "@/components/subscription-plans";
 import { useSubscription } from "@/hooks/use-subscription";
@@ -29,7 +29,15 @@ export default function SignupPage() {
   
   const { signUp, isLoaded, setActive } = useSignUp();
   const { createSubscriptionCheckout } = useSubscription();
+  const { isSignedIn, isLoaded: userLoaded } = useUser();
   const router = useRouter();
+
+  // Redirect signed-in users to video library
+  useEffect(() => {
+    if (userLoaded && isSignedIn) {
+      router.push('/video-library');
+    }
+  }, [userLoaded, isSignedIn, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -303,7 +311,7 @@ export default function SignupPage() {
                 onChange={(e) => setAgreeToTerms(e.target.checked)}
                 className="login-remember-input"
               />
-              I agree to the <Link href="#" className="signup-link">Terms of Service</Link> and <Link href="#" className="signup-link">Privacy Policy</Link>
+              I agree to the <Link href="/terms-subscription" className="signup-link">Terms of Service</Link> and <Link href="/privacy-policy" className="signup-link">Privacy Policy</Link>
             </label>
           </div>
 

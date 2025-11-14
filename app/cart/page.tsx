@@ -129,7 +129,7 @@ export default function CartPage() {
                    <tr key={item.cartKey}>
                     <td className="py-4 px-2">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 bg-gray-100 rounded-none overflow-hidden flex-shrink-0">
+                        <Link href={`/shop/item/${item.slug}`} className="w-16 h-16 bg-gray-100 rounded-none overflow-hidden flex-shrink-0 hover:opacity-80 hover:shadow-md transition-all cursor-pointer">
                           {item.image && (
                             <Image
                               src={item.image}
@@ -139,20 +139,22 @@ export default function CartPage() {
                               className="w-full h-full object-cover"
                             />
                           )}
-                        </div>
+                        </Link>
                         <div className="flex-1 min-w-0">
-                          <p className="text-sm font-medium text-gray-900 truncate">
-                            {item.name}
-                            {item.selectedHand && (
-                              <span className="text-gray-500 ml-2">({item.selectedHand})</span>
-                            )}
-                            {item.selectedSize && (
-                              <span className="text-gray-500 ml-2">({item.selectedSize})</span>
-                            )}
-                            {item.selectedColor && (
-                              <span className="text-gray-500 ml-2">({item.selectedColor})</span>
-                            )}
-                          </p>
+                          <Link href={`/shop/item/${item.slug}`} className="hover:text-blue-600 hover:underline transition-all cursor-pointer">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {item.name}
+                              {item.selectedHand && (
+                                <span className="text-gray-500 ml-2">({item.selectedHand})</span>
+                              )}
+                              {item.selectedSize && (
+                                <span className="text-gray-500 ml-2">({item.selectedSize})</span>
+                              )}
+                              {item.selectedColor && (
+                                <span className="text-gray-500 ml-2">({item.selectedColor})</span>
+                              )}
+                            </p>
+                          </Link>
                         </div>
                       </div>
                     </td>

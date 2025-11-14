@@ -2,11 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchRecipeBySlug } from "@/lib/strapi-api";
 import { notFound } from "next/navigation";
-import { Clock, ChefHat, Users, Star, ArrowLeft } from "lucide-react";
+import { Clock, ChefHat, Users, Star, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RecipeSchema } from "@/components/structured-data";
-import { sanitizeHTML } from "@/lib/sanitize";
+import { SanitizedHTML } from "@/components/sanitized-html";
+import { InlineHTML } from "@/components/inline-html";
 
 // Keep recipes dynamic for now due to complex HTML sanitization
 export const dynamic = 'force-dynamic';
@@ -17,14 +18,51 @@ interface RecipePageProps {
   }>;
 }
 
+// Helper function to fetch adjacent recipes
+async function fetchAdjacentRecipes(currentSlug: string) {
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337'}/api/recipes?sort=title:asc&populate=featuredImage,coverImage&pagination[limit]=100`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.STRAPI_API_TOKEN && {
+          'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
+        }),
+      },
+      cache: 'no-store'
+    });
+    
+    if (!response.ok) return { prev: null, next: null };
+    
+    const data = await response.json();
+    const recipes = data.data || [];
+    
+    const currentIndex = recipes.findIndex((r: any) => r.slug === currentSlug);
+    
+    if (currentIndex === -1) return { prev: null, next: null };
+    
+    const prev = currentIndex > 0 ? recipes[currentIndex - 1] : null;
+    const next = currentIndex < recipes.length - 1 ? recipes[currentIndex + 1] : null;
+    
+    return { prev, next };
+  } catch (error) {
+    console.error('Error fetching adjacent recipes:', error);
+    return { prev: null, next: null };
+  }
+}
+
 export default async function RecipePage({ params }: RecipePageProps) {
   const { slug } = await params;
   
-  const recipe = await fetchRecipeBySlug(slug);
+  const [recipe, adjacentRecipes] = await Promise.all([
+    fetchRecipeBySlug(slug),
+    fetchAdjacentRecipes(slug)
+  ]);
 
   if (!recipe) {
     notFound();
   }
+  
+  const { prev, next } = adjacentRecipes;
 
   // Extract ingredients and instructions for structured data
   const ingredients = recipe.ingredients 
@@ -75,26 +113,14 @@ export default async function RecipePage({ params }: RecipePageProps) {
           </Link>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-          {/* Header with Image and Title */}
-          {(recipe.featuredImage || recipe.coverImage) && (
-            <div className="flex flex-col md:flex-row items-stretch bg-[#FBF9F6] border-b-4 border-black">
-              <div className="relative w-full md:w-1/2 h-64 md:h-auto">
-                <Image
-                  src={(recipe.featuredImage || recipe.coverImage)!.url}
-                  alt={(recipe.featuredImage || recipe.coverImage)!.alternativeText || recipe.title}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="w-full md:w-1/2 flex items-center justify-center p-8 md:p-12">
-                <h1 className="text-3xl md:text-5xl font-serif text-black text-center">
-                  {recipe.headerTitle || recipe.title}
-                </h1>
-              </div>
-            </div>
-          )}
+        {/* Recipe Title */}
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-serif text-black text-center">
+            {recipe.title}
+          </h1>
+        </div>
 
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
           <div className="p-8 md:p-12">
             {/* Method Label */}
             {recipe.methodLabel && (
@@ -105,9 +131,9 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
             {/* Short Description */}
             {recipe.shortDescription && (
-              <div 
+              <SanitizedHTML 
+                html={recipe.shortDescription}
                 className="mb-8 text-gray-700 leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.shortDescription) }}
               />
             )}
 
@@ -132,13 +158,15 @@ export default async function RecipePage({ params }: RecipePageProps) {
                   {Array.isArray(recipe.ingredients) ? (
                     <ul className="space-y-2 text-gray-700">
                       {recipe.ingredients.map((item: any, index: number) => (
-                        <li key={index} dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.ingredients_item || item.ingredientsItem) }} />
+                        <li key={index}>
+                          <InlineHTML html={typeof item === 'string' ? item : item.ingredients_item || item.ingredientsItem} />
+                        </li>
                       ))}
                     </ul>
                   ) : (
-                    <div 
+                    <SanitizedHTML
+                      html={recipe.ingredients}
                       className="prose prose-gray max-w-none"
-                      dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.ingredients) }}
                     />
                   )}
                 </div>
@@ -152,7 +180,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 <ol className="list-decimal list-inside space-y-3 text-gray-700">
                   {recipe.important.map((item: any, index: number) => (
                     <li key={index} className="pl-2">
-                      <span dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.important_items || item.importantItems) }} />
+                      <InlineHTML html={typeof item === 'string' ? item : item.important_items || item.importantItems} />
                     </li>
                   ))}
                 </ol>
@@ -166,13 +194,15 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 {Array.isArray(recipe.instructions) ? (
                   <ol className="list-decimal list-inside space-y-3 text-gray-700">
                     {recipe.instructions.map((item: any, index: number) => (
-                      <li key={index} className="pl-2" dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.instruction) }} />
+                      <li key={index} className="pl-2">
+                        <InlineHTML html={typeof item === 'string' ? item : item.instruction} />
+                      </li>
                     ))}
                   </ol>
                 ) : (
-                  <div 
+                  <SanitizedHTML
+                    html={recipe.instructions}
                     className="prose prose-gray max-w-none"
-                    dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.instructions) }}
                   />
                 )}
               </div>
@@ -185,7 +215,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
                 <ol className="list-decimal list-inside space-y-3 text-gray-700">
                   {recipe.notes.map((item: any, index: number) => (
                     <li key={index} className="pl-2">
-                      <span dangerouslySetInnerHTML={{ __html: sanitizeHTML(typeof item === 'string' ? item : item.note_item || item.noteItem) }} />
+                      <InlineHTML html={typeof item === 'string' ? item : item.note_item || item.noteItem} />
                     </li>
                   ))}
                 </ol>
@@ -195,9 +225,9 @@ export default async function RecipePage({ params }: RecipePageProps) {
             {/* Notice */}
             {recipe.notice && (
               <div className="mb-8 bg-pink-50 border-l-4 border-pink-500 p-6 rounded">
-                <div 
+                <SanitizedHTML 
+                  html={recipe.notice}
                   className="text-gray-700"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.notice) }}
                 />
               </div>
             )}
@@ -205,9 +235,9 @@ export default async function RecipePage({ params }: RecipePageProps) {
             {/* Full Content */}
             {recipe.content && (
               <div className="mb-8">
-                <div 
+                <SanitizedHTML
+                  html={recipe.content}
                   className="prose prose-gray max-w-none"
-                  dangerouslySetInnerHTML={{ __html: sanitizeHTML(recipe.content) }}
                 />
               </div>
             )}
@@ -222,6 +252,49 @@ export default async function RecipePage({ params }: RecipePageProps) {
             </div>
           </div>
         </div>
+
+        {/* Next/Previous Navigation */}
+        {(prev || next) && (
+          <div className="mt-12 flex justify-between items-center gap-4">
+            {prev ? (
+              <Link 
+                href={`/recipes/${prev.slug}`}
+                className="flex-1 group"
+              >
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-[#D4A771] hover:shadow-lg transition-all">
+                  <div className="flex items-center gap-3 text-gray-600 mb-2">
+                    <ChevronLeft className="w-5 h-5" />
+                    <span className="text-sm font-medium">Previous Recipe</span>
+                  </div>
+                  <h3 className="text-lg font-serif text-black group-hover:text-[#D4A771] transition-colors line-clamp-2">
+                    {prev.title}
+                  </h3>
+                </div>
+              </Link>
+            ) : (
+              <div className="flex-1" />
+            )}
+            
+            {next ? (
+              <Link 
+                href={`/recipes/${next.slug}`}
+                className="flex-1 group"
+              >
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:border-[#D4A771] hover:shadow-lg transition-all text-right">
+                  <div className="flex items-center justify-end gap-3 text-gray-600 mb-2">
+                    <span className="text-sm font-medium">Next Recipe</span>
+                    <ChevronRight className="w-5 h-5" />
+                  </div>
+                  <h3 className="text-lg font-serif text-black group-hover:text-[#D4A771] transition-colors line-clamp-2">
+                    {next.title}
+                  </h3>
+                </div>
+              </Link>
+            ) : (
+              <div className="flex-1" />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

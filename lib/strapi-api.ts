@@ -967,6 +967,7 @@ export interface MenuItem {
   description?: string;
   icon?: string;
   cssClass?: string;
+  visibility?: 'always' | 'loggedIn' | 'loggedOut'; // Control menu item visibility
   children?: MenuItem[];
 }
 
@@ -1009,6 +1010,7 @@ export async function fetchMenu(slug: string): Promise<MockDatabaseResponse<Menu
           description: item.description,
           icon: item.icon,
           cssClass: item.cssClass,
+          visibility: item.visibility || 'always', // Default to always show
           children: item.children?.map((child: any) => ({
             id: child.id,
             title: child.title,
@@ -1019,6 +1021,7 @@ export async function fetchMenu(slug: string): Promise<MockDatabaseResponse<Menu
             description: child.description,
             icon: child.icon,
             cssClass: child.cssClass,
+            visibility: child.visibility || 'always',
             // Include nested children (3rd level)
             children: child.children?.map((grandchild: any) => ({
               id: grandchild.id,
@@ -1030,6 +1033,7 @@ export async function fetchMenu(slug: string): Promise<MockDatabaseResponse<Menu
               description: grandchild.description,
               icon: grandchild.icon,
               cssClass: grandchild.cssClass,
+              visibility: grandchild.visibility || 'always',
             })) || [],
           })) || [],
         })) || [],
@@ -1071,6 +1075,7 @@ export async function fetchAllMenus(): Promise<MockDatabaseResponse<Menu[]>> {
           description: item.description,
           icon: item.icon,
           cssClass: item.cssClass,
+          visibility: item.visibility || 'always',
           children: item.children?.map((child: any) => ({
             id: child.id,
             title: child.title,
@@ -1081,6 +1086,7 @@ export async function fetchAllMenus(): Promise<MockDatabaseResponse<Menu[]>> {
             description: child.description,
             icon: child.icon,
             cssClass: child.cssClass,
+            visibility: child.visibility || 'always',
           })) || [],
         })) || [],
       };

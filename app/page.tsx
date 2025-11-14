@@ -1,6 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { SmartSignupButton } from "@/components/smart-signup-button";
+import { HomeRedirect } from "@/components/home-redirect";
 import { FaqAccordion } from "@/components/faq-accordion";
 import { TestimonialsCarousel } from "@/components/testimonials-carousel";
 import { fetchCourses } from "@/lib/strapi-api";
@@ -50,6 +52,7 @@ export default async function HomePage() {
 
   return (
     <>
+      <HomeRedirect />
       <OrganizationSchema
         name="The Piped Peony Academy"
         url="https://thepipedpeony.com"
@@ -84,11 +87,9 @@ function HeroSection() {
               The Piped Peony Academy is for everyone! We'll learn, grow, and bloom together with helpful piping tutorials that take your skills to new heights.
             </p>
             <div className="hero-cta-wrapper !mb-8 md:!mb-0">
-              <Link href="/signup">
-                <Button variant="cta">
-                  Sign up for 7 free days
-                </Button>
-              </Link>
+              <SmartSignupButton variant="cta">
+                Sign up for 7 free days
+              </SmartSignupButton>
             </div>
           </div>
           <div className="hero-image-area relative z-20">
@@ -300,11 +301,9 @@ function CtaSection() {
         <h2 className="cta-title">
           Join The Piped Peony<br />Academy Community!
         </h2>
-        <Link href="/signup">
-          <Button variant="light" className="button-cta">
-            Sign up today
-          </Button>
-        </Link>
+        <SmartSignupButton variant="light" className="button-cta">
+          Sign up today
+        </SmartSignupButton>
       </div>
     </section>
   );
