@@ -198,8 +198,15 @@ export default function SignupPage() {
       <div className="login-background-right"></div>
       
       <div className="signup-container">
-        <h2 className="signup-title">Create Your Account</h2>
-        <p className="signup-subtitle">Join The Piped Peony Academy and start your buttercream artistry journey!</p>
+        {/* Trial & Pricing Information */}
+        <div className="bg-[#f6f5f3]   rounded-lg p-6 mb-6 text-center">
+          <p className="text-2xl font-serif font-bold text-gray-900 mb-2">
+            Get started with a 7-day free trial!
+          </p>
+          <p className="text-gray-700 pb-0 mb-0">
+            No contract membership for only $15 a month.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="grid grid-cols-2 gap-3">
