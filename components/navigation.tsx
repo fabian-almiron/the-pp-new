@@ -17,20 +17,23 @@ interface MenuItemComponentProps {
   className?: string;
 }
 
-// Helper function to filter menu items based on visibility and login status
-function filterMenuItemsByVisibility(items: MenuItem[], isSignedIn: boolean): MenuItem[] {
+// Helper function to filter menu items based on relationType and login status
+function filterMenuItemsByRelationType(items: MenuItem[], isSignedIn: boolean): MenuItem[] {
   return items
     .filter(item => {
-      const visibility = item.visibility || 'always';
-      if (visibility === 'always') return true;
-      if (visibility === 'loggedIn') return isSignedIn;
-      if (visibility === 'loggedOut') return !isSignedIn;
+      const relationType = item.relationType || 'View All';
+      // "View All" items are shown to everyone
+      if (relationType === 'View All') return true;
+      // "Logged In" items are only shown to authenticated users
+      if (relationType === 'Logged In') return isSignedIn;
+      // "Logged Out" items are only shown to non-authenticated users
+      if (relationType === 'Logged Out') return !isSignedIn;
       return true; // Default to showing the item
     })
     .map(item => ({
       ...item,
       // Recursively filter children
-      children: item.children ? filterMenuItemsByVisibility(item.children, isSignedIn) : undefined,
+      children: item.children ? filterMenuItemsByRelationType(item.children, isSignedIn) : undefined,
     }));
 }
 
@@ -189,8 +192,8 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
     return null;
   }
 
-  // Filter menu items based on visibility and login status
-  const filteredMenuItems = filterMenuItemsByVisibility(menu.menuItems, isSignedIn || false);
+  // Filter menu items based on relationType and login status
+  const filteredMenuItems = filterMenuItemsByRelationType(menu.menuItems, isSignedIn || false);
 
   // Check if this is a header navigation (has header-nav class)
   const isHeaderNav = className?.includes('header-nav');

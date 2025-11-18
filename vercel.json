@@ -34,5 +34,142 @@
         }
       ]
     }
+  ],
+  "redirects": [
+    {
+      "source": "/thoughts/:path*",
+      "destination": "/blog",
+      "permanent": true
+    },
+    {
+      "source": "/daras-blog",
+      "destination": "/blog",
+      "permanent": true
+    },
+    {
+      "source": "/author/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/tag/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/category/:path*",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/recipecategory/:path*",
+      "destination": "/recipes",
+      "permanent": true
+    },
+    {
+      "source": "/courselevel/:path*",
+      "destination": "/courses",
+      "permanent": true
+    },
+    {
+      "source": "/product/:slug",
+      "destination": "/shop/item/:slug",
+      "permanent": true
+    },
+    {
+      "source": "/products",
+      "destination": "/shop",
+      "permanent": true
+    },
+    {
+      "source": "/check-email",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/email-verification",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/email-verified",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/search-results",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/sample-page",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/thank-you",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/my-videos",
+      "destination": "/video-library",
+      "permanent": true
+    },
+    {
+      "source": "/tech-support",
+      "destination": "/contact",
+      "permanent": true
+    },
+    {
+      "source": "/all-series",
+      "destination": "/courses",
+      "permanent": true
+    },
+    {
+      "source": "/members-area-only",
+      "destination": "/courses",
+      "permanent": true
+    },
+    {
+      "source": "/reactivate-your-subscription",
+      "destination": "/my-account",
+      "permanent": true
+    },
+    {
+      "source": "/communication-preferences",
+      "destination": "/my-account",
+      "permanent": true
+    },
+    {
+      "source": "/shasta-daisy-class",
+      "destination": "/courses",
+      "permanent": true
+    },
+    {
+      "source": "/site-temporarily-unavailable",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/checkout-success",
+      "destination": "/checkout/success",
+      "permanent": true
+    },
+    {
+      "source": "/order-details",
+      "destination": "/my-account",
+      "permanent": true
+    },
+    {
+      "source": "/checkout-2/:path*",
+      "destination": "/checkout",
+      "permanent": true
+    }
   ]
 }

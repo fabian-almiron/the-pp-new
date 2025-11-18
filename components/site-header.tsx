@@ -68,7 +68,7 @@ function LoggedOutHeader() {
           </div>
         </Link>
         <Navigation 
-          menuSlug="logged-out-header" 
+          menuSlug="header" 
           className="header-nav"
         />
         <div className="header-actions">
@@ -136,7 +136,7 @@ function LoggedOutHeader() {
                   {/* Navigation Links */}
                   <div className="flex-1 overflow-y-auto">
                     <Navigation 
-                      menuSlug="logged-out-header" 
+                      menuSlug="header" 
                       className="flex flex-col space-y-2 mb-6"
                       onLinkClick={() => setIsMobileMenuOpen(false)}
                     />

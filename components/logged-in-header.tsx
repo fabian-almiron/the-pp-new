@@ -55,7 +55,7 @@ export function LoggedInHeader() {
         
         {/* Desktop Navigation */}
         <Navigation 
-          menuSlug="logged-in-header" 
+          menuSlug="header" 
           className="header-nav"
         />
 
@@ -110,7 +110,7 @@ export function LoggedInHeader() {
                   {/* Navigation Links */}
                   <div className="flex-1 overflow-y-auto">
                     <Navigation 
-                      menuSlug="logged-in-header" 
+                      menuSlug="header" 
                       className="flex flex-col space-y-2 mb-6"
                       onLinkClick={() => setIsMobileMenuOpen(false)}
                     />
