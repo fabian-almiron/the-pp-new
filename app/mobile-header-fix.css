@@ -17,8 +17,14 @@
     flex-shrink: 0;
   }
   
-  /* Hide any potential overflow text */
-  .header-container * {
+  /* Hide any potential overflow text - but not for mobile menu */
+  .header-container > * {
+    overflow: visible;
+  }
+  
+  .header-logo,
+  .header-nav,
+  .header-actions {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

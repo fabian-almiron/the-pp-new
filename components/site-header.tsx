@@ -119,91 +119,92 @@ function LoggedOutHeader() {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white">
+              <SheetContent side="left" className="w-full sm:w-[380px] bg-white p-0 flex flex-col">
                 <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
-                <nav className="flex flex-col h-full pt-8">
-                  {/* Logo */}
-                  <div className="mb-8 pb-6 border-b border-gray-200">
-                    <Image
-                      src="/piped-peony-logo-1536x339.png"
-                      alt="The Piped Peony"
-                      width={150}
-                      height={50}
-                      className="h-12 w-auto"
-                    />
-                  </div>
+                
+                {/* Drawer Header */}
+                <div className="px-6 py-5 bg-[#FBF9F6] border-b border-gray-200">
+                  <Image
+                    src="/piped-peony-logo-1536x339.png"
+                    alt="The Piped Peony"
+                    width={140}
+                    height={31}
+                    className="h-10 w-auto"
+                  />
+                </div>
 
-                  {/* Navigation Links */}
-                  <div className="flex-1 overflow-y-auto">
-                    <Navigation 
-                      menuSlug="header" 
-                      className="flex flex-col space-y-2 mb-6"
-                      onLinkClick={() => setIsMobileMenuOpen(false)}
-                    />
-                  </div>
+                {/* Scrollable Navigation Section */}
+                <div className="flex-1 overflow-y-auto px-4 py-4">
+                  <Navigation 
+                    menuSlug="header" 
+                    className="mobile-drawer-nav"
+                    onLinkClick={() => setIsMobileMenuOpen(false)}
+                  />
+                </div>
 
-                  {/* Mobile Actions */}
-                  <div className="flex flex-col gap-3 pt-6 border-t border-gray-200 mt-auto">
-                    <Link 
-                      href="/cart" 
-                      className="flex items-center justify-between px-4 py-3 rounded-lg bg-[#FBF9F6] hover:bg-[#f1eae6] transition-colors group" 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <span className="flex items-center gap-3 font-medium text-gray-700 group-hover:text-gray-900">
-                        <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
-                        Cart
+                {/* Drawer Footer - Fixed Actions */}
+                <div className="mt-auto border-t border-gray-200 bg-white px-4 py-4 space-y-3">
+                  {/* Cart Button */}
+                  <Link 
+                    href="/cart" 
+                    className="flex items-center justify-between px-4 py-3.5 rounded-xl bg-[#FBF9F6] hover:bg-[#f1eae6] transition-all duration-200 group shadow-sm" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span className="flex items-center gap-3 font-medium text-gray-800 group-hover:text-gray-900">
+                      <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
+                      Shopping Cart
+                    </span>
+                    {cartItemCount > 0 && (
+                      <span className="bg-[#D4A771] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
+                        {cartItemCount}
                       </span>
-                      {cartItemCount > 0 && (
-                        <span className="bg-[#D4A771] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                          {cartItemCount}
-                        </span>
-                      )}
-                    </Link>
-
-                    {isSignedIn ? (
-                      <>
-                        <Link 
-                          href="/my-account" 
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="w-full"
-                        >
-                          <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
-                            My Account
-                          </button>
-                        </Link>
-
-                        <button 
-                          className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors"
-                          onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                        >
-                          Sign Out
-                        </button>
-                      </>
-                    ) : (
-                      <>
-                        <Link 
-                          href="/signup" 
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="w-full"
-                        >
-                          <button className="w-full px-4 py-3 rounded-lg bg-[#D4A771] hover:bg-[#C69963] text-white font-medium transition-colors">
-                            Sign Up
-                          </button>
-                        </Link>
-
-                        <Link 
-                          href="/login" 
-                          onClick={() => setIsMobileMenuOpen(false)}
-                          className="w-full"
-                        >
-                          <button className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white hover:bg-[#FBF9F6] text-gray-700 font-medium transition-colors">
-                            Login
-                          </button>
-                        </Link>
-                      </>
                     )}
-                  </div>
-                </nav>
+                  </Link>
+
+                  {/* Auth Buttons */}
+                  {isSignedIn ? (
+                    <div className="flex gap-2">
+                      <Link 
+                        href="/my-account" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex-1"
+                      >
+                        <button className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all duration-200 shadow-sm">
+                          My Account
+                        </button>
+                      </Link>
+
+                      <button 
+                        className="flex-1 px-4 py-3.5 rounded-xl bg-[#D4A771] hover:bg-[#C69963] text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
+                        onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+                      >
+                        Sign Out
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Link 
+                        href="/login" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex-1"
+                      >
+                        <button className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all duration-200 shadow-sm">
+                          Login
+                        </button>
+                      </Link>
+
+                      <Link 
+                        href="/signup" 
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex-1"
+                      >
+                        <button className="w-full px-4 py-3.5 rounded-xl bg-[#D4A771] hover:bg-[#C69963] text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg">
+                          Sign Up
+                        </button>
+                      </Link>
+                    </div>
+                  )}
+                </div>
               </SheetContent>
             </Sheet>
           )}

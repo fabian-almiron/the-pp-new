@@ -76,25 +76,12 @@ function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem;
   const [isOpen, setIsOpen] = useState(false);
   
   const hasChildren = item.children && Array.isArray(item.children) && item.children.length > 0;
-  const textSizes = [
-    "text-base font-medium text-gray-700 hover:text-[#D4A771]", // level 0
-    "text-sm text-gray-600 hover:text-[#D4A771]", // level 1
-    "text-sm text-gray-500 hover:text-[#D4A771]" // level 2
-  ];
-  
-  const paddingClasses = [
-    "px-4 py-3 rounded-lg hover:bg-[#FBF9F6]", // level 0
-    "px-3 py-2 rounded-md hover:bg-gray-50", // level 1
-    "px-3 py-2 rounded-md hover:bg-gray-50" // level 2
-  ];
-
-  const className = `block ${textSizes[level]} ${paddingClasses[level]} transition-all`;
 
   if (!hasChildren) {
     return (
       <MenuItemComponent 
         item={item} 
-        className={className}
+        className=""
         onLinkClick={onLinkClick}
       />
     );
@@ -104,18 +91,18 @@ function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem;
     <div>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`flex items-center justify-between w-full ${className} text-left`}
+        className="flex items-center justify-between w-full text-left"
       >
         <span>{item.title}</span>
         {hasChildren && (
           isOpen ? 
-            <ChevronDown className="h-4 w-4 text-[#D4A771]" /> : 
-            <ChevronRight className="h-4 w-4 text-gray-400" />
+            <ChevronDown className="h-4 w-4 text-[#D4A771] flex-shrink-0" /> : 
+            <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
         )}
       </button>
       
       {hasChildren && isOpen && (
-        <ul className={`pl-3 mt-1 space-y-1`}>
+        <ul className="space-y-0.5">
           {item.children?.filter(child => child).map((child) => (
             <li key={child.id}>
               <CollapsibleMenuItem item={child} level={level + 1} onLinkClick={onLinkClick} />
@@ -247,7 +234,7 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
         </>
       ) : (
         // Default navigation layout (mobile/sidebar) - collapsible
-        <ul className="flex flex-col space-y-2">
+        <ul className="flex flex-col space-y-1">
           {filteredMenuItems.filter(item => item).map((item) => (
               <li key={item.id}>
                 <CollapsibleMenuItem item={item} level={0} onLinkClick={onLinkClick} />
