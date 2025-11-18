@@ -31,7 +31,8 @@ export default function AllCoursesPage() {
   useEffect(() => {
     async function loadCourses() {
       try {
-        const response = await fetch('/api/courses?pageSize=100&sort=title:asc');
+        // Fetch courses with default ordering (rank:asc from Strapi drag-drop plugin)
+        const response = await fetch('/api/courses?pageSize=100');
         const result = await response.json();
         
         if (!response.ok || result.error) {

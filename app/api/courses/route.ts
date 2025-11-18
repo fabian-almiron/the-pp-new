@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const pageSize = parseInt(searchParams.get('pageSize') || '100');
-    const sort = searchParams.get('sort') || 'title:asc';
+    const sort = searchParams.get('sort') || 'rank:asc'; // Use drag-drop rank by default
 
     const { data, error } = await fetchCourses({ page, pageSize, sort });
 

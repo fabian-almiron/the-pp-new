@@ -260,8 +260,9 @@ async function fetchFromStrapi(endpoint: string, cacheOptions?: { revalidate?: n
 export async function fetchProducts(): Promise<MockDatabaseResponse<Product[]>> {
   try {
     // Strapi 5 uses dot notation for nested population
+    // Sort by rank field (for drag-drop plugin) if available, otherwise by name
     const response: StrapiResponse = await fetchFromStrapi(
-      '/products?populate[0]=image&populate[1]=gallery&populate[2]=category&populate[3]=productTabs.accordionItems&pagination[limit]=100'
+      '/products?populate[0]=image&populate[1]=gallery&populate[2]=category&populate[3]=productTabs.accordionItems&pagination[limit]=100&sort[0]=rank:asc&sort[1]=name:asc'
     );
     
     const products = response.data.map(convertStrapiProduct);
@@ -312,7 +313,7 @@ export async function fetchProductBySlug(slug: string): Promise<MockDatabaseResp
 export async function fetchProductsByCategory(categorySlug: string): Promise<MockDatabaseResponse<Product[]>> {
   try {
     const response: StrapiResponse = await fetchFromStrapi(
-      `/products?filters[category][slug][$eq]=${categorySlug}&populate=*`
+      `/products?filters[category][slug][$eq]=${categorySlug}&populate=*&sort[0]=rank:asc&sort[1]=name:asc`
     );
     
     const products = response.data.map(convertStrapiProduct);
@@ -332,7 +333,7 @@ export async function fetchProductsByCategory(categorySlug: string): Promise<Moc
 // Get featured products
 export async function fetchFeaturedProducts(): Promise<MockDatabaseResponse<Product[]>> {
   try {
-    const response: StrapiResponse = await fetchFromStrapi('/products?filters[featured][$eq]=true&populate=*');
+    const response: StrapiResponse = await fetchFromStrapi('/products?filters[featured][$eq]=true&populate=*&sort[0]=rank:asc&sort[1]=name:asc');
     
     const products = response.data.map(convertStrapiProduct);
     
@@ -696,9 +697,10 @@ export async function fetchCourses(options?: {
   sort?: string;
 }): Promise<MockDatabaseResponse<StrapiCourse[]>> {
   try {
-    const { page = 1, pageSize = 25, sort = 'title:asc' } = options || {};
+    // Use drag-drop rank by default, then title as fallback
+    const { page = 1, pageSize = 25, sort = 'rank:asc' } = options || {};
     const response: StrapiCourseResponse = await fetchFromStrapi(
-      `/courses?populate=*&sort=${sort}&pagination[page]=${page}&pagination[pageSize]=${pageSize}`
+      `/courses?populate=*&sort[0]=${sort}&sort[1]=title:asc&pagination[page]=${page}&pagination[pageSize]=${pageSize}`
     );
     
     const courses = response.data.map(convertStrapiCourse);
@@ -772,7 +774,7 @@ export async function fetchCourseById(id: number): Promise<MockDatabaseResponse<
 export async function fetchCoursesBySeries(series: string): Promise<MockDatabaseResponse<StrapiCourse[]>> {
   try {
     const response: StrapiCourseResponse = await fetchFromStrapi(
-      `/courses?filters[series][$eq]=${encodeURIComponent(series)}&populate=*&sort=title:asc&pagination[pageSize]=100`
+      `/courses?filters[series][$eq]=${encodeURIComponent(series)}&populate=*&sort[0]=rank:asc&sort[1]=title:asc&pagination[pageSize]=100`
     );
     
     const courses = response.data.map(convertStrapiCourse);
@@ -794,7 +796,7 @@ export async function fetchCoursesByCategory(category: string): Promise<MockData
   try {
     // Strapi 5 - filter by relation using category name
     const response: StrapiCourseResponse = await fetchFromStrapi(
-      `/courses?filters[category][name][$eq]=${encodeURIComponent(category)}&populate[0]=featuredImage&populate[1]=gallery&populate[2]=category&sort[0]=title:asc`
+      `/courses?filters[category][name][$eq]=${encodeURIComponent(category)}&populate[0]=featuredImage&populate[1]=gallery&populate[2]=category&sort[0]=rank:asc&sort[1]=title:asc`
     );
     
     const courses = response.data.map(convertStrapiCourse);
@@ -815,7 +817,7 @@ export async function fetchCoursesByCategory(category: string): Promise<MockData
 export async function fetchCoursesByLevel(level: 'beginner' | 'intermediate' | 'advanced'): Promise<MockDatabaseResponse<StrapiCourse[]>> {
   try {
     const response: StrapiCourseResponse = await fetchFromStrapi(
-      `/courses?filters[courseLevel][$eq]=${level}&populate=*&sort=title:asc`
+      `/courses?filters[courseLevel][$eq]=${level}&populate=*&sort[0]=rank:asc&sort[1]=title:asc`
     );
     
     const courses = response.data.map(convertStrapiCourse);
@@ -835,7 +837,7 @@ export async function fetchCoursesByLevel(level: 'beginner' | 'intermediate' | '
 // Get featured courses
 export async function fetchFeaturedCourses(): Promise<MockDatabaseResponse<StrapiCourse[]>> {
   try {
-    const response: StrapiCourseResponse = await fetchFromStrapi('/courses?filters[featured][$eq]=true&populate=*&sort=title:asc');
+    const response: StrapiCourseResponse = await fetchFromStrapi('/courses?filters[featured][$eq]=true&populate=*&sort[0]=rank:asc&sort[1]=title:asc');
     
     const courses = response.data.map(convertStrapiCourse);
     
@@ -932,7 +934,7 @@ export async function fetchCourseCategories(): Promise<MockDatabaseResponse<stri
 // Get all categories with full details
 export async function fetchAllCategories(): Promise<MockDatabaseResponse<Category[]>> {
   try {
-    const response = await fetchFromStrapi('/categories?populate=*&sort=name:asc');
+    const response = await fetchFromStrapi('/categories?populate=*&sort[0]=rank:asc&sort[1]=name:asc');
     
     const categories = response.data.map((cat: any) => ({
       id: cat.id,
