@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useMemo } from "react";
+import { useSearchParams } from "next/navigation";
 import { Video, Star, Search, X, Filter, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -54,9 +55,18 @@ export default function AllCoursesPage() {
 }
 
 function CoursesContent({ courses, error, loading }: { courses: any[], error: string | null, loading: boolean }) {
+  const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLevel, setSelectedLevel] = useState<string>('all');
   const [selectedSeries, setSelectedSeries] = useState<string>('all');
+
+  // Read series from URL query params on mount
+  useEffect(() => {
+    const seriesParam = searchParams.get('series');
+    if (seriesParam) {
+      setSelectedSeries(seriesParam);
+    }
+  }, [searchParams]);
 
   // Get unique series and levels - use empty arrays if courses is null
   const allSeries = useMemo(() => 

@@ -19,6 +19,7 @@ const buttonVariants = cva(
         light: "button-light", // Light variant for dark backgrounds
         clean: "button-clean", // Clean variant
         cta: "button-cta", // CTA variant for homepage buttons
+        brown: "button-brown", // Brown variant with black hover
       },
       size: {
         default: "button-default",

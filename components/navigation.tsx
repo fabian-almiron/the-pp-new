@@ -1,15 +1,18 @@
 "use client"
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, MenuItem } from '@/lib/strapi-api';
 import { useEffect, useState } from 'react';
-import { ChevronDown, ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronLeft, X } from 'lucide-react';
 import { useUser } from '@clerk/nextjs';
 
 interface NavigationProps {
   menuSlug: string;
   className?: string;
   onLinkClick?: () => void;
+  renderFooterActions?: () => React.ReactNode;
+  onCloseMenu?: () => void;
 }
 
 interface MenuItemComponentProps {
@@ -71,8 +74,8 @@ function MenuItemComponent({ item, className = "", showArrow = false, arrowDirec
   );
 }
 
-// Collapsible mobile menu item component
-function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem; level?: number; onLinkClick?: () => void }) {
+// Collapsible mobile menu item component with drawer-style navigation
+function CollapsibleMenuItem({ item, level = 0, onLinkClick, renderFooterActions, onCloseMenu }: { item: MenuItem; level?: number; onLinkClick?: () => void; renderFooterActions?: () => React.ReactNode; onCloseMenu?: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   
   const hasChildren = item.children && Array.isArray(item.children) && item.children.length > 0;
@@ -81,40 +84,93 @@ function CollapsibleMenuItem({ item, level = 0, onLinkClick }: { item: MenuItem;
     return (
       <MenuItemComponent 
         item={item} 
-        className=""
+        className="block px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors text-gray-700"
         onLinkClick={onLinkClick}
       />
     );
   }
 
   return (
-    <div>
+    <>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center justify-between w-full text-left"
+        onClick={() => setIsOpen(true)}
+        className="flex items-center justify-between w-full text-left px-4 py-3 hover:bg-gray-50 rounded-lg transition-colors text-gray-700"
       >
-        <span>{item.title}</span>
-        {hasChildren && (
-          isOpen ? 
-            <ChevronDown className="h-4 w-4 text-[#D4A771] flex-shrink-0" /> : 
-            <ChevronRight className="h-4 w-4 text-gray-400 flex-shrink-0" />
-        )}
+        <span className="font-medium">{item.title}</span>
+        <ChevronRight className="h-5 w-5 text-[#D4A771] flex-shrink-0" />
       </button>
       
-      {hasChildren && isOpen && (
-        <ul className="space-y-0.5">
-          {item.children?.filter(child => child).map((child) => (
-            <li key={child.id}>
-              <CollapsibleMenuItem item={child} level={level + 1} onLinkClick={onLinkClick} />
-            </li>
-          ))}
-        </ul>
+      {/* Drawer overlay for submenu - slides in from right */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-white z-[100] flex flex-col animate-slide-in-right"
+          style={{ 
+            left: '0',
+            top: '0',
+            width: '100%',
+            height: '100%'
+          }}
+        >
+          {/* Drawer Header with Logo and Close Button */}
+          <div className="px-6 py-5 bg-[#FBF9F6] border-b border-gray-200 flex items-center justify-between flex-shrink-0">
+            <Image
+              src="/piped-peony-logo-1536x339.png"
+              alt="The Piped Peony"
+              width={140}
+              height={31}
+              className="h-10 w-auto"
+            />
+            {onCloseMenu && (
+              <button
+                onClick={onCloseMenu}
+                className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                aria-label="Close menu"
+              >
+                <X className="h-6 w-6 text-gray-700" />
+              </button>
+            )}
+          </div>
+
+          {/* Submenu Header with Back Button */}
+          <div className="px-4 py-3 bg-white border-b border-gray-100 flex-shrink-0">
+            <button
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 text-gray-700 hover:text-gray-900 transition-colors"
+            >
+              <ChevronLeft className="h-5 w-5 text-[#D4A771]" />
+              <span className="font-semibold text-base">{item.title}</span>
+            </button>
+          </div>
+
+          {/* Submenu Items - scrollable */}
+          <div className="flex-1 overflow-y-auto px-2 py-2">
+            <ul className="space-y-1">
+              {item.children?.filter(child => child).map((child) => (
+                <li key={child.id}>
+                  <CollapsibleMenuItem 
+                    item={child} 
+                    level={level + 1} 
+                    onLinkClick={(e) => {
+                      setIsOpen(false);
+                      onLinkClick?.(e);
+                    }}
+                    renderFooterActions={renderFooterActions}
+                    onCloseMenu={onCloseMenu}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Footer Actions - Always visible in nested drawers */}
+          {renderFooterActions && renderFooterActions()}
+        </div>
       )}
-    </div>
+    </>
   );
 }
 
-export default function Navigation({ menuSlug, className = "", onLinkClick }: NavigationProps) {
+export default function Navigation({ menuSlug, className = "", onLinkClick, renderFooterActions, onCloseMenu }: NavigationProps) {
   const [menu, setMenu] = useState<Menu | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -233,11 +289,17 @@ export default function Navigation({ menuSlug, className = "", onLinkClick }: Na
             ))}
         </>
       ) : (
-        // Default navigation layout (mobile/sidebar) - collapsible
+        // Default navigation layout (mobile/sidebar) - collapsible with drawer-style submenus
         <ul className="flex flex-col space-y-1">
           {filteredMenuItems.filter(item => item).map((item) => (
               <li key={item.id}>
-                <CollapsibleMenuItem item={item} level={0} onLinkClick={onLinkClick} />
+                <CollapsibleMenuItem 
+                  item={item} 
+                  level={0} 
+                  onLinkClick={onLinkClick}
+                  renderFooterActions={renderFooterActions}
+                  onCloseMenu={onCloseMenu}
+                />
               </li>
             ))}
         </ul>

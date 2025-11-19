@@ -936,15 +936,22 @@ export async function fetchAllCategories(): Promise<MockDatabaseResponse<Categor
   try {
     const response = await fetchFromStrapi('/categories?populate=*&sort[0]=rank:asc&sort[1]=name:asc');
     
-    const categories = response.data.map((cat: any) => ({
-      id: cat.id,
-      name: cat.name,
-      slug: cat.slug,
-      image: cat.image ? {
-        url: cat.image.url,
-        alternativeText: cat.image.alternativeText
-      } : undefined
-    }));
+    const categories = response.data.map((cat: any) => {
+      // Try to get featuredImage first, then fall back to image
+      const imageData = cat.featuredImage || cat.image;
+      
+      return {
+        id: cat.id,
+        name: cat.name,
+        slug: cat.slug,
+        image: imageData ? {
+          url: imageData.url.startsWith('http') 
+            ? imageData.url 
+            : `${STRAPI_URL}${imageData.url}`,
+          alternativeText: imageData.alternativeText
+        } : undefined
+      };
+    });
     
     return {
       data: categories,

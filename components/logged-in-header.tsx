@@ -27,6 +27,48 @@ export function LoggedInHeader() {
     await signOut();
   };
 
+  // Footer actions to be rendered in main drawer and nested drawers
+  const renderFooterActions = () => (
+    <div className="mt-auto border-t border-gray-200 bg-white px-4 py-4 space-y-3">
+      {/* Cart Button */}
+      <Link 
+        href="/cart" 
+        className="flex items-center justify-between px-4 py-3.5 rounded-xl bg-[#FBF9F6] hover:bg-[#f1eae6] transition-all duration-200 group shadow-sm" 
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        <span className="flex items-center gap-3 font-medium text-gray-800 group-hover:text-gray-900">
+          <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
+          Shopping Cart
+        </span>
+        {cartItemCount > 0 && (
+          <span className="bg-[#D4A771] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
+            {cartItemCount}
+          </span>
+        )}
+      </Link>
+
+      {/* Auth Buttons */}
+      <div className="flex gap-2">
+        <Link 
+          href="/my-account" 
+          onClick={() => setIsMobileMenuOpen(false)}
+          className="flex-1"
+        >
+          <button className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all duration-200 shadow-sm">
+            My Account
+          </button>
+        </Link>
+
+        <button 
+          className="flex-1 px-4 py-3.5 rounded-xl bg-[#D4A771] hover:bg-[#C69963] text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
+          onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
+        >
+          Sign Out
+        </button>
+      </div>
+    </div>
+  );
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-[#FBF9F6]" style={{ borderColor: '#70707099' }}>
       <div className="header-container">
@@ -113,48 +155,13 @@ export function LoggedInHeader() {
                     menuSlug="header" 
                     className="mobile-drawer-nav"
                     onLinkClick={() => setIsMobileMenuOpen(false)}
+                    renderFooterActions={renderFooterActions}
+                    onCloseMenu={() => setIsMobileMenuOpen(false)}
                   />
                 </div>
 
                 {/* Drawer Footer - Fixed Actions */}
-                <div className="mt-auto border-t border-gray-200 bg-white px-4 py-4 space-y-3">
-                  {/* Cart Button */}
-                  <Link 
-                    href="/cart" 
-                    className="flex items-center justify-between px-4 py-3.5 rounded-xl bg-[#FBF9F6] hover:bg-[#f1eae6] transition-all duration-200 group shadow-sm" 
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <span className="flex items-center gap-3 font-medium text-gray-800 group-hover:text-gray-900">
-                      <ShoppingCart className="h-5 w-5 text-[#D4A771]" />
-                      Shopping Cart
-                    </span>
-                    {cartItemCount > 0 && (
-                      <span className="bg-[#D4A771] text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
-                        {cartItemCount}
-                      </span>
-                    )}
-                  </Link>
-
-                  {/* Auth Buttons */}
-                  <div className="flex gap-2">
-                    <Link 
-                      href="/my-account" 
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex-1"
-                    >
-                      <button className="w-full px-4 py-3.5 rounded-xl border-2 border-gray-300 bg-white hover:bg-gray-50 text-gray-700 font-semibold transition-all duration-200 shadow-sm">
-                        My Account
-                      </button>
-                    </Link>
-
-                    <button 
-                      className="flex-1 px-4 py-3.5 rounded-xl bg-[#D4A771] hover:bg-[#C69963] text-white font-semibold transition-all duration-200 shadow-md hover:shadow-lg"
-                      onClick={() => { handleLogout(); setIsMobileMenuOpen(false); }}
-                    >
-                      Sign Out
-                    </button>
-                  </div>
-                </div>
+                {renderFooterActions()}
               </SheetContent>
             </Sheet>
           )}

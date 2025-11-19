@@ -536,7 +536,21 @@ html {
     
     &:hover {
       border-color: #D4A771;
-      color: #D4A771;
+      color: #ffffff;
+    }
+  }
+  
+  &.button-brown {
+    background-color: #D4A771;
+    color: white;
+    border: 1px solid #D4A771;
+    font-family: "sofia-pro", sans-serif;
+    font-weight: 400;
+    
+    &:hover {
+      background-color: black;
+      border-color: black;
+      color: white;
     }
   }
 }
@@ -2783,6 +2797,20 @@ html {
   }
 }
 
+/* Mobile menu drawer slide-in animation */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
 .password-reset-modal-content {
   background-color: white;
   border: 2px solid #d4c5b9;
@@ -3409,7 +3437,7 @@ section.featuredvl-section {
 }
 
 .flower-piping-content {
-  max-width: 1200px;
+  max-width: 1380px;
   margin: 0 auto;
   padding: 0 1rem;
 }
@@ -3515,7 +3543,7 @@ section.featuredvl-section {
 /* Fixed 4-item container look on desktop */
 .flower-piping-fixed {
   position: relative;
-  max-width: 1200px; /* controls overall width */
+  max-width: 100%; /* controls overall width */
   margin-left: auto;
   margin-right: auto;
 }

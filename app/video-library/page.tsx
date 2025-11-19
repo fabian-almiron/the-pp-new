@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FlowerPipingCarousel } from "@/components/flower-piping-carousel";
-import { fetchCourses, fetchAllCategories } from "@/lib/strapi-api";
+import { fetchCourses } from "@/lib/strapi-api";
 import { NewestVideosCarousel } from "./newest-videos-carousel";
 
 export default async function VideoLibraryPage() {
@@ -15,9 +15,40 @@ export default async function VideoLibraryPage() {
   
   const courses = coursesResponse.data || [];
 
-  // Fetch all categories
-  const categoriesResponse = await fetchAllCategories();
-  const categories = categoriesResponse.data || [];
+  // Fetch all courses to get unique flower piping series
+  const allCoursesResponse = await fetchCourses({ 
+    pageSize: 100, 
+    sort: 'rank:asc' 
+  });
+  
+  const allCourses = allCoursesResponse.data || [];
+  
+  // Filter out non-flower series
+  const excludedSeries = [
+    'business series', 
+    'coloring series',
+    'cake series',
+    'tips and techniques',
+    'business',
+    'coloring',
+  ];
+  
+  // Get unique flower piping series with their first course as representative
+  const seriesMap = new Map();
+  allCourses.forEach(course => {
+    if (course.series) {
+      const seriesLower = course.series.toLowerCase();
+      const isExcluded = excludedSeries.some(excluded => 
+        seriesLower.includes(excluded)
+      );
+      
+      if (!isExcluded && !seriesMap.has(course.series)) {
+        seriesMap.set(course.series, course);
+      }
+    }
+  });
+  
+  const flowerPipingSeries = Array.from(seriesMap.values());
 
   return (
     <>
@@ -25,7 +56,7 @@ export default async function VideoLibraryPage() {
       <DifficultyLevels />
       <NewestVideosCarousel courses={courses} />
       <VideoSeriesSection />
-      <FlowerPipingCarousel categories={categories} />
+      <FlowerPipingCarousel series={flowerPipingSeries} />
       <BusinessSeriesSection />
     </>
   );
