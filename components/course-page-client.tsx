@@ -15,9 +15,27 @@ interface CoursePageClientProps {
 export function CoursePageClient({ course, relatedCourses }: CoursePageClientProps) {
   const [activeChapter, setActiveChapter] = useState<Chapter>(course.chapters[0]);
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   const handlePlayVideo = () => {
     videoPlayerRef.current?.playVideo();
+  };
+
+  const handleSelectChapter = (chapter: Chapter) => {
+    setActiveChapter(chapter);
+    
+    // Scroll to video player on mobile
+    if (videoContainerRef.current) {
+      videoContainerRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+    
+    // Give a small delay for the video to load, then play it
+    setTimeout(() => {
+      videoPlayerRef.current?.playVideo();
+    }, 300);
   };
 
   return (
@@ -25,7 +43,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12 py-16">
           {/* Left Column - Video Player and Course Info */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2" ref={videoContainerRef}>
             <div className="mb-6">
               <h1 className="text-4xl font-serif font-bold text-gray-900">
                 {course.title}
@@ -50,7 +68,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
             <ChapterList
               chapters={course.chapters}
               activeChapterId={activeChapter.id}
-              onSelectChapter={setActiveChapter}
+              onSelectChapter={handleSelectChapter}
               onPlayVideo={handlePlayVideo}
             />
           </div>

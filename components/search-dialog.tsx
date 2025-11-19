@@ -57,7 +57,7 @@ export function SearchDialog() {
           course.title?.toLowerCase().includes(trimmedQuery) ||
           course.description?.toLowerCase().includes(trimmedQuery) ||
           course.instructor?.toLowerCase().includes(trimmedQuery) ||
-          course.tags?.some((tag: string) => tag.toLowerCase().includes(trimmedQuery))
+          course.tags?.some((tag: string) => tag?.toLowerCase()?.includes(trimmedQuery))
         ).map((course: any) => ({
           type: 'course' as const,
           id: course.id,
@@ -75,7 +75,7 @@ export function SearchDialog() {
           recipe.title?.toLowerCase().includes(trimmedQuery) ||
           recipe.description?.toLowerCase().includes(trimmedQuery) ||
           recipe.ingredients?.some((ing: any) => 
-            ing.name?.toLowerCase().includes(trimmedQuery)
+            ing?.name?.toLowerCase()?.includes(trimmedQuery)
           )
         ).map((recipe: any) => ({
           type: 'recipe' as const,
