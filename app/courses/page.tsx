@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Video, Star, Search, X, Filter, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -51,7 +51,18 @@ export default function AllCoursesPage() {
     loadCourses();
   }, []);
 
-  return <CoursesContent courses={courses} error={error} loading={loading} />;
+  return (
+    <Suspense fallback={
+      <div className="container mx-auto px-4 py-16">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading courses...</p>
+        </div>
+      </div>
+    }>
+      <CoursesContent courses={courses} error={error} loading={loading} />
+    </Suspense>
+  );
 }
 
 function CoursesContent({ courses, error, loading }: { courses: any[], error: string | null, loading: boolean }) {
