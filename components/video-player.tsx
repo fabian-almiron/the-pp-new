@@ -1,20 +1,24 @@
 "use client";
 
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useRouter } from "next/navigation";
 import { Chapter } from "@/data/types";
+import { Play } from "lucide-react";
 
 interface VideoPlayerProps {
   chapter: Chapter;
+  isSignedIn?: boolean;
 }
 
 export interface VideoPlayerRef {
   playVideo: () => void;
 }
 
-export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapter }, ref) => {
+export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapter, isSignedIn = false }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [player, setPlayer] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   // Extract video ID and timestamp from Vimeo URL
   const parseVimeoUrl = (url: string) => {
@@ -47,6 +51,13 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
   // Expose playVideo method to parent component
   useImperativeHandle(ref, () => ({
     playVideo: () => {
+      // Redirect to signup if not signed in
+      if (!isSignedIn) {
+        const currentPath = window.location.pathname;
+        router.push(`/signup?redirect_url=${encodeURIComponent(currentPath)}`);
+        return;
+      }
+
       if (player && typeof player.play === 'function') {
         // First ensure the video is unmuted, then play it
         Promise.resolve()
@@ -84,7 +95,7 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
           });
       }
     }
-  }), [player]);
+  }), [player, isSignedIn, router]);
 
   // Load Vimeo Player API
   useEffect(() => {
@@ -156,6 +167,11 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
       setIsLoading(false);
       setPlayer(newPlayer);
       
+      // Only proceed with unmute/autoplay if signed in
+      if (!isSignedIn) {
+        return; // Don't autoplay or unmute for non-signed-in users
+      }
+
       // Ensure video is unmuted
       return Promise.resolve()
         .then(() => {
@@ -202,16 +218,25 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         player.setCurrentTime(timestamp).then(() => {
+          // Only proceed with unmute/autoplay if signed in
+          if (!isSignedIn) {
+            return; // Don't autoplay for non-signed-in users
+          }
+
           // Ensure video is unmuted
           if (typeof player.setMuted === 'function') {
             return player.setMuted(false);
           }
         }).then(() => {
+          if (!isSignedIn) return; // Skip if not signed in
+
           // Set volume to 100% (unmuted)
           if (typeof player.setVolume === 'function') {
             return player.setVolume(1);
           }
         }).then(() => {
+          if (!isSignedIn) return; // Skip if not signed in
+
           // Only auto-play on desktop, not on mobile
           if (!isMobile && player && typeof player.play === 'function') {
             return player.play();
@@ -223,7 +248,7 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
 
       return () => clearTimeout(timeoutId);
     }
-  }, [player, timestamp]);
+  }, [player, timestamp, isSignedIn]);
 
   // Cleanup player on unmount
   useEffect(() => {
@@ -252,11 +277,16 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
     );
   }
 
+  const handleSignupClick = () => {
+    const currentPath = window.location.pathname;
+    router.push(`/signup?redirect_url=${encodeURIComponent(currentPath)}`);
+  };
+
   return (
     <div>
       <div className="relative mt-4 aspect-video bg-black rounded-md overflow-hidden shadow-lg">
         {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white">
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900 text-white z-20">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-2"></div>
               <p>Loading video...</p>
@@ -267,6 +297,30 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
           ref={containerRef}
           className="w-full h-full"
         />
+        
+        {/* Signup Overlay for non-signed-in users */}
+        {!isSignedIn && (
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-10 cursor-pointer"
+            onClick={handleSignupClick}
+          >
+            <div className="text-center px-6">
+              <h3 className="text-2xl font-serif font-bold text-white mb-3">
+                Sign Up to Watch
+              </h3>
+              <p className="text-gray-200 mb-6 max-w-md">
+                Create a free account to access this course video and explore our full library of cake decorating tutorials.
+              </p>
+              <button
+                onClick={handleSignupClick}
+                className="bg-white hover:bg-gray-100 text-black font-semibold px-8 py-3 rounded-full transition-colors inline-flex items-center gap-2"
+              >
+                <Play className="w-5 h-5" />
+                Sign Up to Watch
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

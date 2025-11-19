@@ -6,6 +6,7 @@ import { VideoPlayer, VideoPlayerRef } from "@/components/video-player";
 import { ChapterList } from "@/components/chapter-list";
 import { CourseTabs } from "@/components/course-tabs";
 import { ContentCarousel } from "@/components/content-carousel";
+import { useRole } from "@/hooks/use-role";
 
 interface CoursePageClientProps {
   course: Course;
@@ -16,6 +17,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
   const [activeChapter, setActiveChapter] = useState<Chapter>(course.chapters[0]);
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
+  const { isSignedIn } = useRole();
 
   const handlePlayVideo = () => {
     videoPlayerRef.current?.playVideo();
@@ -54,7 +56,11 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
             </div>
             
             <div className="sticky top-4">
-              <VideoPlayer ref={videoPlayerRef} chapter={activeChapter} />
+              <VideoPlayer 
+                ref={videoPlayerRef} 
+                chapter={activeChapter} 
+                isSignedIn={isSignedIn}
+              />
               
               <CourseTabs 
                 aboutContent={course.aboutContent}
