@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Playfair_Display, Lato, Dancing_Script, Inter, Alex_Brush } from 'next/font/google';
 import "./globals.css";
 import "./mobile-header-fix.css";
@@ -105,6 +106,51 @@ export default function RootLayout({
           <CookieConsentBanner />
           <Analytics />
           <SpeedInsights />
+          
+          {/* accessiBe Accessibility Widget */}
+          <Script
+            id="accessibe"
+            strategy="afterInteractive"
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(){
+                  var s = document.createElement('script');
+                  var h = document.querySelector('head') || document.body;
+                  s.src = 'https://acsbapp.com/apps/app/dist/js/app.js';
+                  s.async = true;
+                  s.onload = function(){
+                    acsbJS.init({
+                      statementLink: '',
+                      footerHtml: '',
+                      hideMobile: false,
+                      hideTrigger: false,
+                      disableBgProcess: false,
+                      language: 'en',
+                      position: 'right',
+                      leadColor: '#D4A771',
+                      triggerColor: '#D4A771',
+                      triggerRadius: '50%',
+                      triggerPositionX: 'right',
+                      triggerPositionY: 'bottom',
+                      triggerIcon: 'people',
+                      triggerSize: 'medium',
+                      triggerOffsetX: 20,
+                      triggerOffsetY: 20,
+                      mobile: {
+                        triggerSize: 'small',
+                        triggerPositionX: 'right',
+                        triggerPositionY: 'bottom',
+                        triggerOffsetX: 10,
+                        triggerOffsetY: 10,
+                        triggerRadius: '50%'
+                      }
+                    });
+                  };
+                  h.appendChild(s);
+                })();
+              `,
+            }}
+          />
         </body>
       </html>
     </ClerkProvider>
