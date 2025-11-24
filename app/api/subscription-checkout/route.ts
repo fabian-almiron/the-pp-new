@@ -30,11 +30,23 @@ export async function POST(request: NextRequest) {
 
     // Fetch subscription details from Strapi (to get Stripe Price ID)
     const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
+    const strapiToken = process.env.STRAPI_API_TOKEN;
     
     console.log('🔍 Fetching subscription from Strapi:', subscriptionId);
     
     // Strapi v5 uses documentId
-    const subscriptionResponse = await fetch(`${strapiUrl}/api/subscriptions?filters[documentId][$eq]=${subscriptionId}&populate=*`);
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (strapiToken) {
+      headers['Authorization'] = `Bearer ${strapiToken}`;
+    }
+    
+    const subscriptionResponse = await fetch(
+      `${strapiUrl}/api/subscriptions?filters[documentId][$eq]=${subscriptionId}&populate=*`,
+      { headers }
+    );
     
     if (!subscriptionResponse.ok) {
       console.error('❌ Failed to fetch subscription from Strapi:', subscriptionResponse.status);

@@ -45,12 +45,12 @@ export function useSubscription() {
   useEffect(() => {
     const fetchAvailableSubscriptions = async () => {
       try {
-        const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-        const response = await fetch(`${strapiUrl}/api/subscriptions?filters[active][$eq]=true&sort=subscriptionPrice:asc`);
+        // Fetch from our API route which handles authentication
+        const response = await fetch('/api/subscriptions-list');
         
         if (response.ok) {
-          const { data } = await response.json();
-          setAvailableSubscriptions(data);
+          const { subscriptions } = await response.json();
+          setAvailableSubscriptions(subscriptions || []);
         }
       } catch (err) {
         console.error('Error fetching subscriptions:', err);
