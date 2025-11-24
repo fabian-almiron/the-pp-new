@@ -32,12 +32,12 @@ export default function SignupPage() {
   const { isSignedIn, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
-  // Redirect signed-in users to video library
+  // Redirect signed-in users to video library (but not if they're on subscription step)
   useEffect(() => {
-    if (userLoaded && isSignedIn) {
+    if (userLoaded && isSignedIn && currentStep === 'signup') {
       router.push('/video-library');
     }
-  }, [userLoaded, isSignedIn, router]);
+  }, [userLoaded, isSignedIn, currentStep, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
