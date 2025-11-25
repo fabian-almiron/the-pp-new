@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Lato, Dancing_Script, Inter, Alex_Brush } from 'next/font/google';
+import Script from 'next/script';
 import "./globals.css";
 import "./mobile-header-fix.css";
 import { SiteHeader } from "@/components/site-header";
@@ -105,6 +106,19 @@ export default function RootLayout({
           <CookieConsentBanner />
           <Analytics />
           <SpeedInsights />
+          
+          {/* accessiBe - Loaded during idle time for minimal performance impact */}
+          <Script
+            src="https://acsbapp.com/apps/app/dist/js/app.js"
+            strategy="lazyOnload"
+            onLoad={() => {
+              // @ts-ignore - accessiBe global object
+              if (typeof acsbJS !== 'undefined') {
+                // @ts-ignore
+                acsbJS.init();
+              }
+            }}
+          />
         </body>
       </html>
     </ClerkProvider>
