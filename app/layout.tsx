@@ -109,14 +109,21 @@ export default function RootLayout({
           
           {/* accessiBe - Loaded during idle time for minimal performance impact */}
           <Script
-            src="https://acsbapp.com/apps/app/dist/js/app.js"
+            id="accessibe-script"
             strategy="lazyOnload"
-            onLoad={() => {
-              // @ts-ignore - accessiBe global object
-              if (typeof acsbJS !== 'undefined') {
-                // @ts-ignore
-                acsbJS.init();
-              }
+            dangerouslySetInnerHTML={{
+              __html: `
+                (function(){
+                  var s = document.createElement('script');
+                  var h = document.querySelector('head') || document.body;
+                  s.src = 'https://acsbapp.com/apps/app/dist/js/app.js';
+                  s.async = true;
+                  s.onload = function(){
+                    acsbJS.init();
+                  };
+                  h.appendChild(s);
+                })();
+              `
             }}
           />
         </body>
