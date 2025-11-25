@@ -220,22 +220,19 @@ async function handleInvoiceCreated(invoice: Stripe.Invoice) {
     console.log('  - Amount:', invoice.amount_due / 100);
     console.log('  - Customer email:', invoice.customer_email);
     
-    // Skip subscription invoices (they have their own email flow)
-    if (invoice.billing_reason === 'subscription_create' || 
-        invoice.billing_reason === 'subscription_cycle' ||
+    // Only skip recurring subscription invoices (not the first trial invoice)
+    if (invoice.billing_reason === 'subscription_cycle' ||
         invoice.billing_reason === 'subscription_update') {
-      console.log('ℹ️  Skipping subscription invoice - Stripe handles these automatically');
+      console.log('ℹ️  Skipping recurring subscription invoice - Stripe handles these automatically');
       return;
     }
     
-    // Skip $0.00 invoices (free trials, etc.)
+    // Handle all invoices including $0.00 free trials
     if (invoice.amount_due === 0) {
-      console.log('ℹ️  Skipping $0.00 invoice - no receipt needed');
-      return;
+      console.log('💝 Processing $0.00 invoice (free trial confirmation)...');
+    } else {
+      console.log('💰 Processing paid invoice...');
     }
-    
-    // Handle product purchase invoices (from checkout sessions)
-    console.log('📧 Processing product purchase invoice...');
     
     // Finalize the invoice if it's still a draft
     if (invoice.status === 'draft') {
@@ -251,6 +248,7 @@ async function handleInvoiceCreated(invoice: Stripe.Invoice) {
   } catch (error: any) {
     console.error('❌ Error sending invoice:', error);
     console.error('Error details:', error.message);
+    // Don't throw - we don't want to fail the webhook if email sending fails
   }
 }
 
