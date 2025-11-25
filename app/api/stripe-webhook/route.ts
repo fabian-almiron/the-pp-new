@@ -214,22 +214,43 @@ async function updateClerkUserRole(clerkUserId: string, role: 'customer' | 'subs
 
 async function handleInvoiceCreated(invoice: Stripe.Invoice) {
   try {
-    // Only handle invoices from checkout sessions (not subscription invoices)
-    if (invoice.billing_reason === 'manual') {
-      console.log('📧 Finalizing and sending invoice:', invoice.id);
-      
-      // Finalize the invoice (makes it ready to send)
-      if (invoice.status === 'draft') {
-        await stripe.invoices.finalizeInvoice(invoice.id);
-      }
-      
-      // Send the invoice email to the customer
-      await stripe.invoices.sendInvoice(invoice.id);
-      
-      console.log('✅ Invoice sent successfully to:', invoice.customer_email);
+    console.log('📧 Invoice created:', invoice.id);
+    console.log('  - Billing reason:', invoice.billing_reason);
+    console.log('  - Status:', invoice.status);
+    console.log('  - Amount:', invoice.amount_due / 100);
+    console.log('  - Customer email:', invoice.customer_email);
+    
+    // Skip subscription invoices (they have their own email flow)
+    if (invoice.billing_reason === 'subscription_create' || 
+        invoice.billing_reason === 'subscription_cycle' ||
+        invoice.billing_reason === 'subscription_update') {
+      console.log('ℹ️  Skipping subscription invoice - Stripe handles these automatically');
+      return;
     }
-  } catch (error) {
+    
+    // Skip $0.00 invoices (free trials, etc.)
+    if (invoice.amount_due === 0) {
+      console.log('ℹ️  Skipping $0.00 invoice - no receipt needed');
+      return;
+    }
+    
+    // Handle product purchase invoices (from checkout sessions)
+    console.log('📧 Processing product purchase invoice...');
+    
+    // Finalize the invoice if it's still a draft
+    if (invoice.status === 'draft') {
+      console.log('📝 Finalizing draft invoice...');
+      await stripe.invoices.finalizeInvoice(invoice.id);
+    }
+    
+    // Send the invoice/receipt email to the customer
+    console.log('📮 Sending receipt email to:', invoice.customer_email);
+    await stripe.invoices.sendInvoice(invoice.id);
+    
+    console.log('✅ Receipt sent successfully!');
+  } catch (error: any) {
     console.error('❌ Error sending invoice:', error);
+    console.error('Error details:', error.message);
   }
 }
 
