@@ -25,14 +25,8 @@ export default function CartPage() {
   }
 
   const handleCheckout = async () => {
-    // Check if user is signed in
+    // Check if Clerk is loaded
     if (!isLoaded) {
-      return
-    }
-
-    if (!isSignedIn) {
-      // Redirect to login page with return URL
-      router.push('/login?redirect_url=' + encodeURIComponent(window.location.pathname))
       return
     }
 
@@ -40,6 +34,7 @@ export default function CartPage() {
 
     try {
       // Call your API to create a Stripe Checkout session
+      // API now handles both authenticated and guest users
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: {
@@ -221,11 +216,11 @@ export default function CartPage() {
             </div>
             {!isSignedIn && isLoaded && (
               <p className="text-sm text-gray-600 mb-3">
-                Please <Link href="/login?redirect_url=/cart" className="text-blue-600 hover:underline">sign in</Link> to proceed with checkout
+                Checkout as guest or <Link href="/login?redirect_url=/cart" className="text-blue-600 hover:underline">sign in</Link> to track your orders
               </p>
             )}
             <Button
-              text={isProcessing ? "Processing..." : (isSignedIn ? "Proceed to Checkout" : "Sign In to Checkout")}
+              text={isProcessing ? "Processing..." : "Proceed to Checkout"}
               className="!bg-white !text-black !border-black hover:!bg-black hover:!text-white"
               onClick={handleCheckout}
               disabled={isProcessing || !isLoaded}

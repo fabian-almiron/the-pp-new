@@ -23,16 +23,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get the logged-in user
+    // Get the logged-in user (optional - supports guest checkout)
     const user = await currentUser();
-    if (!user) {
-      return NextResponse.json(
-        { error: 'Authentication required' },
-        { status: 401 }
-      );
+    
+    if (user) {
+      console.log('🛒 Creating checkout session for authenticated user:', user.id);
+    } else {
+      console.log('🛒 Creating checkout session for guest user');
     }
-
-    console.log('🛒 Creating checkout session for user:', user.id);
     console.log('📦 Items:', items.length);
 
     // Get the origin from the request
@@ -104,59 +102,61 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Create or retrieve Stripe customer
-    const userEmail = user.emailAddresses[0]?.emailAddress;
-    let stripeCustomerId = user.privateMetadata?.stripeCustomerId as string | undefined;
-    
-    if (!stripeCustomerId && userEmail) {
-      console.log('🔍 Looking for Stripe customer:', userEmail);
+    // Create or retrieve Stripe customer (only for authenticated users)
+    let stripeCustomerId: string | undefined;
+    let userEmail: string | undefined;
+
+    if (user) {
+      userEmail = user.emailAddresses[0]?.emailAddress;
+      stripeCustomerId = user.privateMetadata?.stripeCustomerId as string | undefined;
       
-      const customers = await stripe.customers.list({
-        email: userEmail,
-        limit: 1,
-      });
-      
-      if (customers.data.length > 0) {
-        stripeCustomerId = customers.data[0].id;
-        console.log('✅ Found existing Stripe customer:', stripeCustomerId);
+      if (!stripeCustomerId && userEmail) {
+        console.log('🔍 Looking for Stripe customer:', userEmail);
         
-        // Update metadata if clerkUserId is not set
-        if (!customers.data[0].metadata?.clerkUserId) {
-          await stripe.customers.update(stripeCustomerId, {
+        const customers = await stripe.customers.list({
+          email: userEmail,
+          limit: 1,
+        });
+        
+        if (customers.data.length > 0) {
+          stripeCustomerId = customers.data[0].id;
+          console.log('✅ Found existing Stripe customer:', stripeCustomerId);
+          
+          // Update metadata if clerkUserId is not set
+          if (!customers.data[0].metadata?.clerkUserId) {
+            await stripe.customers.update(stripeCustomerId, {
+              metadata: { clerkUserId: user.id },
+            });
+          }
+        } else {
+          const customer = await stripe.customers.create({
+            email: userEmail,
+            name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
             metadata: { clerkUserId: user.id },
           });
+          stripeCustomerId = customer.id;
+          console.log('✅ Created new Stripe customer:', stripeCustomerId);
         }
-      } else {
-        const customer = await stripe.customers.create({
-          email: userEmail,
-          name: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
-          metadata: { clerkUserId: user.id },
-        });
-        stripeCustomerId = customer.id;
-        console.log('✅ Created new Stripe customer:', stripeCustomerId);
-      }
-      
-      // Save to Clerk metadata
-      try {
-        await clerkClient.users.updateUserMetadata(user.id, {
-          privateMetadata: { stripeCustomerId },
-        });
-        console.log('✅ Saved Stripe customer ID to Clerk metadata');
-      } catch (metadataError) {
-        console.error('⚠️  Failed to save customer ID to Clerk:', metadataError);
+        
+        // Save to Clerk metadata
+        try {
+          await clerkClient.users.updateUserMetadata(user.id, {
+            privateMetadata: { stripeCustomerId },
+          });
+          console.log('✅ Saved Stripe customer ID to Clerk metadata');
+        } catch (metadataError) {
+          console.error('⚠️  Failed to save customer ID to Clerk:', metadataError);
+        }
       }
     }
 
     // Create Checkout Session
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/cart`,
-      customer: stripeCustomerId,
-      customer_email: stripeCustomerId ? undefined : userEmail, // Use email only if no customer ID
-      client_reference_id: user.id,
       shipping_address_collection: {
         allowed_countries: ['US', 'CA', 'GB', 'AU', 'NZ'], // Add more countries as needed
       },
@@ -167,16 +167,34 @@ export async function POST(request: NextRequest) {
         invoice_data: {
           description: `Order from The Piped Peony`,
           footer: 'Thank you for your purchase!',
-          metadata: {
+          metadata: user ? {
             clerkUserId: user.id,
-          },
+          } : {},
         },
       },
-      metadata: {
+      metadata: user ? {
         clerkUserId: user.id,
-        userEmail: user.emailAddresses[0]?.emailAddress || '',
+        userEmail: userEmail || '',
+      } : {
+        guestCheckout: 'true',
       },
-    });
+    };
+
+    // Add customer info if user is authenticated
+    if (stripeCustomerId) {
+      sessionConfig.customer = stripeCustomerId;
+    } else if (userEmail) {
+      // For authenticated users without a Stripe customer ID yet
+      sessionConfig.customer_email = userEmail;
+    }
+    // For guests, Stripe will collect email during checkout
+
+    // Add client reference ID for authenticated users
+    if (user) {
+      sessionConfig.client_reference_id = user.id;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     console.log('✅ Checkout session created:', session.id);
 
