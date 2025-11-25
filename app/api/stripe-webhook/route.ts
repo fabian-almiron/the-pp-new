@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/nextjs/server';
+import { sendWelcomeEmail, sendPurchaseReceiptEmail } from '@/lib/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
@@ -114,6 +115,34 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       try {
         await updateClerkUserRole(clerkUserId, 'subscriber');
         console.log('✅ Clerk user role update completed successfully');
+        
+        // Send welcome email for subscription signups
+        if (session.customer_email) {
+          console.log('📧 Sending welcome email to:', session.customer_email);
+          
+          // Get customer username from Clerk
+          let username = '';
+          try {
+            const user = await clerkClient.users.getUser(clerkUserId);
+            username = user.username || user.firstName || session.customer_email.split('@')[0];
+          } catch (e) {
+            console.log('Could not fetch username from Clerk');
+            username = session.customer_email.split('@')[0];
+          }
+          
+          // Determine trial days
+          const trialDays = subscription.trial_end ? 
+            Math.ceil((subscription.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+          
+          const subscriptionName = subscription.metadata?.subscriptionName || 'Membership';
+          
+          await sendWelcomeEmail(
+            session.customer_email,
+            username,
+            subscriptionName,
+            trialDays
+          );
+        }
       } catch (error) {
         console.error('❌ Failed to update Clerk user role:', error);
         throw error;
@@ -268,6 +297,39 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
 
     console.log('📦 Line items:', lineItems.data.length);
 
+    // Send custom receipt email
+    if (session.customer_email && session.amount_total) {
+      console.log('📧 Sending purchase receipt email to:', session.customer_email);
+      
+      // Get customer name
+      let customerName = '';
+      if (session.metadata?.clerkUserId) {
+        try {
+          const user = await clerkClient.users.getUser(session.metadata.clerkUserId);
+          customerName = user.firstName || '';
+        } catch (e) {
+          console.log('Could not fetch user name from Clerk');
+        }
+      }
+      
+      // Format line items for email
+      const items = lineItems.data.map(item => ({
+        name: item.description || 'Product',
+        quantity: item.quantity || 1,
+        price: item.amount_total ? item.amount_total / 100 : 0,
+      }));
+      
+      await sendPurchaseReceiptEmail(
+        session.customer_email,
+        customerName,
+        {
+          orderId: session.id.slice(-8).toUpperCase(),
+          total: session.amount_total / 100,
+          items,
+        }
+      );
+    }
+
     // Optional: Create order in Strapi
     // Uncomment this section when you create an Order content type in Strapi
     /*
@@ -312,7 +374,6 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
     */
 
     console.log('✅ Product purchase processed successfully');
-    console.log('📧 TODO: Send order confirmation email to:', session.customer_email);
   } catch (error) {
     console.error('❌ Error processing product purchase:', error);
     throw error;
