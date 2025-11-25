@@ -8,6 +8,7 @@ import { Video, Star, Search, X, Filter, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { SubscriberGate } from "@/components/subscriber-gate";
 
 
 // Function to get Vimeo thumbnail URL
@@ -52,16 +53,18 @@ export default function AllCoursesPage() {
   }, []);
 
   return (
-    <Suspense fallback={
-      <div className="container mx-auto px-4 py-16">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading courses...</p>
+    <SubscriberGate>
+      <Suspense fallback={
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Loading courses...</p>
+          </div>
         </div>
-      </div>
-    }>
-      <CoursesContent courses={courses} error={error} loading={loading} />
-    </Suspense>
+      }>
+        <CoursesContent courses={courses} error={error} loading={loading} />
+      </Suspense>
+    </SubscriberGate>
   );
 }
 

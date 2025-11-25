@@ -130,9 +130,28 @@ export default function SignupPage() {
     }
   };
 
-  const handleSkipSubscription = () => {
-    // Force a hard navigation to ensure session is picked up
-    window.location.href = '/video-library';
+  const handleSkipSubscription = async () => {
+    try {
+      setIsLoading(true);
+      // Set the user's role to "customer" in Clerk metadata
+      const response = await fetch('/api/set-user-role', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role: 'customer' }),
+      });
+
+      if (!response.ok) {
+        console.error('Failed to set user role');
+      }
+    } catch (error) {
+      console.error('Error setting user role:', error);
+    } finally {
+      setIsLoading(false);
+      // Force a hard navigation to ensure session is picked up
+      window.location.href = '/video-library';
+    }
   };
 
   if (currentStep === 'subscription') {
