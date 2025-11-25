@@ -17,7 +17,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
   const [activeChapter, setActiveChapter] = useState<Chapter>(course.chapters[0]);
   const videoPlayerRef = useRef<VideoPlayerRef>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
-  const { isSignedIn } = useRole();
+  const { isSignedIn, isSubscriber } = useRole();
 
   const handlePlayVideo = () => {
     videoPlayerRef.current?.playVideo();
@@ -60,6 +60,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
                 ref={videoPlayerRef} 
                 chapter={activeChapter} 
                 isSignedIn={isSignedIn}
+                isSubscriber={isSubscriber}
               />
               
               <CourseTabs 

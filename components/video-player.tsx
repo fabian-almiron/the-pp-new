@@ -3,22 +3,26 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from "react";
 import { useRouter } from "next/navigation";
 import { Chapter } from "@/data/types";
-import { Play } from "lucide-react";
+import { Play, Crown } from "lucide-react";
 
 interface VideoPlayerProps {
   chapter: Chapter;
   isSignedIn?: boolean;
+  isSubscriber?: boolean;
 }
 
 export interface VideoPlayerRef {
   playVideo: () => void;
 }
 
-export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapter, isSignedIn = false }, ref) => {
+export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapter, isSignedIn = false, isSubscriber = false }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [player, setPlayer] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  
+  // Only show video if user is signed in AND is a subscriber
+  const canWatchVideo = isSignedIn && isSubscriber;
 
   // Extract video ID and timestamp from Vimeo URL
   const parseVimeoUrl = (url: string) => {
@@ -55,6 +59,13 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
       if (!isSignedIn) {
         const currentPath = window.location.pathname;
         router.push(`/signup?redirect_url=${encodeURIComponent(currentPath)}`);
+        return;
+      }
+
+      // Redirect to upgrade if not a subscriber
+      if (!isSubscriber) {
+        const currentPath = window.location.pathname;
+        router.push(`/upgrade?redirect_url=${encodeURIComponent(currentPath)}`);
         return;
       }
 
@@ -95,7 +106,7 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
           });
       }
     }
-  }), [player, isSignedIn, router]);
+  }), [player, isSignedIn, isSubscriber, router]);
 
   // Load Vimeo Player API
   useEffect(() => {
@@ -167,9 +178,9 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
       setIsLoading(false);
       setPlayer(newPlayer);
       
-      // Only proceed with unmute/autoplay if signed in
-      if (!isSignedIn) {
-        return; // Don't autoplay or unmute for non-signed-in users
+      // Only proceed with unmute/autoplay if user can watch video
+      if (!canWatchVideo) {
+        return; // Don't autoplay or unmute for guests or non-subscribers
       }
 
       // Ensure video is unmuted
@@ -218,9 +229,9 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         player.setCurrentTime(timestamp).then(() => {
-          // Only proceed with unmute/autoplay if signed in
-          if (!isSignedIn) {
-            return; // Don't autoplay for non-signed-in users
+          // Only proceed with unmute/autoplay if user can watch video
+          if (!canWatchVideo) {
+            return; // Don't autoplay for guests or non-subscribers
           }
 
           // Ensure video is unmuted
@@ -228,14 +239,14 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
             return player.setMuted(false);
           }
         }).then(() => {
-          if (!isSignedIn) return; // Skip if not signed in
+          if (!canWatchVideo) return; // Skip if can't watch video
 
           // Set volume to 100% (unmuted)
           if (typeof player.setVolume === 'function') {
             return player.setVolume(1);
           }
         }).then(() => {
-          if (!isSignedIn) return; // Skip if not signed in
+          if (!canWatchVideo) return; // Skip if can't watch video
 
           // Only auto-play on desktop, not on mobile
           if (!isMobile && player && typeof player.play === 'function') {
@@ -248,7 +259,7 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
 
       return () => clearTimeout(timeoutId);
     }
-  }, [player, timestamp, isSignedIn]);
+  }, [player, timestamp, canWatchVideo]);
 
   // Cleanup player on unmount
   useEffect(() => {
@@ -280,6 +291,11 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
   const handleSignupClick = () => {
     const currentPath = window.location.pathname;
     router.push(`/signup?redirect_url=${encodeURIComponent(currentPath)}`);
+  };
+
+  const handleUpgradeClick = () => {
+    const currentPath = window.location.pathname;
+    router.push(`/upgrade?redirect_url=${encodeURIComponent(currentPath)}`);
   };
 
   return (
@@ -317,6 +333,31 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(({ chapt
               >
                 <Play className="w-5 h-5" />
                 Sign Up to Watch
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Upgrade Overlay for signed-in non-subscribers */}
+        {isSignedIn && !isSubscriber && (
+          <div 
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-10 cursor-pointer"
+            onClick={handleUpgradeClick}
+          >
+            <div className="text-center px-6">
+              <Crown className="w-16 h-16 text-yellow-400 mx-auto mb-4" />
+              <h3 className="text-2xl font-serif font-bold text-white mb-3">
+                Upgrade to Premium
+              </h3>
+              <p className="text-gray-200 mb-6 max-w-md">
+                This video is available to premium subscribers. Upgrade now to unlock full access to all courses and tutorials.
+              </p>
+              <button
+                onClick={handleUpgradeClick}
+                className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-black font-semibold px-8 py-3 rounded-full transition-colors inline-flex items-center gap-2"
+              >
+                <Crown className="w-5 h-5" />
+                Upgrade to Premium
               </button>
             </div>
           </div>

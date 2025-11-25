@@ -1,6 +1,5 @@
 import { Course, CarouselItem } from "@/data/types";
 import { CoursePageClient } from "@/components/course-page-client";
-import { SubscriberCourseWrapper } from "@/components/subscriber-course-wrapper";
 import { notFound } from "next/navigation";
 import { fetchCourseBySlug, fetchCoursesBySeries, fetchCourses } from "@/lib/strapi-api";
 import { CourseSchema } from "@/components/structured-data";
@@ -141,7 +140,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
   }
 
   return (
-    <SubscriberCourseWrapper>
+    <>
       <CourseSchema
         name={strapiCourse.title}
         description={strapiCourse.excerpt || strapiCourse.about || strapiCourse.content || ''}
@@ -154,7 +153,7 @@ export default async function CoursePage({ params }: CoursePageProps) {
         course={course} 
         relatedCourses={relatedCourses}
       />
-    </SubscriberCourseWrapper>
+    </>
   );
 }
 

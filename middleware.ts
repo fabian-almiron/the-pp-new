@@ -13,7 +13,7 @@ const isSubscriberRoute = createRouteMatcher([
   '/video-library(.*)',
   '/academy(/.*)?', // Only /academy and /academy/* (not /academy-details)
   '/colors(.*)',
-  '/courses(.*)', // Protect all courses routes
+  // Note: /courses routes are now public - video access is gated client-side
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
