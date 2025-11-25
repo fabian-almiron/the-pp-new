@@ -42,7 +42,7 @@ export default function ContactPage() {
                 This helps Dara by reducing duplicate questions and allows other members to benefit too.
               </p>
               <Link 
-                href="https://www.facebook.com/groups/thepipedpeonyacademy" 
+                href="https://www.facebook.com/dpipedreams" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-[#D4A771] hover:text-[#C19660] font-medium transition-colors"
@@ -66,10 +66,10 @@ export default function ContactPage() {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">Email Us</h4>
                   <a 
-                    href="mailto:support@thepipedpeony.com" 
+                    href="mailto:mel@thepipedpeony.com" 
                     className="text-[#D4A771] hover:text-[#C19660] transition-colors"
                   >
-                    support@thepipedpeony.com
+                    mel@thepipedpeony.com
                   </a>
                   <p className="text-sm text-gray-600 mt-1">
                     We typically respond within 1-2 business days
@@ -85,12 +85,12 @@ export default function ContactPage() {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">Facebook</h4>
                   <Link 
-                    href="https://www.facebook.com/dpipedreams/" 
+                    href="https://www.facebook.com/dpipedreams" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-[#D4A771] hover:text-[#C19660] transition-colors"
                   >
-                    @thepipedpeony
+                    @dpipedreams
                   </Link>
                   <p className="text-sm text-gray-600 mt-1">
                     Follow us for updates and inspiration
@@ -127,7 +127,7 @@ export default function ContactPage() {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">Community Support</h4>
                   <Link 
-                    href="https://www.facebook.com/groups/thepipedpeonyacademy" 
+                    href="https://www.facebook.com/dpipedreams" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-[#D4A771] hover:text-[#C19660] transition-colors"
