@@ -220,19 +220,21 @@ async function handleInvoiceCreated(invoice: Stripe.Invoice) {
     console.log('  - Amount:', invoice.amount_due / 100);
     console.log('  - Customer email:', invoice.customer_email);
     
-    // Only skip recurring subscription invoices (not the first trial invoice)
-    if (invoice.billing_reason === 'subscription_cycle' ||
+    // Note: For subscription invoices, Stripe automatically sends receipts
+    // when you have "Customer emails" enabled in Dashboard → Settings → Emails
+    // So we only need to manually send invoices for one-time payments (shop purchases)
+    
+    // Skip subscription invoices - Stripe sends these automatically
+    if (invoice.billing_reason === 'subscription_create' ||
+        invoice.billing_reason === 'subscription_cycle' ||
         invoice.billing_reason === 'subscription_update') {
-      console.log('ℹ️  Skipping recurring subscription invoice - Stripe handles these automatically');
+      console.log('ℹ️  Skipping subscription invoice - Stripe sends these automatically when "Customer emails" are enabled in dashboard');
+      console.log('💡 To verify: Dashboard → Settings → Emails → "Successful payments" should be enabled');
       return;
     }
     
-    // Handle all invoices including $0.00 free trials
-    if (invoice.amount_due === 0) {
-      console.log('💝 Processing $0.00 invoice (free trial confirmation)...');
-    } else {
-      console.log('💰 Processing paid invoice...');
-    }
+    // Handle product purchase invoices (from shop checkout)
+    console.log('💰 Processing shop purchase invoice...');
     
     // Finalize the invoice if it's still a draft
     if (invoice.status === 'draft') {
