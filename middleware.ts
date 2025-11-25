@@ -10,10 +10,9 @@ const isProtectedRoute = createRouteMatcher([
 
 // Define routes that should check for subscriber role (but we'll do this client-side)
 const isSubscriberRoute = createRouteMatcher([
-  '/video-library(.*)',
   '/academy(/.*)?', // Only /academy and /academy/* (not /academy-details)
   '/colors(.*)',
-  // Note: /courses routes are now public - video access is gated client-side
+  // Note: /courses and /video-library routes are now public - video access is gated client-side
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
