@@ -65,15 +65,14 @@ export async function sendEmail({ to, subject, html, text }: SendEmailParams): P
 }
 
 /**
- * Send a welcome email for free trial signups
+ * Send an email for subscription trial signups
  */
-export async function sendWelcomeEmail(
+export async function sendSubscriptionTrialEmail(
   email: string,
-  username: string,
   subscriptionName: string,
   trialDays: number
 ): Promise<boolean> {
-  const subject = `Welcome to The Piped Peony`;
+  const subject = `Subscription Trial Activated`;
 
   const html = `
 <!DOCTYPE html>
@@ -81,7 +80,7 @@ export async function sendWelcomeEmail(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to The Piped Peony</title>
+  <title>Subscription Trial Activated</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body style="margin: 0; padding: 0; font-family: 'sofia-pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background-color: #f9fafb;">
@@ -94,17 +93,14 @@ export async function sendWelcomeEmail(
           <tr>
             <td style="background-color: #f2ece7; padding: 40px 30px; text-align: center;">
               <img src="https://www.thepipedpeony.com/full-logo-1-1536x271.png" alt="The Piped Peony" style="max-width: 600px; height: auto; margin-bottom: 20px; display: inline-block;">
-              <h1 style="margin: 0; color: #000000; font-size: 32px; font-weight: 700; letter-spacing: 1px; font-family: 'Playfair Display', Georgia, serif;">
-                Welcome to The Piped Peony
-              </h1>
             </td>
           </tr>
           
           <!-- Content -->
           <tr>
             <td style="padding: 40px 30px; text-align: center;">
-              <p style="  text-align: center; margin: 0 0 20px; font-size: 26px; line-height: 1.6; color: #374151; font-family: 'sofia-pro', sans-serif;">
-                Thanks for creating an account on The Piped Peony. Your username is <strong>${username || email}</strong>.
+              <p style="  text-align: center; margin: 0 0 20px; font-size: 20px; line-height: 1.6; color: #374151; font-family: 'sofia-pro', sans-serif;">
+                Thank you for subscribing to The Piped Peony Academy!
               </p>
               
               <p style="margin: 0 0 30px; font-size: 14px; line-height: 1.6; color: #374151; font-family: 'sofia-pro', sans-serif;">

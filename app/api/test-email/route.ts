@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendWelcomeEmail } from '@/lib/email';
+import { sendSubscriptionTrialEmail } from '@/lib/email';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('🧪 Testing email sending...');
     
     // Send test welcome email
-    const emailSent = await sendWelcomeEmail(
-      'fabian.e.almiron@gmail.com',
-      'Fabian',
+    const emailSent = await sendSubscriptionTrialEmail(
+      'joshuastesch@gmail.com',
       'The Piped Peony Academy',
       7 // 7 day trial
     );
@@ -17,7 +16,7 @@ export async function GET(request: NextRequest) {
       console.log('✅ Test email sent successfully!');
       return NextResponse.json({ 
         success: true, 
-        message: 'Test email sent successfully to fabian.e.almiron@gmail.com' 
+        message: 'Test email sent successfully to joshuastesch@gmail.com' 
       });
     } else {
       console.error('❌ Failed to send test email');

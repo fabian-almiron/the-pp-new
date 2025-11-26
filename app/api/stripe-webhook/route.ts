@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/nextjs/server';
-import { sendWelcomeEmail, sendPurchaseReceiptEmail } from '@/lib/email';
+import { sendSubscriptionTrialEmail, sendPurchaseReceiptEmail } from '@/lib/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
@@ -136,9 +136,8 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           
           const subscriptionName = subscription.metadata?.subscriptionName || 'Membership';
           
-          await sendWelcomeEmail(
+          await sendSubscriptionTrialEmail(
             session.customer_email,
-            username,
             subscriptionName,
             trialDays
           );
