@@ -117,18 +117,11 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         console.log('✅ Clerk user role update completed successfully');
         
         // Send welcome email for subscription signups
-        if (session.customer_email) {
-          console.log('📧 Sending welcome email to:', session.customer_email);
-          
-          // Get customer username from Clerk
-          let username = '';
-          try {
-            const user = await clerkClient.users.getUser(clerkUserId);
-            username = user.username || user.firstName || session.customer_email.split('@')[0];
-          } catch (e) {
-            console.log('Could not fetch username from Clerk');
-            username = session.customer_email.split('@')[0];
-          }
+        // Use customer_details.email as fallback since customer_email can be null
+        const customerEmail = session.customer_email || session.customer_details?.email;
+        
+        if (customerEmail) {
+          console.log('📧 Sending subscription trial email to:', customerEmail);
           
           // Determine trial days
           const trialDays = subscription.trial_end ? 
@@ -137,10 +130,12 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           const subscriptionName = subscription.metadata?.subscriptionName || 'Membership';
           
           await sendSubscriptionTrialEmail(
-            session.customer_email,
+            customerEmail,
             subscriptionName,
             trialDays
           );
+        } else {
+          console.log('⚠️ No customer email found, skipping email');
         }
       } catch (error) {
         console.error('❌ Failed to update Clerk user role:', error);
