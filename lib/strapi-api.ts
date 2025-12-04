@@ -853,11 +853,11 @@ export async function fetchFeaturedCourses(): Promise<MockDatabaseResponse<Strap
   }
 }
 
-// Search courses by title or content
+// Search courses by title, content, series, author
 export async function searchCourses(query: string): Promise<MockDatabaseResponse<StrapiCourse[]>> {
   try {
     const response: StrapiCourseResponse = await fetchFromStrapi(
-      `/courses?filters[$or][0][title][$containsi]=${encodeURIComponent(query)}&filters[$or][1][excerpt][$containsi]=${encodeURIComponent(query)}&populate=*&sort=title:asc`
+      `/courses?filters[$or][0][title][$containsi]=${encodeURIComponent(query)}&filters[$or][1][excerpt][$containsi]=${encodeURIComponent(query)}&filters[$or][2][content][$containsi]=${encodeURIComponent(query)}&filters[$or][3][series][$containsi]=${encodeURIComponent(query)}&filters[$or][4][author][$containsi]=${encodeURIComponent(query)}&populate=*&sort=title:asc`
     );
     
     const courses = response.data.map(convertStrapiCourse);

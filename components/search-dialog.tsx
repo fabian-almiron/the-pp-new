@@ -39,74 +39,17 @@ export function SearchDialog() {
     }
 
     setIsSearching(true);
-    const trimmedQuery = query.trim().toLowerCase();
 
     try {
-      // Fetch all data in parallel
-      const [coursesRes, recipesRes, productsRes] = await Promise.all([
-        fetch('/api/courses').then(res => res.json()),
-        fetch('/api/recipes').then(res => res.json()),
-        fetch('/api/products').then(res => res.json()),
-      ]);
+      // Use the unified search API endpoint
+      const response = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+      const searchData = await response.json();
 
-      const allResults: SearchResult[] = [];
-
-      // Search courses
-      if (coursesRes.data) {
-        const courseMatches = coursesRes.data.filter((course: any) =>
-          course.title?.toLowerCase().includes(trimmedQuery) ||
-          course.description?.toLowerCase().includes(trimmedQuery) ||
-          course.instructor?.toLowerCase().includes(trimmedQuery) ||
-          course.tags?.some((tag: string) => tag?.toLowerCase()?.includes(trimmedQuery))
-        ).map((course: any) => ({
-          type: 'course' as const,
-          id: course.id,
-          title: course.title,
-          slug: course.slug,
-          description: course.description,
-          image: course.thumbnail?.url,
-        }));
-        allResults.push(...courseMatches);
+      if (searchData.data && Array.isArray(searchData.data)) {
+        setResults(searchData.data);
+      } else {
+        setResults([]);
       }
-
-      // Search recipes
-      if (recipesRes.data) {
-        const recipeMatches = recipesRes.data.filter((recipe: any) =>
-          recipe.title?.toLowerCase().includes(trimmedQuery) ||
-          recipe.description?.toLowerCase().includes(trimmedQuery) ||
-          recipe.ingredients?.some((ing: any) => 
-            ing?.name?.toLowerCase()?.includes(trimmedQuery)
-          )
-        ).map((recipe: any) => ({
-          type: 'recipe' as const,
-          id: recipe.id,
-          title: recipe.title,
-          slug: recipe.slug,
-          description: recipe.description,
-          image: recipe.image?.url,
-        }));
-        allResults.push(...recipeMatches);
-      }
-
-      // Search products
-      if (productsRes.data) {
-        const productMatches = productsRes.data.filter((product: any) =>
-          product.title?.toLowerCase().includes(trimmedQuery) ||
-          product.description?.toLowerCase().includes(trimmedQuery) ||
-          product.category?.toLowerCase().includes(trimmedQuery)
-        ).map((product: any) => ({
-          type: 'product' as const,
-          id: product.id,
-          title: product.title,
-          slug: product.slug,
-          description: product.description,
-          image: product.images?.[0]?.url,
-          price: product.price,
-        }));
-        allResults.push(...productMatches);
-      }
-
-      setResults(allResults.slice(0, 20)); // Limit to 20 results
     } catch (error) {
       console.error('Search error:', error);
       setResults([]);
@@ -204,7 +147,7 @@ export function SearchDialog() {
 
       {/* Search Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="sm:max-w-[600px] p-0 gap-0">
+        <DialogContent className="sm:max-w-[600px] p-0 gap-0 [&>button]:top-3 [&>button]:right-2">
           <DialogHeader className="px-4 pt-4 pb-3 border-b">
             <DialogTitle className="sr-only">Search</DialogTitle>
             <div className="relative">
@@ -263,6 +206,7 @@ export function SearchDialog() {
                           fill
                           className="object-cover"
                           sizes="64px"
+                          unoptimized
                         />
                       </div>
                     ) : (

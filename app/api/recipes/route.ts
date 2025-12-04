@@ -4,11 +4,11 @@ import { fetchRecipes } from '@/lib/strapi-api';
 export async function GET() {
   try {
     const recipes = await fetchRecipes();
-    return NextResponse.json(recipes);
+    return NextResponse.json({ data: recipes, error: null });
   } catch (error) {
     console.error('Error fetching recipes:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch recipes' },
+      { data: null, error: 'Failed to fetch recipes' },
       { status: 500 }
     );
   }
