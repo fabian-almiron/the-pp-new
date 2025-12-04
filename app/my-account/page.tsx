@@ -10,6 +10,7 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { useRole } from "@/hooks/use-role"
 import { useStripeCustomer } from "@/hooks/use-stripe-customer"
+import { useNameSync } from "@/hooks/use-name-sync"
 import OrderHistory from "@/components/order-history"
 
 export default function MyAccountPage() {
@@ -17,6 +18,7 @@ export default function MyAccountPage() {
   const { signOut } = useClerk()
   const { role, roleDisplayName, roleBadgeColor, roleDescription, isSubscriber } = useRole()
   const { isLinked: isStripeLinked } = useStripeCustomer() // Auto-link Stripe customer
+  useNameSync() // Auto-sync name from Stripe if missing
   const router = useRouter()
   const [showCancelDialog, setShowCancelDialog] = useState(false)
   const [isCancelling, setIsCancelling] = useState(false)
