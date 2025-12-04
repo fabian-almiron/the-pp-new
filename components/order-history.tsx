@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Package, Calendar, DollarSign, MapPin, ChevronDown, ChevronUp } from 'lucide-react'
+import { Package, Calendar, DollarSign, MapPin, ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
 
 interface OrderItem {
   name: string
@@ -25,6 +25,10 @@ interface Order {
       postal_code?: string | null
       country?: string | null
     }
+  } | null
+  paymentMethod?: {
+    brand: string
+    last4: string
   } | null
 }
 
@@ -88,6 +92,19 @@ export default function OrderHistory() {
     ].filter(Boolean)
 
     return parts.join(', ')
+  }
+
+  const formatCardBrand = (brand: string) => {
+    const brandMap: { [key: string]: string } = {
+      'visa': 'Visa',
+      'mastercard': 'Mastercard',
+      'amex': 'American Express',
+      'discover': 'Discover',
+      'diners': 'Diners Club',
+      'jcb': 'JCB',
+      'unionpay': 'UnionPay',
+    }
+    return brandMap[brand.toLowerCase()] || brand.charAt(0).toUpperCase() + brand.slice(1)
   }
 
   if (isLoading) {
@@ -163,7 +180,7 @@ export default function OrderHistory() {
                           Paid
                         </span>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 flex-wrap">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {formatDate(order.date)}
@@ -172,6 +189,12 @@ export default function OrderHistory() {
                           <DollarSign className="h-4 w-4" />
                           ${order.total.toFixed(2)} {order.currency}
                         </span>
+                        {order.paymentMethod && (
+                          <span className="flex items-center gap-1">
+                            <CreditCard className="h-4 w-4" />
+                            {formatCardBrand(order.paymentMethod.brand)} ••••{order.paymentMethod.last4}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

@@ -91,6 +91,31 @@ export async function GET(request: NextRequest) {
             expand: ['data.price.product'],
           });
 
+          // Get payment method details
+          let paymentMethod = null;
+          if (session.payment_intent) {
+            try {
+              const paymentIntent = await stripe.paymentIntents.retrieve(
+                session.payment_intent as string
+              );
+              
+              if (paymentIntent.payment_method) {
+                const pm = await stripe.paymentMethods.retrieve(
+                  paymentIntent.payment_method as string
+                );
+                
+                if (pm.card) {
+                  paymentMethod = {
+                    brand: pm.card.brand,
+                    last4: pm.card.last4,
+                  };
+                }
+              }
+            } catch (pmError) {
+              console.error('Error fetching payment method:', pmError);
+            }
+          }
+
           return {
             id: session.id,
             date: new Date(session.created * 1000),
@@ -103,6 +128,7 @@ export async function GET(request: NextRequest) {
               amount: item.amount_total ? item.amount_total / 100 : 0,
             })),
             shipping: session.shipping_details?.address,
+            paymentMethod,
           };
         } catch (error) {
           console.error('Error fetching order details:', error);
