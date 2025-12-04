@@ -2,12 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchRecipeBySlug } from "@/lib/strapi-api";
 import { notFound } from "next/navigation";
-import { Clock, ChefHat, Users, Star, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { Clock, ChefHat, Users, Star, ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RecipeSchema } from "@/components/structured-data";
 import { SanitizedHTML } from "@/components/sanitized-html";
 import { InlineHTML } from "@/components/inline-html";
+import { DownloadRecipeButton } from "@/components/download-recipe-button";
 
 // Keep recipes dynamic for now due to complex HTML sanitization
 export const dynamic = 'force-dynamic';
@@ -120,7 +121,11 @@ export default async function RecipePage({ params }: RecipePageProps) {
           </h1>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
+        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden relative">
+          {/* Download Button - Top Right Corner */}
+          <div className="absolute top-4 right-4 z-10 no-print">
+            <DownloadRecipeButton recipe={recipe} />
+          </div>
           <div className="p-8 md:p-12">
             {/* Method Label */}
             {recipe.methodLabel && (
@@ -255,7 +260,7 @@ export default async function RecipePage({ params }: RecipePageProps) {
 
         {/* Next/Previous Navigation */}
         {(prev || next) && (
-          <div className="mt-12 flex justify-between items-center gap-4">
+          <div className="mt-12 flex justify-between items-center gap-4 next-prev-navigation">
             {prev ? (
               <Link 
                 href={`/recipes/${prev.slug}`}
