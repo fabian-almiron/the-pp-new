@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { StrapiCourse } from "@/data/types";
+import { stripHtml } from "@/lib/utils";
 
 interface NewestVideosCarouselProps {
   courses: StrapiCourse[];
@@ -95,7 +96,7 @@ export function NewestVideosCarousel({ courses }: NewestVideosCarouselProps) {
                           
                           {course.excerpt && (
                             <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                              {course.excerpt}
+                              {stripHtml(course.excerpt)}
                             </p>
                           )}
                           

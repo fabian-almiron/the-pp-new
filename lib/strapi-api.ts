@@ -125,6 +125,29 @@ interface StrapiResponse {
   };
 }
 
+// Helper function to strip HTML tags from text
+function stripHtmlTags(html: string | undefined | null): string {
+  if (!html) return '';
+  
+  // Remove HTML tags
+  let text = html.replace(/<[^>]*>/g, ' ');
+  
+  // Decode common HTML entities
+  text = text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&apos;/g, "'");
+  
+  // Remove extra whitespace
+  text = text.replace(/\s+/g, ' ').trim();
+  
+  return text;
+}
+
 // Convert Strapi product to frontend Product format
 function convertStrapiProduct(strapiProduct: StrapiProduct): Product {
   // Convert gallery images
@@ -164,13 +187,19 @@ function convertStrapiProduct(strapiProduct: StrapiProduct): Product {
     });
   }
 
+  // Strip HTML from descriptions and truncate for short description
+  const cleanDescription = stripHtmlTags(strapiProduct.description);
+  const shortDesc = cleanDescription.length > 150 
+    ? cleanDescription.substring(0, 150) + '...' 
+    : cleanDescription;
+
   return {
     id: strapiProduct.id,
     slug: strapiProduct.slug || `product-${strapiProduct.documentId}`,
     name: strapiProduct.name,
     price: strapiProduct.price,
     images,
-    shortDescription: strapiProduct.description?.substring(0, 150) + '...' || '',
+    shortDescription: shortDesc || '',
     longDescription: strapiProduct.description || '',
     category: strapiProduct.category?.slug || 'piping-tips',
     inStock: strapiProduct.stock > 0,

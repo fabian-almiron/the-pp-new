@@ -1,28 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { searchCourses, fetchRecipes, fetchProducts, fetchBlogs } from '@/lib/strapi-api';
+import { stripHtml } from '@/lib/utils';
 
-// Helper function to strip HTML tags and clean text
-function stripHtml(html: string | undefined): string {
-  if (!html) return '';
-  
-  // Remove HTML tags
-  let text = html.replace(/<[^>]*>/g, ' ');
-  
-  // Decode HTML entities
-  text = text
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&amp;/g, '&')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&quot;/g, '"')
-    .replace(/&#039;/g, "'");
-  
-  // Remove extra whitespace
-  text = text.replace(/\s+/g, ' ').trim();
+// Helper function to strip HTML and truncate for search results
+function stripHtmlForSearch(html: string | undefined): string {
+  const text = stripHtml(html);
   
   // Truncate to reasonable length for preview
   if (text.length > 150) {
-    text = text.substring(0, 150) + '...';
+    return text.substring(0, 150) + '...';
   }
   
   return text;
@@ -62,7 +48,7 @@ export async function GET(request: NextRequest) {
           id: course.id,
           title: course.title,
           slug: course.slug,
-          description: stripHtml(course.excerpt || course.content),
+          description: stripHtmlForSearch(course.excerpt || course.content),
           image: course.featuredImage?.url,
           series: course.series,
         };
@@ -85,7 +71,7 @@ export async function GET(request: NextRequest) {
           id: recipe.id,
           title: recipe.title,
           slug: recipe.slug,
-          description: stripHtml(recipe.excerpt || recipe.shortDescription),
+          description: stripHtmlForSearch(recipe.excerpt || recipe.shortDescription),
           image: recipe.coverImage?.url || recipe.featuredImage?.url,
         }));
       allResults.push(...recipeResults);
@@ -105,7 +91,7 @@ export async function GET(request: NextRequest) {
           id: product.id,
           title: product.name,
           slug: product.slug,
-          description: stripHtml(product.shortDescription),
+          description: stripHtmlForSearch(product.shortDescription),
           image: product.images?.[0]?.src,
           price: product.price,
         }));
@@ -125,7 +111,7 @@ export async function GET(request: NextRequest) {
           id: blog.id,
           title: blog.title,
           slug: blog.slug,
-          description: stripHtml(blog.excerpt),
+          description: stripHtmlForSearch(blog.excerpt),
           image: blog.coverImage?.url,
         }));
       allResults.push(...blogResults);

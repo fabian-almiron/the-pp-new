@@ -25,6 +25,12 @@ export async function generateStaticParams() {
   }
 }
 
+// Helper to strip HTML tags for metadata
+function stripHtmlForMeta(html: string | undefined): string {
+  if (!html) return '';
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
   const { slug } = await params;
   
@@ -37,7 +43,11 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       };
     }
 
-    const description = product.shortDescription || product.longDescription || product.description || `Shop ${product.name} at The Piped Peony`;
+    // Use shortDescription (already cleaned) or strip HTML from longDescription/description
+    const description = product.shortDescription || 
+                       stripHtmlForMeta(product.longDescription) || 
+                       stripHtmlForMeta(product.description) || 
+                       `Shop ${product.name} at The Piped Peony`;
 
     return {
       title: `${product.name} | The Piped Peony Shop`,
@@ -86,11 +96,17 @@ export default async function ProductPage({ params }: ProductPageProps) {
       notFound();
     }
 
+    // Strip HTML from descriptions for structured data
+    const cleanDescription = product.shortDescription || 
+                            stripHtmlForMeta(product.longDescription) || 
+                            stripHtmlForMeta(product.description) || 
+                            '';
+
     return (
       <>
         <ProductSchema
           name={product.name}
-          description={product.shortDescription || product.longDescription || product.description || ''}
+          description={cleanDescription}
           image={product.images?.map((img: any) => img.src) || []}
           sku={product.sku || product.id.toString()}
           brand="The Piped Peony"

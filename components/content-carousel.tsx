@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Video } from "lucide-react";
 import { CarouselItem } from "@/data/types";
 import { VimeoThumbnail } from "@/components/vimeo-thumbnail";
+import { stripHtml } from "@/lib/utils";
 import {
   Carousel,
   CarouselContent,
@@ -80,7 +81,7 @@ export function ContentCarousel({ items, title = "Continue the Series" }: Conten
                       {/* Course Description */}
                       {item.excerpt && (
                         <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
-                          {item.excerpt}
+                          {stripHtml(item.excerpt)}
                         </p>
                       )}
 

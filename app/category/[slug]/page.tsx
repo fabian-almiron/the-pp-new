@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Video, Star, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { stripHtml } from "@/lib/utils";
 
 // Keep categories dynamic for now
 export const dynamic = 'force-dynamic';
@@ -189,7 +190,7 @@ function renderCategoryPage(title: string, courses: any[], slug: string) {
                   
                   {course.excerpt && (
                     <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
-                      {course.excerpt}
+                      {stripHtml(course.excerpt)}
                     </p>
                   )}
 

@@ -8,6 +8,7 @@ import { Video, Star, Search, X, Filter, Award } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { stripHtml } from "@/lib/utils";
 
 
 // Function to get Vimeo thumbnail URL
@@ -258,7 +259,7 @@ function CoursesContent({ courses, error, loading }: { courses: any[], error: st
                         
                         {course.excerpt && (
                           <p className="text-sm text-gray-600 line-clamp-3 mb-4">
-                            {course.excerpt}
+                            {stripHtml(course.excerpt)}
                           </p>
                         )}
 
@@ -467,7 +468,7 @@ function CoursesContent({ courses, error, loading }: { courses: any[], error: st
                         
                         {course.excerpt && (
                           <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
-                            {course.excerpt}
+                            {stripHtml(course.excerpt)}
                           </p>
                         )}
 

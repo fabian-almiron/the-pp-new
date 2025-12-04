@@ -6,6 +6,7 @@ import { Video, Star, ArrowLeft } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { SubscriberGate } from "@/components/subscriber-gate";
+import { stripHtml } from "@/lib/utils";
 
 // Keep levels dynamic for now
 export const dynamic = 'force-dynamic';
@@ -166,7 +167,7 @@ function renderLevelPage(level: string, courses: any[]) {
                   
                   {course.excerpt && (
                     <p className="text-sm text-gray-600 line-clamp-2 mb-4 flex-1">
-                      {course.excerpt}
+                      {stripHtml(course.excerpt)}
                     </p>
                   )}
 
