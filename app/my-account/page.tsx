@@ -784,8 +784,8 @@ export default function MyAccountPage() {
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-500">
               Need help? Contact us at{' '}
-              <a href="mailto:support@pipedpeony.com" className="text-[#D4A771] hover:underline font-medium">
-                support@pipedpeony.com
+              <a href="mailto:mel@pipedpeony.com" className="text-[#D4A771] hover:underline font-medium">
+                mel@pipedpeony.com
               </a>
             </p>
           </div>
