@@ -46,12 +46,26 @@ export default function RecipeLibraryPage() {
     async function loadRecipes() {
       try {
         const response = await fetch('/api/recipes');
-        const data = await response.json();
-        setRecipes(data);
+        const result = await response.json();
+        
+        // Handle the API response format: { data: Recipe[], error: null }
+        if (result.error) {
+          setError(result.error);
+          setRecipes([]);
+        } else if (Array.isArray(result.data)) {
+          setRecipes(result.data);
+        } else if (Array.isArray(result)) {
+          // Fallback: if API returns array directly
+          setRecipes(result);
+        } else {
+          setError('Invalid response format from recipes API');
+          setRecipes([]);
+        }
         setLoading(false);
       } catch (err) {
         console.error('Recipe fetch error:', err);
         setError('Failed to load recipes. Please make sure Strapi is running and the Recipe API is accessible.');
+        setRecipes([]);
         setLoading(false);
       }
     }
@@ -60,6 +74,7 @@ export default function RecipeLibraryPage() {
 
   // Get unique categories and difficulties
   const categories = useMemo(() => {
+    if (!Array.isArray(recipes)) return [];
     const cats = new Set<string>();
     recipes.forEach(recipe => {
       // If recipe has categories array, add all of them
@@ -79,12 +94,14 @@ export default function RecipeLibraryPage() {
   }, [recipes]);
 
   const difficulties = useMemo(() => {
+    if (!Array.isArray(recipes)) return [];
     const diffs = new Set(recipes.map(r => r.difficulty).filter(Boolean));
     return Array.from(diffs).sort();
   }, [recipes]);
 
   // Filter recipes
   const filteredRecipes = useMemo(() => {
+    if (!Array.isArray(recipes)) return [];
     return recipes.filter(recipe => {
       // Search filter
       if (searchQuery && !recipe.title?.toLowerCase().includes(searchQuery.toLowerCase())) {
@@ -253,7 +270,7 @@ export default function RecipeLibraryPage() {
           {/* Results count */}
           <div className="mt-4 pt-4 border-t border-gray-200">
             <p className="text-sm text-gray-600">
-              Showing <span className="font-semibold text-black">{filteredRecipes.length}</span> of {recipes.length} recipes
+              Showing <span className="font-semibold text-black">{filteredRecipes.length}</span> of {Array.isArray(recipes) ? recipes.length : 0} recipes
               {(searchQuery || selectedCategory !== "all" || selectedDifficulty !== "all") && <span className="text-black"> (filtered)</span>}
             </p>
           </div>
