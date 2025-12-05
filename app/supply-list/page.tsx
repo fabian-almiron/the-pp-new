@@ -1,14 +1,19 @@
 "use client"
 
-import { useState } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 
-type Category = 'flowers' | 'color' | 'cake' | 'kids';
-
 export default function SupplyListPage() {
-  const [activeCategory, setActiveCategory] = useState<Category>('flowers');
+  const flowersRef = useRef<HTMLDivElement>(null);
+  const colorRef = useRef<HTMLDivElement>(null);
+  const cakeRef = useRef<HTMLDivElement>(null);
+  const kidsRef = useRef<HTMLDivElement>(null);
+
+  const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
+    ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
   return (
     <div className="min-h-screen bg-[#FBF9F6]">
@@ -36,48 +41,56 @@ export default function SupplyListPage() {
         <div className="text-center mb-8">
           <h2 className="text-3xl font-serif text-black mb-4">Supply List</h2>
           <p className="text-base text-gray-700 max-w-3xl mx-auto mb-8">
-            Dara has put together an all-inclusive list of supplies, tools, and piping tip styles that are specifically customized to your project. You can find her recommendations in our shop or through our suppliers.
+            Dara has put together an all-inclusive list of supplies, tools, and piping tip styles that are specifically customized to your project. You can trust her recommendations to guide you through the creative process and help you bring your vision to life.
           </p>
 
-          {/* Category Filter Buttons */}
+          {/* Category Navigation Buttons */}
           <div className="flex flex-wrap justify-center gap-3 mb-12">
             <Button
-              variant={activeCategory === 'flowers' ? 'default' : 'outline'}
-              onClick={() => setActiveCategory('flowers')}
-              className={activeCategory === 'flowers' ? 'bg-black text-white' : 'border-black text-black hover:bg-gray-100'}
+              variant="outline"
+              onClick={() => scrollToSection(flowersRef)}
+              className="border-black text-black hover:bg-gray-100"
             >
               Flowers and basic piping
             </Button>
             <Button
-              variant={activeCategory === 'color' ? 'default' : 'outline'}
-              onClick={() => setActiveCategory('color')}
-              className={activeCategory === 'color' ? 'bg-black text-white' : 'border-black text-black hover:bg-gray-100'}
+              variant="outline"
+              onClick={() => scrollToSection(colorRef)}
+              className="border-black text-black hover:bg-gray-100"
             >
               Color
             </Button>
             <Button
-              variant={activeCategory === 'cake' ? 'default' : 'outline'}
-              onClick={() => setActiveCategory('cake')}
-              className={activeCategory === 'cake' ? 'bg-black text-white' : 'border-black text-black hover:bg-gray-100'}
+              variant="outline"
+              onClick={() => scrollToSection(cakeRef)}
+              className="border-black text-black hover:bg-gray-100"
             >
               Cake and cupcake decorating
             </Button>
             <Button
-              variant={activeCategory === 'kids' ? 'default' : 'outline'}
-              onClick={() => setActiveCategory('kids')}
-              className={activeCategory === 'kids' ? 'bg-black text-white' : 'border-black text-black hover:bg-gray-100'}
+              variant="outline"
+              onClick={() => scrollToSection(kidsRef)}
+              className="border-black text-black hover:bg-gray-100"
             >
               Kids
             </Button>
           </div>
         </div>
 
-        {/* Category Content */}
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 md:p-12">
-          {activeCategory === 'flowers' && <FlowersSection />}
-          {activeCategory === 'color' && <ColorSection />}
-          {activeCategory === 'cake' && <CakeSection />}
-          {activeCategory === 'kids' && <KidsSection />}
+        {/* All Sections */}
+        <div className="space-y-12">
+          <div ref={flowersRef}>
+            <FlowersSection />
+          </div>
+          <div ref={colorRef}>
+            <ColorSection />
+          </div>
+          <div ref={cakeRef}>
+            <CakeSection />
+          </div>
+          <div ref={kidsRef}>
+            <KidsSection />
+          </div>
         </div>
       </div>
     </div>
@@ -86,77 +99,93 @@ export default function SupplyListPage() {
 
 function FlowersSection() {
   return (
-    <div>
-      <h3 className="text-2xl font-serif text-black mb-6">Flowers and Basic Piping</h3>
-      
-      <div className="mb-8">
-        <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
-        <ul className="space-y-2 text-gray-700">
-          <li>• Roses: 59, 60, 61, 74, 80, 81, 104K, 122, 123, 124, 125, 126, 150, 340, 349, 352, 353, 354, 363</li>
-          <li>• Roses: (02, 4), 79, 80, 81, 104K, 124R, 127, 349, 888, 108 (only if wilton/ateco)</li>
-          <li>• G.G. Cakraft: 62, 865, 105, 106, 1002 (whichever tips or 104d right/handed tip or 104d Left/handed tip)</li>
-          <li>• (smallest tip)</li>
-        </ul>
-      </div>
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 md:p-12">
+      <div className="grid md:grid-cols-[300px_1fr] gap-8">
+        {/* Left Image Container */}
+        <div className="hidden md:block">
+          <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
+            <Image
+              src="/piping.jpg"
+              alt="Flowers and basic piping supplies"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
 
-      <div>
-        <h4 className="text-lg font-semibold text-black mb-3">Equipment</h4>
-        <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Piping black</span>
+        {/* Content */}
+        <div>
+          <h3 className="text-2xl font-serif text-black mb-6">Flowers and Basic Piping</h3>
+          
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
+            <ul className="space-y-2 text-gray-700 text-sm pl-6">
+              <li>• <strong>Wilton:</strong> 4B, 1, 2, 3, 4, 7, 8, 9, 10, 12, 16, 19A, 61, 81, 101, 102, 103, 104, 123, 133, 199, 249, 352, 366</li>
+              <li>• <strong>Ateco:</strong> 6G, 4I, 79, 80, 81, 124K, 126K, 227, 249, 808, 109 (only if left-handed)</li>
+              <li>• <strong>G.G. Cakraft:</strong> 65, 810, 105, 106, 1051 (left-handed tip) or 1052 (right-handed tip), 1061 (left-handed tip) or 1062 (right-handed tip)</li>
+            </ul>
           </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Silicone spatulas</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Extra large flower nail</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Piping bags (12-18)</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Flower lifter (oval tip)</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Needle nose pliers</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Flower lifter (octstar tip)</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Food scale</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Microremovable foods</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Piping couplers</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Storage containers</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Floral wire (22 gauge)</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">G.G. Cakraft 7' flower nail</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Styrofoam</span>
+
+          <div>
+            <h4 className="text-lg font-semibold text-black mb-3">Equipment</h4>
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Piping block</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Silicone spatulas</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Extra large flower nail</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Piping bags (10-12 in)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Flower lifter (oval tip)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Needle nose pliers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Flower lifter (scissor tip)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Food scale</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Microwavable bowls</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Piping couplers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Storage containers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Floral wire (22 gauge)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">G.G. Cakraft Y flower nail</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Styrofoam</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -166,35 +195,49 @@ function FlowersSection() {
 
 function ColorSection() {
   return (
-    <div>
-      <h3 className="text-2xl font-serif text-black mb-6">Coloring</h3>
-      
-      <div className="grid md:grid-cols-2 gap-8 mb-8">
-        <div>
-          <Image
-            src="/coloring-300x161.jpg"
-            alt="Color palette for buttercream"
-            width={400}
-            height={215}
-            className="rounded-lg"
-          />
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 md:p-12">
+      <div className="grid md:grid-cols-[300px_1fr] gap-8">
+        {/* Left Image Container */}
+        <div className="hidden md:block">
+          <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
+            <Image
+              src="/coloring.jpg"
+              alt="Color palette for buttercream"
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
-        <div>
-          <h4 className="text-lg font-semibold text-black mb-3">Gel Colors (Wilton-based, used only for Blooming Buttercream®)</h4>
-          <ul className="space-y-2 text-gray-700 mb-6">
-            <li>• Americolor: super black, red, yellow, blue, optional: maroon, teal pink, electric pink</li>
-            <li>• Chefmaster: buckeye, brown, liquid whitener</li>
-            <li>• Flower lifter (oval tip)</li>
-            <li>• Flower lifter (octstar tip)</li>
-          </ul>
 
-          <h4 className="text-lg font-semibold text-black mb-3">Oil-Based Colors (Used only for Italian Meringue Buttercream)</h4>
-          <p className="text-gray-700 mb-3">
-            <strong>Colour Mill:</strong> (all are completely oil-based). you can color Italian Meringue with gel colors, it's just takes longer to develop the color. Super tinter's piping for heavy a better than chespin 17 black, brown, red, yellow, blue.
-          </p>
-          <ul className="space-y-2 text-gray-700">
-            <li>• Food scale</li>
-          </ul>
+        {/* Content */}
+        <div>
+          <h3 className="text-2xl font-serif text-black mb-6">Coloring</h3>
+          
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-black mb-3">Gel Colors (Water-based, used only for Blooming Buttercream)</h4>
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3 mb-6">
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm"><strong>Americolor:</strong> super black, red, yellow, blue, optional: mauve, soft pink, electric pink</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm"><strong>Chefmaster:</strong> buckeye, brown, liquid whitener</span>
+              </div>
+            </div>
+
+            <h4 className="text-lg font-semibold text-black mb-3">Oil-Based Colors (Used only for Italian Meringue Buttercream)</h4>
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3 mb-6">
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm"><strong>Colour Mill</strong> (all are completely optional; you can color Italian Meringue with gel colors; it's just takes longer to develop the color; Sugar Sister's pricing for these is better than Amazon's): black, brown, red, yellow, blue, green</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Food scale</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -203,51 +246,37 @@ function ColorSection() {
 
 function CakeSection() {
   return (
-    <div>
-      <h3 className="text-2xl font-serif text-black mb-6">Cake and Cupcake</h3>
-      
-      <div className="mb-8">
-        <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
-        <ul className="space-y-2 text-gray-700">
-          <li>• Pastry brush</li>
-          <li>• Piping tips: 1M (large star tip)</li>
-          <li>• Bamboo skewers</li>
-          <li>• Cake turntable</li>
-          <li>• Cake leveler</li>
-          <li>• Bench scraper (also called 'flour cake layer')</li>
-          <li>• Piping bags; preferably 12"-18"</li>
-          <li>• 10" metal bench scraper</li>
-          <li>• Piping tips: Wilton 789 (optional)</li>
-          <li>• 1 cavity thermometers</li>
-        </ul>
-      </div>
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 md:p-12">
+      <div className="grid md:grid-cols-[300px_1fr] gap-8">
+        {/* Left Image Container */}
+        <div className="hidden md:block">
+          <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
+            <Image
+              src="/cake-card.png"
+              alt="Cake and cupcake decorating supplies"
+              fill
+              className="object-cover"
+            />
+          </div>
+        </div>
 
-      <div>
-        <h4 className="text-lg font-semibold text-black mb-3">Equipment</h4>
-        <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Food scale</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Chocolate or white chocolate melting wafers</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Parchment paper</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Cake boards; same size as cake or larger (1 usually buy a bulk pack of 8" boards so I often use them for all sizes of cakes)</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Offset spatula</span>
-          </div>
-          <div className="flex items-start gap-2">
-            <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-            <span className="text-gray-700">Round tip paint brush or equivalent</span>
+        {/* Content */}
+        <div>
+          <h3 className="text-2xl font-serif text-black mb-6">Cake and Cupcake</h3>
+          
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
+            <ul className="space-y-2 text-gray-700 text-sm pl-6">
+              <li>• Pastry brush</li>
+              <li>• Piping tips: Ateco 869</li>
+              <li>• Bamboo skewers</li>
+              <li>• Cake turntable</li>
+              <li>• Cake leveler</li>
+              <li>• Food scale</li>
+              <li>• Chocolate or white chocolate melting wafers</li>
+              <li>• Parchment paper</li>
+              <li>• Cake boards; some size as cake or larger (I usually buy a bulk pack of 9" boards so I can use them for all sizes of cakes.)</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -257,80 +286,90 @@ function CakeSection() {
 
 function KidsSection() {
   return (
-    <div>
-      <h3 className="text-2xl font-serif text-black mb-6">Kids</h3>
-      
-      <div className="grid md:grid-cols-2 gap-8 mb-8">
-        <div>
-          <Image
-            src="/placeholder.jpg"
-            alt="Sunflower cake decoration"
-            width={400}
-            height={400}
-            className="rounded-lg"
-          />
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 md:p-12">
+      <div className="grid md:grid-cols-[300px_1fr] gap-8">
+        {/* Left Image Container */}
+        <div className="hidden md:block">
+          <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
+            <Image
+              src="/kids.png"
+              alt="Kids cake decorating supplies"
+              fill
+              className="object-cover"
+            />
+          </div>
         </div>
-        <div>
-          <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
-          <ul className="space-y-2 text-gray-700 mb-6">
-            <li>• Wilton: 1, 2, 3, 4, 5, 16, 18, 20, 21, 30, 48, 59, 67, 68, 81, 103, 104, 125, 352 *Check out the Wilton 55 peace set if you would all of these</li>
-            <li>• Ateco: 12/4R, 104K, 107, 125, 849, 863</li>
-            <li>• G.G. Cakraft: 102 (right) 1002 (left) *whichever big or 104d (right-handed big or 104d left-handed big 108</li>
-          </ul>
 
-          <h4 className="text-lg font-semibold text-black mb-3">Equipment</h4>
-          <div className="grid gap-y-3">
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Piping black</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Silicone spatulas</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Extra large flower nail</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Piping bags (12-18 pt)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Flower lifter (oval tip)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Needle nose pliers</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Food scale</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Piping couplers</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Microremovable foods</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Floral wire (22 gauge)</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Storage containers</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">Styrofoam</span>
-            </div>
-            <div className="flex items-start gap-2">
-              <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-              <span className="text-gray-700">G.G. Cakraft 7' flower nail</span>
+        {/* Content */}
+        <div>
+          <h3 className="text-2xl font-serif text-black mb-6">Kids</h3>
+          
+          <div className="mb-8">
+            <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
+            <ul className="space-y-2 text-gray-700 text-sm pl-6 mb-6">
+              <li>• <strong>Wilton:</strong> 24 or 4B, 1, 2, 5, 6, 10, 12, 16, 59c/59, 81, 101, 103, 123, 233, 349, 369 *check out the Wilton 55 piece set if you need all of these.</li>
+              <li>• <strong>Ateco:</strong> 50, 79, 1246, 1266, 237, 349, 869</li>
+              <li>• <strong>G.G. Cakroft:</strong> 102 (opt), 1061 (left-handed tip) or 1062 (right-handed tip), 106</li>
+            </ul>
+
+            <h4 className="text-lg font-semibold text-black mb-3">Equipment</h4>
+            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Piping block</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Silicone spatulas</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Extra large flower nail</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Piping bags (10-12 in)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Flower lifter (oval tip)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Needle nose pliers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Flower lifter (scissor tip)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Food scale</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Microwavable bowls</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Piping couplers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Storage containers</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Floral wire (22 gauge)</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">G.G. Cakroft 9 flower nail</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
+                <span className="text-gray-700 text-sm">Styrofoam</span>
+              </div>
             </div>
           </div>
         </div>
