@@ -9,7 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 });
 
 const STRAPI_URL = process.env.NEXT_PUBLIC_STRAPI_URL || 'http://localhost:1337';
-const EBOOK_SLUG = 'peony-masterclass-ebook'; // Match the slug from products.ts
+const EBOOK_SLUG = 'the-ultimate-tip-guide'; // Product slug
 
 // Ebook file ID in Strapi Media Library
 // Can be overridden via STRAPI_EBOOK_FILE_ID environment variable
@@ -68,6 +68,15 @@ async function verifyEbookPurchase(userId: string, userEmail?: string): Promise<
 
       for (const item of lineItems.data) {
         const product = item.price?.product as Stripe.Product | undefined;
+        const description = item.description?.toLowerCase() || '';
+        
+        // Log for debugging
+        console.log('🔍 Checking line item:', {
+          description: item.description,
+          productName: product?.name,
+          productId: product?.id,
+          productMetadata: product?.metadata,
+        });
         
         // Check by product name or metadata
         if (product) {
@@ -76,20 +85,19 @@ async function verifyEbookPurchase(userId: string, userEmail?: string): Promise<
           
           // Check if this is the ebook product
           if (
-            productName.includes('peony masterclass ebook') ||
-            productName.includes('masterclass ebook') ||
+            productName.includes('the ultimate tip guide') ||
+            productName.includes('ultimate tip guide') ||
             productSlug === EBOOK_SLUG ||
             product.metadata?.slug === EBOOK_SLUG
           ) {
-            console.log('✅ User has purchased ebook:', product.id);
+            console.log('✅ User has purchased ebook (by product name/metadata):', product.id);
             return true;
           }
         }
         
         // Also check description as fallback
-        const description = item.description?.toLowerCase() || '';
-        if (description.includes('peony masterclass ebook') || description.includes('masterclass ebook')) {
-          console.log('✅ User has purchased ebook (via description)');
+        if (description.includes('the ultimate tip guide') || description.includes('ultimate tip guide')) {
+          console.log('✅ User has purchased ebook (via description):', item.description);
           return true;
         }
       }
@@ -139,7 +147,7 @@ async function getEbookFileUrl(): Promise<string | null> {
     // Method 2: Search Media Library by filename (fallback if no ID configured)
     console.log('🔍 Searching Strapi Media Library for ebook file...');
     
-    // Try searching with "The Ultimate Tip Guide" first (actual filename)
+    // Try searching with "The Ultimate Tip Guide" first (actual product name)
     const searchUrl = `${STRAPI_URL}/api/upload/files?filters[name][$contains]=The Ultimate Tip Guide&filters[ext][$eq]=pdf`;
     
     const response = await fetch(searchUrl, {
@@ -167,7 +175,7 @@ async function getEbookFileUrl(): Promise<string | null> {
       }
     }
 
-    // Also try searching with "ultimate tip guide" (case-insensitive fallback)
+    // Also try searching with "ultimate tip guide" (case-insensitive variant)
     const searchUrl2 = `${STRAPI_URL}/api/upload/files?filters[name][$contains]=ultimate tip guide&filters[ext][$eq]=pdf`;
     const response2 = await fetch(searchUrl2, {
       headers: {
@@ -191,8 +199,8 @@ async function getEbookFileUrl(): Promise<string | null> {
       }
     }
 
-    // Also try searching with "ebook" keyword as final fallback
-    const searchUrl3 = `${STRAPI_URL}/api/upload/files?filters[name][$contains]=ebook&filters[ext][$eq]=pdf`;
+    // Also try searching with "the-ultimate-tip-guide" (product slug)
+    const searchUrl3 = `${STRAPI_URL}/api/upload/files?filters[name][$contains]=the-ultimate-tip-guide&filters[ext][$eq]=pdf`;
     const response3 = await fetch(searchUrl3, {
       headers: {
         'Content-Type': 'application/json',
@@ -207,6 +215,30 @@ async function getEbookFileUrl(): Promise<string | null> {
       const data3 = await response3.json();
       if (data3 && Array.isArray(data3) && data3.length > 0) {
         const file = data3[0];
+        const fileUrl = file.url?.startsWith('http') 
+          ? file.url 
+          : `${STRAPI_URL}${file.url}`;
+        console.log('✅ Found ebook file in Strapi Media Library (by "the-ultimate-tip-guide"):', file.name);
+        return fileUrl;
+      }
+    }
+
+    // Also try searching with "ebook" keyword as final fallback
+    const searchUrl4 = `${STRAPI_URL}/api/upload/files?filters[name][$contains]=ebook&filters[ext][$eq]=pdf`;
+    const response4 = await fetch(searchUrl4, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(process.env.STRAPI_API_TOKEN && {
+          'Authorization': `Bearer ${process.env.STRAPI_API_TOKEN}`
+        }),
+      },
+      cache: 'no-store',
+    });
+
+    if (response4.ok) {
+      const data4 = await response4.json();
+      if (data4 && Array.isArray(data4) && data4.length > 0) {
+        const file = data4[0];
         const fileUrl = file.url?.startsWith('http') 
           ? file.url 
           : `${STRAPI_URL}${file.url}`;

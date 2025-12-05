@@ -307,11 +307,25 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
       }
       
       // Format line items for email
-      const items = lineItems.data.map(item => ({
-        name: item.description || 'Product',
-        quantity: item.quantity || 1,
-        price: item.amount_total ? item.amount_total / 100 : 0,
-      }));
+      // Use product name from expanded product object if available, otherwise use description
+      const items = lineItems.data.map(item => {
+        const product = item.price?.product as Stripe.Product | undefined;
+        const productName = product?.name || item.description || 'Product';
+        
+        // Log product details for debugging
+        console.log('📦 Line item:', {
+          description: item.description,
+          productName: product?.name,
+          productId: product?.id,
+          productMetadata: product?.metadata,
+        });
+        
+        return {
+          name: productName,
+          quantity: item.quantity || 1,
+          price: item.amount_total ? item.amount_total / 100 : 0,
+        };
+      });
       
       await sendPurchaseReceiptEmail(
         session.customer_email,

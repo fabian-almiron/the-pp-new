@@ -163,13 +163,17 @@ export default function MyAccountPage() {
       })
       
       setUpdateSuccess("Password updated successfully!")
-      setIsEditingPassword(false)
+      
+      // Clear form fields immediately
       setCurrentPassword("")
       setNewPassword("")
       setConfirmPassword("")
       
-      // Clear success message after 3 seconds
-      setTimeout(() => setUpdateSuccess(null), 3000)
+      // Close form and clear success message after 2 seconds (gives user time to see success message)
+      setTimeout(() => {
+        setIsEditingPassword(false)
+        setUpdateSuccess(null)
+      }, 2000)
     } catch (error: any) {
       setUpdateError(error.message || 'Failed to update password')
     } finally {
@@ -591,6 +595,28 @@ export default function MyAccountPage() {
                         className="mt-1"
                       />
                     </div>
+                    
+                    {/* Password-specific success/error messages */}
+                    {isEditingPassword && updateSuccess && (
+                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <svg className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                          <p className="text-sm text-green-700 font-medium">{updateSuccess}</p>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {isEditingPassword && updateError && (
+                      <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                          <p className="text-sm text-red-700 font-medium">{updateError}</p>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="flex gap-3">
                       <Button
                         onClick={handleUpdatePassword}

@@ -208,8 +208,8 @@ export async function sendPurchaseReceiptEmail(
   // Check if order contains ebook
   const hasEbook = orderDetails.items.some(item => {
     const itemName = item.name.toLowerCase();
-    return itemName.includes('peony masterclass ebook') || 
-           itemName.includes('masterclass ebook') || 
+    return itemName.includes('the ultimate tip guide') || 
+           itemName.includes('ultimate tip guide') || 
            itemName.includes('ebook');
   });
 

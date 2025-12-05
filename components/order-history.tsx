@@ -110,8 +110,8 @@ export default function OrderHistory() {
 
   const isEbook = (itemName: string): boolean => {
     const name = itemName.toLowerCase()
-    return name.includes('peony masterclass ebook') || 
-           name.includes('masterclass ebook') || 
+    return name.includes('the ultimate tip guide') || 
+           name.includes('ultimate tip guide') || 
            name.includes('ebook')
   }
 
