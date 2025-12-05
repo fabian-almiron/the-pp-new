@@ -205,6 +205,17 @@ export async function sendPurchaseReceiptEmail(
 ): Promise<boolean> {
   const subject = `Your Order Confirmation - The Piped Peony`;
 
+  // Check if order contains ebook
+  const hasEbook = orderDetails.items.some(item => {
+    const itemName = item.name.toLowerCase();
+    return itemName.includes('peony masterclass ebook') || 
+           itemName.includes('masterclass ebook') || 
+           itemName.includes('ebook');
+  });
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thepipedpeony.com';
+  const downloadUrl = `${siteUrl}/api/download-ebook`;
+
   const html = `
 <!DOCTYPE html>
 <html>
@@ -240,6 +251,35 @@ export async function sendPurchaseReceiptEmail(
               <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #374151; font-family: 'sofia-pro', sans-serif;">
                 Thank you for your purchase! Your order has been confirmed and will be processed shortly.
               </p>
+              
+              ${hasEbook ? `
+              <!-- Ebook Download Box -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #D4A771; border-radius: 12px; margin: 30px 0;">
+                <tr>
+                  <td style="padding: 30px; text-align: center;">
+                    <h2 style="margin: 0 0 15px; font-size: 22px; color: #ffffff; font-family: 'Playfair Display', Georgia, serif; font-weight: 700;">
+                      📚 Your Digital Download is Ready!
+                    </h2>
+                    <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #ffffff; font-family: 'sofia-pro', sans-serif;">
+                      Your ebook is available for immediate download. Click the button below to access your file.
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center">
+                          <a href="${downloadUrl}" 
+                             style="display: inline-block; background-color: #ffffff; color: #D4A771; text-decoration: none; padding: 14px 36px; border-radius: 50px; font-weight: 600; font-size: 16px; font-family: 'sofia-pro', sans-serif;">
+                            Download Your Ebook
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin: 20px 0 0; font-size: 12px; line-height: 1.6; color: #ffffff; font-family: 'sofia-pro', sans-serif; opacity: 0.9;">
+                      You can also access your download anytime from your account page.
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
               
               <!-- Order Info Box -->
               <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f2ece7; border-radius: 12px; margin: 30px 0;">
@@ -291,9 +331,11 @@ export async function sendPurchaseReceiptEmail(
                 </tr>
               </table>
               
+              ${!hasEbook ? `
               <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280; font-family: 'sofia-pro', sans-serif;">
                 You'll receive a shipping confirmation email once your order is on its way.
               </p>
+              ` : ''}
               
               <p style="margin: 20px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280; font-family: 'sofia-pro', sans-serif;">
                 Questions about your order? Just reply to this email!
@@ -313,8 +355,8 @@ export async function sendPurchaseReceiptEmail(
                 The Piped Peony LLC
               </p>
               <p style="margin: 0; font-size: 12px; color: #9ca3af; font-family: 'sofia-pro', sans-serif;">
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thepipedpeony.com'}/my-account" style="color: #000000; text-decoration: none;">View Orders</a> | 
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thepipedpeony.com'}/contact" style="color: #000000; text-decoration: none;">Contact Us</a>
+                <a href="${siteUrl}/my-account" style="color: #000000; text-decoration: none;">View Orders</a> | 
+                <a href="${siteUrl}/contact" style="color: #000000; text-decoration: none;">Contact Us</a>
               </p>
             </td>
           </tr>

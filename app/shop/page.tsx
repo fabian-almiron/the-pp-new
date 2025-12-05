@@ -53,7 +53,6 @@ export default function ShopPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gray-900 mb-4">Shop</h1>
             </div>
             <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
-            <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
           </div>
           <div className="flex justify-center items-center py-16">
             <PeonyLoader />
@@ -74,7 +73,6 @@ export default function ShopPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gray-900 mb-4">Shop</h1>
             </div>
             <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
-            <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
           </div>
           <div className="flex justify-center items-center py-16">
             <div className="text-center">
@@ -102,7 +100,6 @@ export default function ShopPage() {
             <h1 className="shop-title">Shop</h1>
           </div>
           <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
-          <p className="text-gray-600">All orders placed on or after June 11th will be fulfilled on 6/24 due to upcoming business and personal travel. Thank you for continuing to support our small business!</p>
           <div className="mt-6">
             <Link href="/cart" className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 transition-colors">
               <span>View Cart</span>
