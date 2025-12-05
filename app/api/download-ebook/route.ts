@@ -310,7 +310,7 @@ export async function GET(request: NextRequest) {
     const ebookUrl = await getEbookFileUrl();
     let fileBuffer: ArrayBuffer;
     let contentType = 'application/pdf';
-    let contentDisposition = 'attachment; filename="peony-masterclass-ebook.pdf"';
+    let contentDisposition = 'attachment; filename="the-ultimate-tip-guide.pdf"';
 
     if (ebookUrl) {
       // Fetch the file from Strapi

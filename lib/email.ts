@@ -60,6 +60,14 @@ export async function sendEmail({ to, subject, html, text }: SendEmailParams): P
   } catch (error: any) {
     console.error('❌ Error sending email:', error);
     console.error('Error details:', error.message);
+    
+    // Provide helpful error messages for common issues
+    if (error.message?.includes('invalid_grant')) {
+      console.error('⚠️  Gmail refresh token has expired or is invalid.');
+      console.error('💡 You need to regenerate your Gmail OAuth refresh token.');
+      console.error('   See: https://developers.google.com/gmail/api/quickstart/nodejs');
+    }
+    
     return false;
   }
 }

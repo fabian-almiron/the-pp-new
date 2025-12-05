@@ -137,7 +137,7 @@ export default function OrderHistory() {
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
-      a.download = 'peony-masterclass-ebook.pdf'
+      a.download = 'the-ultimate-tip-guide.pdf'
       document.body.appendChild(a)
       a.click()
       window.URL.revokeObjectURL(url)
