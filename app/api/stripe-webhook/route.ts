@@ -363,7 +363,7 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
         };
       });
       
-      await sendPurchaseReceiptEmail(
+      const emailSent = await sendPurchaseReceiptEmail(
         session.customer_email,
         customerName,
         {
@@ -373,6 +373,14 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
         },
         ebookAttachments
       );
+      
+      if (emailSent) {
+        console.log('✅ Purchase receipt email sent successfully');
+      } else {
+        console.error('❌ Failed to send purchase receipt email');
+      }
+    } else {
+      console.log('⚠️ Skipping email - missing customer email or amount');
     }
 
     // Optional: Create order in Strapi
@@ -419,8 +427,11 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
     */
 
     console.log('✅ Product purchase processed successfully');
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ Error processing product purchase:', error);
-    throw error;
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
+    // Don't throw - we don't want to return 500 and have Stripe retry
+    // Just log the error so we can debug
   }
 }

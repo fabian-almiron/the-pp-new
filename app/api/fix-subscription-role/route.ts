@@ -66,11 +66,32 @@ export async function POST(request: NextRequest) {
 
     if (activeSubscription) {
       newRole = 'subscriber';
+      
+      // Safely convert timestamps to ISO strings
+      let currentPeriodEndISO = null;
+      let trialEndISO = null;
+      
+      try {
+        if (activeSubscription.current_period_end) {
+          currentPeriodEndISO = new Date(activeSubscription.current_period_end * 1000).toISOString();
+        }
+      } catch (e) {
+        console.warn('Failed to convert current_period_end to ISO string:', e);
+      }
+      
+      try {
+        if (activeSubscription.trial_end) {
+          trialEndISO = new Date(activeSubscription.trial_end * 1000).toISOString();
+        }
+      } catch (e) {
+        console.warn('Failed to convert trial_end to ISO string:', e);
+      }
+      
       subscriptionDetails = {
         id: activeSubscription.id,
         status: activeSubscription.status,
-        currentPeriodEnd: new Date(activeSubscription.current_period_end * 1000).toISOString(),
-        trialEnd: activeSubscription.trial_end ? new Date(activeSubscription.trial_end * 1000).toISOString() : null,
+        currentPeriodEnd: currentPeriodEndISO,
+        trialEnd: trialEndISO,
       };
 
       console.log('✅ Active subscription found:', activeSubscription.id, 'Status:', activeSubscription.status);
