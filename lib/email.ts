@@ -1,71 +1,79 @@
-import { google } from 'googleapis';
+import nodemailer from 'nodemailer';
 
-// Initialize Gmail API
-const getGmailClient = () => {
-  const oauth2Client = new google.auth.OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET,
-    process.env.GMAIL_REDIRECT_URI
-  );
-
-  oauth2Client.setCredentials({
-    refresh_token: process.env.GMAIL_REFRESH_TOKEN,
+// Initialize Brevo SMTP transporter
+const getEmailTransporter = () => {
+  return nodemailer.createTransport({
+    host: process.env.BREVO_SMTP_HOST || 'smtp-relay.brevo.com',
+    port: parseInt(process.env.BREVO_SMTP_PORT || '587'),
+    secure: false, // true for 465, false for other ports
+    auth: {
+      user: process.env.BREVO_SMTP_USER!, // Your Brevo email or login
+      pass: process.env.BREVO_SMTP_KEY!,  // Your Brevo SMTP key
+    },
   });
-
-  return google.gmail({ version: 'v1', auth: oauth2Client });
 };
+
+interface Attachment {
+  filename: string;
+  content: Buffer | string; // Base64 string or Buffer
+  contentType?: string;
+}
 
 interface SendEmailParams {
   to: string;
   subject: string;
   html: string;
   text?: string;
+  attachments?: Attachment[];
 }
 
 /**
- * Send an email using Gmail API
+ * Send an email using Brevo SMTP with optional attachments
  */
-export async function sendEmail({ to, subject, html, text }: SendEmailParams): Promise<boolean> {
+export async function sendEmail({ to, subject, html, text, attachments }: SendEmailParams): Promise<boolean> {
   try {
-    const gmail = getGmailClient();
+    const transporter = getEmailTransporter();
+    
+    // Prepare email options
+    const mailOptions: any = {
+      from: {
+        name: 'The Piped Peony',
+        address: process.env.BREVO_FROM_EMAIL || process.env.BREVO_SMTP_USER!,
+      },
+      to: to,
+      subject: subject,
+      html: html,
+      text: text,
+    };
 
-    // Create the email content
-    const emailContent = [
-      `From: The Piped Peony <${process.env.GMAIL_USER}>`,
-      `To: ${to}`,
-      `Subject: ${subject}`,
-      'MIME-Version: 1.0',
-      'Content-Type: text/html; charset=utf-8',
-      '',
-      html,
-    ].join('\n');
-
-    // Encode the email in base64
-    const encodedEmail = Buffer.from(emailContent)
-      .toString('base64')
-      .replace(/\+/g, '-')
-      .replace(/\//g, '_')
-      .replace(/=+$/, '');
+    // Add attachments if provided
+    if (attachments && attachments.length > 0) {
+      mailOptions.attachments = attachments.map(attachment => ({
+        filename: attachment.filename,
+        content: attachment.content,
+        contentType: attachment.contentType || 'application/octet-stream',
+      }));
+    }
 
     // Send the email
-    await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw: encodedEmail,
-      },
-    });
+    const info = await transporter.sendMail(mailOptions);
 
     console.log('✅ Email sent successfully to:', to);
+    console.log('   📧 Message ID:', info.messageId);
+    if (attachments && attachments.length > 0) {
+      console.log(`   📎 With ${attachments.length} attachment(s)`);
+    }
     return true;
   } catch (error: any) {
     console.error('❌ Error sending email:', error);
     console.error('Error details:', error.message);
     
     // Provide helpful error messages for common issues
-    if (error.message?.includes('invalid_grant')) {
-      console.error('⚠️  Gmail refresh token has expired or is invalid.');
-      console.error('💡 You need to regenerate your Gmail OAuth refresh token.');
-      console.error('   See: https://developers.google.com/gmail/api/quickstart/nodejs');
+    if (error.message?.includes('auth') || error.message?.includes('authentication')) {
+      console.error('⚠️  SMTP authentication failed.');
+      console.error('💡 Please check your Brevo SMTP credentials in .env.local');
+      console.error('   - BREVO_SMTP_USER');
+      console.error('   - BREVO_SMTP_KEY');
     }
     
     return false;
@@ -196,7 +204,7 @@ export async function sendSubscriptionTrialEmail(
 }
 
 /**
- * Send a receipt email for product purchases
+ * Send a receipt email for product purchases with optional ebook attachments
  */
 export async function sendPurchaseReceiptEmail(
   email: string,
@@ -209,20 +217,23 @@ export async function sendPurchaseReceiptEmail(
       quantity: number;
       price: number;
     }>;
-  }
+  },
+  ebookAttachments?: Attachment[]
 ): Promise<boolean> {
   const subject = `Your Order Confirmation - The Piped Peony`;
 
-  // Check if order contains ebook
+  // Check if order contains any ebooks
   const hasEbook = orderDetails.items.some(item => {
     const itemName = item.name.toLowerCase();
     return itemName.includes('the ultimate tip guide') || 
-           itemName.includes('ultimate tip guide') || 
+           itemName.includes('ultimate tip guide') ||
+           itemName.includes('the caddy book set') ||
+           itemName.includes('caddy book') ||
            itemName.includes('ebook');
   });
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.thepipedpeony.com';
-  const downloadUrl = `${siteUrl}/api/download-ebook`;
+  const downloadUrl = `${siteUrl}/my-account`;
 
   const html = `
 <!DOCTYPE html>
@@ -269,7 +280,7 @@ export async function sendPurchaseReceiptEmail(
                       📚 Your Digital Download is Ready!
                     </h2>
                     <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.6; color: #ffffff; font-family: 'sofia-pro', sans-serif;">
-                      Your ebook is available for immediate download. Click the button below to access your file.
+                      Your ebook is ready! Click the button below to access your account and download your PDF.
                     </p>
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
@@ -282,72 +293,12 @@ export async function sendPurchaseReceiptEmail(
                       </tr>
                     </table>
                     <p style="margin: 20px 0 0; font-size: 12px; line-height: 1.6; color: #ffffff; font-family: 'sofia-pro', sans-serif; opacity: 0.9;">
-                      You can also access your download anytime from your account page.
+                      Your download will be available in your account forever - access it anytime!
                     </p>
                   </td>
                 </tr>
               </table>
               ` : ''}
-              
-              <!-- Order Info Box -->
-              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f2ece7; border-radius: 12px; margin: 30px 0;">
-                <tr>
-                  <td style="padding: 25px;">
-                    <h2 style="margin: 0 0 12px; font-size: 20px; color: #000000; font-family: 'Playfair Display', Georgia, serif; font-weight: 700;">
-                      Order Details
-                    </h2>
-                    <p style="margin: 0; font-size: 14px; color: #374151; font-family: 'sofia-pro', sans-serif;">
-                      Order ID: <strong>#${orderDetails.orderId}</strong>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-              
-              <!-- Items -->
-              <h3 style="margin: 30px 0 15px; font-size: 20px; color: #000000; font-family: 'Playfair Display', Georgia, serif; font-weight: 700;">
-                Order Items
-              </h3>
-              
-              <table width="100%" cellpadding="0" cellspacing="0" style="border-top: 2px solid #e5e7eb;">
-                ${orderDetails.items.map(item => `
-                <tr>
-                  <td style="padding: 15px 0; border-bottom: 1px solid #e5e7eb;">
-                    <p style="margin: 0; font-size: 14px; color: #374151; font-family: 'sofia-pro', sans-serif;">
-                      <strong>${item.name}</strong><br>
-                      <span style="color: #6b7280;">Qty: ${item.quantity}</span>
-                    </p>
-                  </td>
-                  <td align="right" style="padding: 15px 0; border-bottom: 1px solid #e5e7eb;">
-                    <p style="margin: 0; font-size: 14px; color: #374151; font-family: 'sofia-pro', sans-serif;">
-                      $${item.price.toFixed(2)}
-                    </p>
-                  </td>
-                </tr>
-                `).join('')}
-                
-                <tr>
-                  <td style="padding: 20px 0;">
-                    <p style="margin: 0; font-size: 18px; color: #000000; font-family: 'sofia-pro', sans-serif; font-weight: 600;">
-                      <strong>Total</strong>
-                    </p>
-                  </td>
-                  <td align="right" style="padding: 20px 0;">
-                    <p style="margin: 0; font-size: 18px; color: #000000; font-family: 'sofia-pro', sans-serif; font-weight: 600;">
-                      <strong>$${orderDetails.total.toFixed(2)}</strong>
-                    </p>
-                  </td>
-                </tr>
-              </table>
-              
-              ${!hasEbook ? `
-              <p style="margin: 30px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280; font-family: 'sofia-pro', sans-serif;">
-                You'll receive a shipping confirmation email once your order is on its way.
-              </p>
-              ` : ''}
-              
-              <p style="margin: 20px 0 0; font-size: 14px; line-height: 1.6; color: #6b7280; font-family: 'sofia-pro', sans-serif;">
-                Questions about your order? Just reply to this email!
-              </p>
               
               <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.6; color: #374151; font-family: 'sofia-pro', sans-serif;">
                 Thank you for shopping with us! 💜<br>
@@ -377,6 +328,11 @@ export async function sendPurchaseReceiptEmail(
 </html>
   `;
 
-  return sendEmail({ to: email, subject, html });
+  return sendEmail({ 
+    to: email, 
+    subject, 
+    html,
+    attachments: ebookAttachments 
+  });
 }
 

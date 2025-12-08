@@ -12,6 +12,7 @@ import { useRole } from "@/hooks/use-role"
 import { useStripeCustomer } from "@/hooks/use-stripe-customer"
 import { useNameSync } from "@/hooks/use-name-sync"
 import OrderHistory from "@/components/order-history"
+import DigitalDownloads from "@/components/digital-downloads"
 
 export default function MyAccountPage() {
   const { isSignedIn, user, isLoaded } = useUser()
@@ -687,6 +688,9 @@ export default function MyAccountPage() {
             </div>
           </Link>
         </div>
+
+        {/* Digital Downloads */}
+        <DigitalDownloads />
 
         {/* Order History */}
         <OrderHistory />

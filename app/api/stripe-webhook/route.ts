@@ -306,6 +306,42 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
         }
       }
       
+      // Direct PDF URL (both ebooks use the same file)
+      const EBOOK_PDF_URL = 'https://content.thepipedpeony.com/uploads/Ultimate_Tip_Guide_ce3a0f7f97.pdf';
+      
+      // Ebook product configurations
+      const EBOOK_PRODUCTS = {
+        'prod_SP1bz7J9np1Elf': {
+          slug: 'the-ultimate-tip-guide',
+          fileName: 'the-ultimate-tip-guide.pdf',
+          pdfUrl: EBOOK_PDF_URL,
+        },
+        'prod_SGCInU8ZdnTmuW': {
+          slug: 'the-caddy-book-set',
+          fileName: 'the-caddy-book-set.pdf',
+          pdfUrl: EBOOK_PDF_URL, // Same file as Ultimate Tip Guide
+        },
+      };
+      
+      // Note: We don't attach the PDF anymore because it's 18MB and exceeds email size limits
+      // Customers can download from their My Account page instead
+      const ebookAttachments = undefined; // No attachments
+      
+      // Check if order contains ebook products (for email content)
+      let hasEbook = false;
+      for (const item of lineItems.data) {
+        const product = item.price?.product as Stripe.Product | undefined;
+        if (product?.id && EBOOK_PRODUCTS[product.id as keyof typeof EBOOK_PRODUCTS]) {
+          hasEbook = true;
+          console.log('📚 Ebook detected in order:', product.id);
+          break;
+        }
+      }
+      
+      if (hasEbook) {
+        console.log('ℹ️  Ebook order - email will include download link (no attachment due to file size)');
+      }
+      
       // Format line items for email
       // Use product name from expanded product object if available, otherwise use description
       const items = lineItems.data.map(item => {
@@ -334,7 +370,8 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
           orderId: session.id.slice(-8).toUpperCase(),
           total: session.amount_total / 100,
           items,
-        }
+        },
+        ebookAttachments.length > 0 ? ebookAttachments : undefined
       );
     }
 

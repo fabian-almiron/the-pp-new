@@ -1,8 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { Package, Calendar, DollarSign, MapPin, ChevronDown, ChevronUp, CreditCard, Download } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { Package, Calendar, DollarSign, MapPin, ChevronDown, ChevronUp, CreditCard } from 'lucide-react'
 
 interface OrderItem {
   name: string
@@ -108,45 +107,6 @@ export default function OrderHistory() {
     return brandMap[brand.toLowerCase()] || brand.charAt(0).toUpperCase() + brand.slice(1)
   }
 
-  const isEbook = (itemName: string): boolean => {
-    const name = itemName.toLowerCase()
-    return name.includes('the ultimate tip guide') || 
-           name.includes('ultimate tip guide') || 
-           name.includes('ebook')
-  }
-
-  const handleDownloadEbook = async (e: React.MouseEvent) => {
-    e.stopPropagation() // Prevent expanding/collapsing order when clicking download
-    
-    try {
-      const response = await fetch('/api/download-ebook')
-      
-      if (!response.ok) {
-        if (response.status === 403) {
-          alert('You must purchase the ebook to download it.')
-        } else {
-          alert('Failed to download ebook. Please try again.')
-        }
-        return
-      }
-
-      // Get the file blob
-      const blob = await response.blob()
-      
-      // Create download link
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = 'the-ultimate-tip-guide.pdf'
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      console.error('Error downloading ebook:', error)
-      alert('Failed to download ebook. Please try again.')
-    }
-  }
 
   if (isLoading) {
     return (
@@ -256,35 +216,18 @@ export default function OrderHistory() {
                   <div className="mb-4">
                     <h4 className="text-sm font-medium text-gray-900 mb-2">Items</h4>
                     <div className="space-y-3">
-                      {order.items.map((item, idx) => {
-                        const itemIsEbook = isEbook(item.name)
-                        return (
-                          <div key={idx} className="flex flex-col gap-2">
-                            <div className="flex justify-between items-start text-sm">
-                              <div className="flex-1">
-                                <span className="text-gray-700">
-                                  {item.name} {item.quantity && `x${item.quantity}`}
-                                </span>
-                              </div>
-                              <span className="text-gray-900 font-medium">
-                                ${item.amount.toFixed(2)}
-                              </span>
-                            </div>
-                            {itemIsEbook && (
-                              <div className="mt-1">
-                                <Button
-                                  onClick={(e) => handleDownloadEbook(e)}
-                                  size="sm"
-                                  className="!bg-[#D4A771] !text-white hover:!bg-[#C69963] flex items-center gap-2"
-                                >
-                                  <Download className="w-4 h-4" />
-                                  Download Ebook
-                                </Button>
-                              </div>
-                            )}
+                      {order.items.map((item, idx) => (
+                        <div key={idx} className="flex justify-between items-start text-sm">
+                          <div className="flex-1">
+                            <span className="text-gray-700">
+                              {item.name} {item.quantity && `x${item.quantity}`}
+                            </span>
                           </div>
-                        )
-                      })}
+                          <span className="text-gray-900 font-medium">
+                            ${item.amount.toFixed(2)}
+                          </span>
+                        </div>
+                      ))}
                     </div>
                   </div>
 
