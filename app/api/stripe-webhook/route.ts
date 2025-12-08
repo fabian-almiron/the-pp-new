@@ -291,9 +291,16 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
 
     console.log('📦 Line items:', lineItems.data.length);
 
+    // Get customer email from multiple possible sources
+    const customerEmail = session.customer_email || 
+                         session.customer_details?.email || 
+                         session.metadata?.userEmail;
+    
+    console.log('📧 Customer email:', customerEmail);
+
     // Send custom receipt email
-    if (session.customer_email && session.amount_total) {
-      console.log('📧 Sending purchase receipt email to:', session.customer_email);
+    if (customerEmail && session.amount_total) {
+      console.log('📧 Sending purchase receipt email to:', customerEmail);
       
       // Get customer name
       let customerName = '';
@@ -364,7 +371,7 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
       });
       
       const emailSent = await sendPurchaseReceiptEmail(
-        session.customer_email,
+        customerEmail,
         customerName,
         {
           orderId: session.id.slice(-8).toUpperCase(),
@@ -381,6 +388,8 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
       }
     } else {
       console.log('⚠️ Skipping email - missing customer email or amount');
+      console.log('   - Customer email:', customerEmail);
+      console.log('   - Amount:', session.amount_total);
     }
 
     // Optional: Create order in Strapi
