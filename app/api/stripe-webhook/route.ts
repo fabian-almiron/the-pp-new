@@ -371,7 +371,7 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
           total: session.amount_total / 100,
           items,
         },
-        ebookAttachments.length > 0 ? ebookAttachments : undefined
+        ebookAttachments
       );
     }
 
