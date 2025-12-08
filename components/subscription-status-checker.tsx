@@ -2,45 +2,62 @@
 
 import { useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { useSubscription } from '@/hooks/use-subscription';
 
-interface SubscriptionStatusCheckerProps {
-  children: React.ReactNode;
-}
-
-export default function SubscriptionStatusChecker({ children }: SubscriptionStatusCheckerProps) {
-  const { user } = useUser();
-  const { subscriptionStatus, refreshSubscriptionStatus } = useSubscription();
+/**
+ * Component that automatically checks Stripe for active subscriptions
+ * and updates the user's role in Clerk when they log in.
+ * Only runs once per browser session.
+ */
+export function SubscriptionStatusChecker() {
+  const { isSignedIn, isLoaded, user } = useUser();
 
   useEffect(() => {
-    if (!user || !subscriptionStatus) return;
+    const checkSubscriptionRole = async () => {
+      if (!isLoaded || !isSignedIn || !user) {
+        return;
+      }
 
-    // Check subscription status every 5 minutes
-    const interval = setInterval(() => {
-      refreshSubscriptionStatus();
-    }, 5 * 60 * 1000);
+      // Check if we've already done this check in this session
+      const checkKey = `subscription_checked_${user.id}`;
+      const hasChecked = sessionStorage.getItem(checkKey);
+      
+      if (hasChecked) {
+        console.log('⏭️ Subscription already checked this session');
+        return;
+      }
 
-    // Check if any subscriptions are expiring soon (within 3 days)
-    const checkExpiringSubscriptions = () => {
-      if (subscriptionStatus.subscriptions.length === 0) return;
-
-      const threeDaysFromNow = new Date();
-      threeDaysFromNow.setDate(threeDaysFromNow.getDate() + 3);
-
-      subscriptionStatus.subscriptions.forEach(sub => {
-        const periodEnd = new Date(sub.currentPeriodEnd);
+      try {
+        console.log('🔍 Checking subscription status for user:', user.id);
         
-        if (periodEnd <= threeDaysFromNow && sub.status === 'active' && !sub.cancelAtPeriodEnd) {
-          // Subscription is expiring soon - could show a notification
-          console.log(`Subscription ${sub.subscription?.name} expires on ${periodEnd.toLocaleDateString()}`);
+        const response = await fetch('/api/fix-subscription-role', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('✅ Subscription check complete:', data);
+          
+          // If role was updated, reload user data
+          if (data.newRole !== data.previousRole) {
+            console.log(`🔄 Role updated from ${data.previousRole} to ${data.newRole}`);
+            await user.reload();
+          }
+          
+          // Mark as checked for this session
+          sessionStorage.setItem(checkKey, 'true');
         }
-      });
+      } catch (error) {
+        console.error('❌ Error checking subscription role:', error);
+        // Silently fail - don't disrupt user experience
+      }
     };
 
-    checkExpiringSubscriptions();
+    checkSubscriptionRole();
+  }, [isLoaded, isSignedIn, user]);
 
-    return () => clearInterval(interval);
-  }, [user, subscriptionStatus, refreshSubscriptionStatus]);
-
-  return <>{children}</>;
+  // This component doesn't render anything
+  return null;
 }

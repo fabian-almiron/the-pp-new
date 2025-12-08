@@ -11,6 +11,7 @@ import { HomePageLines } from "@/components/home-page-lines";
 import { ShopShadowBorders } from "@/components/shop-shadow-borders";
 import { ClerkProvider } from '@clerk/nextjs';
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
+import { SubscriptionStatusChecker } from "@/components/subscription-status-checker";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -95,6 +96,7 @@ export default function RootLayout({
             Skip to main content
           </a>
           <div className="relative flex min-h-screen flex-col">
+            <SubscriptionStatusChecker />
             <CartProvider>
               <HomePageLines />
               <ShopShadowBorders />

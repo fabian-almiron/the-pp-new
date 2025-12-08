@@ -26,7 +26,6 @@ export default function MyAccountPage() {
   const [cancelError, setCancelError] = useState<string | null>(null)
   const [cancelSuccess, setCancelSuccess] = useState(false)
   const [isLoadingBillingPortal, setIsLoadingBillingPortal] = useState(false)
-  const [isCheckingSubscription, setIsCheckingSubscription] = useState(false)
   
   // Account editing states
   const [isEditingName, setIsEditingName] = useState(false)
@@ -47,41 +46,6 @@ export default function MyAccountPage() {
       router.push('/login?redirect_url=/my-account')
     }
   }, [isLoaded, isSignedIn, router])
-
-  // Check Stripe for active subscription and update role in Clerk
-  useEffect(() => {
-    const checkSubscriptionRole = async () => {
-      if (!isLoaded || !isSignedIn || !user) return
-      
-      setIsCheckingSubscription(true)
-      try {
-        const response = await fetch('/api/fix-subscription-role', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        })
-
-        if (response.ok) {
-          const data = await response.json()
-          console.log('Subscription check result:', data)
-          
-          // If role was updated, reload user data
-          if (data.newRole !== data.previousRole) {
-            console.log(`Role updated from ${data.previousRole} to ${data.newRole}`)
-            await user.reload()
-          }
-        }
-      } catch (error) {
-        console.error('Error checking subscription role:', error)
-        // Silently fail - don't show error to user
-      } finally {
-        setIsCheckingSubscription(false)
-      }
-    }
-
-    checkSubscriptionRole()
-  }, [isLoaded, isSignedIn, user])
 
   // Initialize form fields with current user data
   useEffect(() => {
