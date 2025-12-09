@@ -132,9 +132,9 @@ export async function POST(request: NextRequest) {
 </html>
     `;
 
-    // Send email to mel@thepipedpeony.com
+    // Send email to mel@thepipedpeony.com and Dara@thepipedpeony.com
     const emailSent = await sendEmail({
-      to: 'mel@thepipedpeony.com',
+      to: 'mel@thepipedpeony.com, dara@thepipedpeony.com',
       subject,
       html,
     });
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ Contact form email sent successfully');
+    console.log('✅ Contact form email sent successfully to mel@thepipedpeony.com and Dara@thepipedpeony.com');
     return NextResponse.json(
       { message: 'Message sent successfully!' },
       { status: 200 }
