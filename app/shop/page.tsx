@@ -49,7 +49,7 @@ export default function ShopPage() {
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
           <div className="text-center mb-12">
             <div className="mb-6">
-              <h3 className="signature-text mb-2">Welcome to the</h3>
+              <h3 className="mb-2 font-bold" style={{ fontFamily: 'LeFestin, cursive' }}>Welcome to the</h3>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gray-900 mb-4">Shop</h1>
             </div>
             <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
@@ -69,7 +69,7 @@ export default function ShopPage() {
         <div className="container mx-auto px-4 md:px-8 lg:px-16 xl:px-24 py-12 md:py-24">
           <div className="text-center mb-12">
             <div className="mb-6">
-              <h3 className="signature-text mb-2">Welcome to the</h3>
+              <h3 className="mb-2 font-bold" style={{ fontFamily: 'LeFestin, cursive' }}>Welcome to the</h3>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif text-gray-900 mb-4">Shop</h1>
             </div>
             <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
@@ -96,7 +96,7 @@ export default function ShopPage() {
       <div className="container mx-auto" style={{ margin: "0px 159.583px", padding: "80px 16px 96px" }}>
         <div className="text-center mb-12">
           <div className="mb-6">
-            <h1 className="signature-text mb-2">Welcome to the</h1>
+            <h1 className="mb-2 font-bold" style={{ fontFamily: 'LeFestin, cursive' }}>Welcome to the</h1>
             <h1 className="shop-title">Shop</h1>
           </div>
           <p className="text-gray-600 mt-2">Watch our academy's videos to stay up-to-date on the latest techniques, trends, and piping recipes.</p>
