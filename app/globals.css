@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+/* LeFestin Font */
+@font-face {
+  font-family: 'LeFestin';
+  src: url('/fonts/LeFestin-1.woff2') format('woff2'),
+       url('/fonts/LeFestin-1.woff') format('woff'),
+       url('/fonts/LeFestin-1.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Reset nextjs-portal positioning */
+nextjs-portal {
+  left: auto !important;
+  top: auto !important;
+}
+
 html {
   scroll-behavior: smooth;
 }

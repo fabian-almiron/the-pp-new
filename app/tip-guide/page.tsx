@@ -80,8 +80,8 @@ export default function TipGuidePage() {
         style={{ backgroundImage: 'url(/archive-header-bg.svg)' }}
       >
         <div className="max-w-7xl mx-auto text-center relative z-10">
-          <p className="text-sm uppercase tracking-wider text-gray-600 mb-2" style={{ fontFamily: 'var(--font-dancing-script)' }}>
-            Tip 10
+          <p className="text-base font-bold tracking-wider text-gray-600 mb-1" style={{ fontFamily: 'LeFestin, cursive' }}>
+            Top 10
           </p>
           <h1 className="text-4xl md:text-6xl font-serif mb-4 text-black uppercase">
             TIP GUIDE
