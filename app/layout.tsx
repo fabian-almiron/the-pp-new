@@ -63,6 +63,16 @@ export default function RootLayout({
     >
       <html lang="en">
         <head>
+          {/* Google Tag Manager - Loaded inline for fastest initialization */}
+          <script dangerouslySetInnerHTML={{ __html: `
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WX96X4D');
+          ` }} />
+          {/* End Google Tag Manager */}
+          
           {/* Preconnect to TypeKit for faster font loading */}
           <link rel="preconnect" href="https://use.typekit.net" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://p.typekit.net" crossOrigin="anonymous" />
@@ -87,6 +97,17 @@ export default function RootLayout({
             alexBrush.variable
           )}
         >
+          {/* Google Tag Manager (noscript) */}
+          <noscript>
+            <iframe 
+              src="https://www.googletagmanager.com/ns.html?id=GTM-WX96X4D"
+              height="0" 
+              width="0" 
+              style={{ display: 'none', visibility: 'hidden' }}
+            />
+          </noscript>
+          {/* End Google Tag Manager (noscript) */}
+          
           <div className="keyword-uptime" style={{ display: 'none' }}>c-squared-uptime</div>
           {/* Skip to main content link for accessibility */}
           <a 
