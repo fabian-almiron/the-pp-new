@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/nextjs/server';
-import { sendSubscriptionTrialEmail, sendPurchaseReceiptEmail } from '@/lib/email';
+import { sendSubscriptionTrialEmail, sendPurchaseReceiptEmail, sendInvoiceCopyToOwner } from '@/lib/email';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
@@ -197,6 +197,65 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       await updateClerkUserRole(clerkUserId, 'subscriber');
     }
   }
+  
+  // Send invoice copy to business owner
+  try {
+    // Retrieve full invoice with line items
+    const fullInvoice = await stripe.invoices.retrieve(invoice.id, {
+      expand: ['lines.data', 'customer'],
+    });
+    
+    const customer = fullInvoice.customer as Stripe.Customer | null;
+    const customerName = customer && typeof customer === 'object' ? customer.name || '' : '';
+    const customerEmail = fullInvoice.customer_email || (customer && typeof customer === 'object' ? customer.email : '') || '';
+    
+    // Format line items
+    const items = fullInvoice.lines.data.map(line => ({
+      description: line.description || 'Subscription',
+      quantity: line.quantity || 1,
+      amount: (line.amount / 100),
+    }));
+    
+    // Get invoice PDF URL
+    const invoicePdfUrl = fullInvoice.invoice_pdf || '';
+    const stripeDashboardUrl = `https://dashboard.stripe.com${fullInvoice.livemode ? '' : '/test'}/invoices/${fullInvoice.id}`;
+    
+    // Format payment date
+    const paymentDate = fullInvoice.status_transitions?.paid_at 
+      ? new Date(fullInvoice.status_transitions.paid_at * 1000).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        })
+      : new Date().toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+    
+    await sendInvoiceCopyToOwner({
+      invoiceId: fullInvoice.id,
+      invoiceNumber: fullInvoice.number,
+      invoicePdfUrl,
+      stripeDashboardUrl,
+      customerName,
+      customerEmail,
+      paymentDate,
+      items,
+      subtotal: (fullInvoice.subtotal || 0) / 100,
+      tax: (fullInvoice.tax || 0) / 100,
+      total: (fullInvoice.total || 0) / 100,
+      currency: fullInvoice.currency || 'usd',
+      paymentType: 'subscription',
+    });
+  } catch (error: any) {
+    console.error('❌ Error sending invoice copy to owner:', error);
+    // Don't throw - we don't want to fail the webhook if email sending fails
+  }
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
@@ -390,6 +449,98 @@ async function handleProductPurchase(session: Stripe.Checkout.Session) {
       console.log('⚠️ Skipping email - missing customer email or amount');
       console.log('   - Customer email:', customerEmail);
       console.log('   - Amount:', session.amount_total);
+    }
+    
+    // Send invoice copy to business owner
+    try {
+      // Get the invoice from the session
+      if (session.invoice && typeof session.invoice === 'string') {
+        console.log('📧 Fetching invoice for business owner notification:', session.invoice);
+        
+        const invoice = await stripe.invoices.retrieve(session.invoice, {
+          expand: ['lines.data', 'customer'],
+        });
+        
+        const customer = invoice.customer as Stripe.Customer | null;
+        const invCustomerName = customer && typeof customer === 'object' ? customer.name || customerName || '' : customerName || '';
+        const invCustomerEmail = invoice.customer_email || customerEmail || '';
+        
+        // Format line items from invoice
+        const invoiceItems = invoice.lines.data.map(line => ({
+          description: line.description || 'Product',
+          quantity: line.quantity || 1,
+          amount: (line.amount / 100),
+        }));
+        
+        // Get invoice PDF URL
+        const invoicePdfUrl = invoice.invoice_pdf || '';
+        const stripeDashboardUrl = `https://dashboard.stripe.com${invoice.livemode ? '' : '/test'}/invoices/${invoice.id}`;
+        
+        // Format payment date
+        const paymentDate = invoice.status_transitions?.paid_at 
+          ? new Date(invoice.status_transitions.paid_at * 1000).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            })
+          : new Date().toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+            });
+        
+        await sendInvoiceCopyToOwner({
+          invoiceId: invoice.id,
+          invoiceNumber: invoice.number,
+          invoicePdfUrl,
+          stripeDashboardUrl,
+          customerName: invCustomerName,
+          customerEmail: invCustomerEmail,
+          paymentDate,
+          items: invoiceItems,
+          subtotal: (invoice.subtotal || 0) / 100,
+          tax: (invoice.tax || 0) / 100,
+          total: (invoice.total || 0) / 100,
+          currency: invoice.currency || 'usd',
+          paymentType: 'product_purchase',
+        });
+      } else {
+        console.log('⚠️ No invoice found on session - using session data for owner notification');
+        
+        // Fallback: create invoice data from session
+        const stripeDashboardUrl = `https://dashboard.stripe.com${session.livemode ? '' : '/test'}/payments/${session.payment_intent}`;
+        const paymentDate = new Date(session.created * 1000).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+        });
+        
+        await sendInvoiceCopyToOwner({
+          invoiceId: session.id,
+          invoiceNumber: null,
+          invoicePdfUrl: '', // No PDF available for sessions without invoices
+          stripeDashboardUrl,
+          customerName: customerName || '',
+          customerEmail: customerEmail || '',
+          paymentDate,
+          items,
+          subtotal: session.amount_subtotal ? session.amount_subtotal / 100 : session.amount_total! / 100,
+          tax: session.total_details?.amount_tax ? session.total_details.amount_tax / 100 : 0,
+          total: session.amount_total! / 100,
+          currency: session.currency || 'usd',
+          paymentType: 'product_purchase',
+        });
+      }
+    } catch (error: any) {
+      console.error('❌ Error sending invoice copy to owner:', error);
+      console.error('Error message:', error.message);
+      // Don't throw - we don't want to fail the webhook if email sending fails
     }
 
     // Optional: Create order in Strapi
