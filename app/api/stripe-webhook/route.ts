@@ -198,64 +198,9 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     }
   }
   
-  // Send invoice copy to business owner
-  try {
-    // Retrieve full invoice with line items
-    const fullInvoice = await stripe.invoices.retrieve(invoice.id, {
-      expand: ['lines.data', 'customer'],
-    });
-    
-    const customer = fullInvoice.customer as Stripe.Customer | null;
-    const customerName = customer && typeof customer === 'object' ? customer.name || '' : '';
-    const customerEmail = fullInvoice.customer_email || (customer && typeof customer === 'object' ? customer.email : '') || '';
-    
-    // Format line items
-    const items = fullInvoice.lines.data.map(line => ({
-      description: line.description || 'Subscription',
-      quantity: line.quantity || 1,
-      amount: (line.amount / 100),
-    }));
-    
-    // Get invoice PDF URL
-    const invoicePdfUrl = fullInvoice.invoice_pdf || '';
-    const stripeDashboardUrl = `https://dashboard.stripe.com${fullInvoice.livemode ? '' : '/test'}/invoices/${fullInvoice.id}`;
-    
-    // Format payment date
-    const paymentDate = fullInvoice.status_transitions?.paid_at 
-      ? new Date(fullInvoice.status_transitions.paid_at * 1000).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        })
-      : new Date().toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        });
-    
-    await sendInvoiceCopyToOwner({
-      invoiceId: fullInvoice.id,
-      invoiceNumber: fullInvoice.number,
-      invoicePdfUrl,
-      stripeDashboardUrl,
-      customerName,
-      customerEmail,
-      paymentDate,
-      items,
-      subtotal: (fullInvoice.subtotal || 0) / 100,
-      tax: (fullInvoice.tax || 0) / 100,
-      total: (fullInvoice.total || 0) / 100,
-      currency: fullInvoice.currency || 'usd',
-      paymentType: 'subscription',
-    });
-  } catch (error: any) {
-    console.error('❌ Error sending invoice copy to owner:', error);
-    // Don't throw - we don't want to fail the webhook if email sending fails
-  }
+  // Note: Invoice copy emails are only sent for product purchases, not subscriptions
+  // This prevents inbox flooding from recurring subscription payments
+  console.log('ℹ️  Skipping owner notification for subscription payment');
 }
 
 async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
