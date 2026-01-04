@@ -3,12 +3,15 @@ import Link from "next/link";
 import { Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FlowerPipingCarousel } from "@/components/flower-piping-carousel";
-import { fetchCourses, fetchFeaturedCourses } from "@/lib/strapi-api";
+import { fetchCourses } from "@/lib/strapi-api";
 import { NewestVideosCarousel } from "./newest-videos-carousel";
 
 export default async function VideoLibraryPage() {
-  // Fetch featured courses from Strapi
-  const coursesResponse = await fetchFeaturedCourses();
+  // Fetch most recent courses from Strapi
+  const coursesResponse = await fetchCourses({ 
+    pageSize: 12, 
+    sort: 'publishedAt:desc' 
+  });
   
   const courses = coursesResponse.data || [];
 

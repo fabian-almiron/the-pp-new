@@ -35,7 +35,7 @@ export function NewestVideosCarousel({ courses }: NewestVideosCarouselProps) {
     <section className="w-full py-12 md:py-24 bg-white">
       <div className="max-w-7xl mx-auto px-4 md:px-6">
         <h2 className="font-playfair text-4xl md:text-5xl text-black font-normal mb-8 text-center">
-          Featured Videos
+          Newest Classes
         </h2>
         <Carousel
           opts={{

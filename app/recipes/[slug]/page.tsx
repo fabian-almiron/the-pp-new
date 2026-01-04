@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchRecipeBySlug } from "@/lib/strapi-api";
 import { notFound } from "next/navigation";
-import { Clock, ChefHat, Users, Star, ArrowLeft, ChevronLeft, ChevronRight, Download } from "lucide-react";
+import { Clock, ChefHat, Users, Star, ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { RecipeSchema } from "@/components/structured-data";

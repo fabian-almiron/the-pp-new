@@ -9,7 +9,6 @@ export default function SupplyListPage() {
   const flowersRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef<HTMLDivElement>(null);
   const cakeRef = useRef<HTMLDivElement>(null);
-  const kidsRef = useRef<HTMLDivElement>(null);
 
   const scrollToSection = (ref: React.RefObject<HTMLDivElement>) => {
     ref.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -67,13 +66,6 @@ export default function SupplyListPage() {
             >
               Cake and cupcake decorating
             </Button>
-            <Button
-              variant="outline"
-              onClick={() => scrollToSection(kidsRef)}
-              className="border-black text-black hover:bg-gray-100"
-            >
-              Kids
-            </Button>
           </div>
         </div>
 
@@ -87,9 +79,6 @@ export default function SupplyListPage() {
           </div>
           <div ref={cakeRef}>
             <CakeSection />
-          </div>
-          <div ref={kidsRef}>
-            <KidsSection />
           </div>
         </div>
       </div>
@@ -120,9 +109,11 @@ function FlowersSection() {
           <div className="mb-8">
             <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
             <ul className="space-y-2 text-gray-700 text-sm pl-6">
-              <li>• <strong>Wilton:</strong> 4B, 1, 2, 3, 4, 7, 8, 9, 10, 12, 16, 19A, 61, 81, 101, 102, 103, 104, 123, 133, 199, 249, 352, 366</li>
-              <li>• <strong>Ateco:</strong> 6G, 4I, 79, 80, 81, 124K, 126K, 227, 249, 808, 109 (only if left-handed)</li>
-              <li>• <strong>G.G. Cakraft:</strong> 65, 810, 105, 106, 1051 (left-handed tip) or 1052 (right-handed tip), 1061 (left-handed tip) or 1062 (right-handed tip)</li>
+              <li>• <strong>Wilton:</strong> 4B, 1, 2, 3, 4, 7, 8, 9, 10, 12, 14, 59s, 81, 101, 102, 103, 104, 133, 199, 349, 352, 366</li>
+              <li>• <strong>Ateco:</strong> 00, 4I, 79, 80, 81, 123, 124K, 125k, 126K, 227, 349, 352, 869</li>
+              <li>• <strong>G.G. Cakraft:</strong> 55, 105, 106, 1051 (left-handed tip) or 1052 (right-handed tip), 1061 (left-handed tip) or 1062 (right-handed tip)</li>
+              <li>• <strong>Korea:</strong> 61</li>
+              <li>• <strong>PP:</strong> 349 (Wilton 349 is a substitute for this tip)</li>
             </ul>
           </div>
 
@@ -214,29 +205,12 @@ function ColorSection() {
           <h3 className="text-2xl font-serif text-black mb-6">Coloring</h3>
           
           <div className="mb-8">
-            <h4 className="text-lg font-semibold text-black mb-3">Gel Colors (Water-based, used only for Blooming Buttercream)</h4>
-            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3 mb-6">
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm"><strong>Americolor:</strong> super black, red, yellow, blue, optional: mauve, soft pink, electric pink</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm"><strong>Chefmaster:</strong> buckeye, brown, liquid whitener</span>
-              </div>
-            </div>
-
-            <h4 className="text-lg font-semibold text-black mb-3">Oil-Based Colors (Used only for Italian Meringue Buttercream)</h4>
-            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3 mb-6">
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm"><strong>Colour Mill</strong> (all are completely optional; you can color Italian Meringue with gel colors; it's just takes longer to develop the color; Sugar Sister's pricing for these is better than Amazon's): black, brown, red, yellow, blue, green</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Food scale</span>
-              </div>
-            </div>
+            <h4 className="text-lg font-semibold text-black mb-3">Gel Colors</h4>
+            <ul className="space-y-2 text-gray-700 text-sm pl-6">
+              <li>• <strong>Wilton:</strong> black, red, lemon yellow, royal blue, brown, violet, leaf green</li>
+              <li>• <strong>Americolor:</strong> electric pink, regal purple</li>
+              <li>• <strong>Chefmaster:</strong> liquid whitener</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -284,96 +258,3 @@ function CakeSection() {
   );
 }
 
-function KidsSection() {
-  return (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8 md:p-12">
-      <div className="grid md:grid-cols-[300px_1fr] gap-8">
-        {/* Left Image Container */}
-        <div className="hidden md:block">
-          <div className="relative w-full aspect-square bg-gray-100 rounded-lg overflow-hidden">
-            <Image
-              src="/kids.png"
-              alt="Kids cake decorating supplies"
-              fill
-              className="object-cover"
-            />
-          </div>
-        </div>
-
-        {/* Content */}
-        <div>
-          <h3 className="text-2xl font-serif text-black mb-6">Kids</h3>
-          
-          <div className="mb-8">
-            <h4 className="text-lg font-semibold text-black mb-3">Tips</h4>
-            <ul className="space-y-2 text-gray-700 text-sm pl-6 mb-6">
-              <li>• <strong>Wilton:</strong> 24 or 4B, 1, 2, 5, 6, 10, 12, 16, 59c/59, 81, 101, 103, 123, 233, 349, 369 *check out the Wilton 55 piece set if you need all of these.</li>
-              <li>• <strong>Ateco:</strong> 50, 79, 1246, 1266, 237, 349, 869</li>
-              <li>• <strong>G.G. Cakroft:</strong> 102 (opt), 1061 (left-handed tip) or 1062 (right-handed tip), 106</li>
-            </ul>
-
-            <h4 className="text-lg font-semibold text-black mb-3">Equipment</h4>
-            <div className="grid md:grid-cols-2 gap-x-8 gap-y-3">
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Piping block</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Silicone spatulas</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Extra large flower nail</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Piping bags (10-12 in)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Flower lifter (oval tip)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Needle nose pliers</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Flower lifter (scissor tip)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Food scale</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Microwavable bowls</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Piping couplers</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Storage containers</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Floral wire (22 gauge)</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">G.G. Cakroft 9 flower nail</span>
-              </div>
-              <div className="flex items-start gap-2">
-                <Check className="w-5 h-5 text-[#D4A771] mt-0.5 flex-shrink-0" />
-                <span className="text-gray-700 text-sm">Styrofoam</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}

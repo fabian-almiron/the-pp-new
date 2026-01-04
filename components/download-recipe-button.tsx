@@ -1,6 +1,6 @@
 "use client"
 
-import { Download } from "lucide-react"
+import { Printer } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface DownloadRecipeButtonProps {
@@ -18,8 +18,8 @@ export function DownloadRecipeButton({ recipe }: DownloadRecipeButtonProps) {
       onClick={handleDownload}
       className="!bg-[#D4A771] !text-white hover:!bg-[#C69963] flex items-center gap-2"
     >
-      <Download className="w-4 h-4" />
-      Download Recipe
+      <Printer className="w-4 h-4" />
+      Print Recipe
     </Button>
   )
 }

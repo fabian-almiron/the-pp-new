@@ -190,18 +190,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             "
           />
 
-          {/* Author & Date Footer */}
+          {/* Author Footer */}
           <div className="mt-12 pt-8 border-t border-gray-200">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center">
               <div>
                 <p className="text-sm text-gray-500">Written by</p>
                 <p className="text-lg font-medium text-gray-900">{post.author}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-500">Published</p>
-                <p className="text-lg font-medium text-gray-900">
-                  {new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                </p>
               </div>
             </div>
           </div>

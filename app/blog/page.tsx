@@ -113,8 +113,6 @@ export default async function BlogPage() {
                 <div className="p-6">
                   {/* Meta Info */}
                   <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
-                    <span>{new Date(post.publishedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                    <span>•</span>
                     <span>{post.readTime} min read</span>
                   </div>
 
