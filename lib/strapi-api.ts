@@ -750,6 +750,7 @@ export async function fetchCourses(options?: {
 // Get single course by slug
 export async function fetchCourseBySlug(slug: string): Promise<MockDatabaseResponse<StrapiCourse>> {
   try {
+    // Use populate=* to get all fields including JSON fields and components
     const response: StrapiCourseResponse = await fetchFromStrapi(`/courses?filters[slug][$eq]=${slug}&populate=*`);
     
     if (!response.data || response.data.length === 0) {

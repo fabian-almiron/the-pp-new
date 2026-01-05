@@ -99,12 +99,18 @@ export interface Chapter {
   duration: number; // in seconds
 }
 
+export interface RecipeLink {
+  title: string;
+  link: string;
+}
+
 export interface Course {
   title: string;
   series: string;
   chapters: Chapter[];
   aboutContent: string;
   whatYouNeedContent: string;
+  recipeLinks?: RecipeLink[];
 }
 
 export interface CarouselItem {
@@ -163,4 +169,8 @@ export interface StrapiCourse {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  recipeLinks?: Array<{
+    title: string;
+    link: string;
+  }>;
 }

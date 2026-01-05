@@ -86,6 +86,7 @@ function convertToLegacyCourse(strapiCourse: any): Course {
     chapters,
     aboutContent: strapiCourse.about || strapiCourse.content || '<p>No description available.</p>',
     whatYouNeedContent,
+    recipeLinks: strapiCourse.recipeLinks,
   };
 }
 

@@ -66,6 +66,7 @@ export function CoursePageClient({ course, relatedCourses }: CoursePageClientPro
               <CourseTabs 
                 aboutContent={course.aboutContent}
                 whatYouNeedContent={course.whatYouNeedContent}
+                recipeLinks={course.recipeLinks}
               />
             </div>
           </div>

@@ -9,6 +9,7 @@ import { RecipeSchema } from "@/components/structured-data";
 import { SanitizedHTML } from "@/components/sanitized-html";
 import { InlineHTML } from "@/components/inline-html";
 import { DownloadRecipeButton } from "@/components/download-recipe-button";
+import { RecipeContentGate } from "@/components/recipe-content-gate";
 
 // Keep recipes dynamic for now due to complex HTML sanitization
 export const dynamic = 'force-dynamic';
@@ -121,142 +122,144 @@ export default async function RecipePage({ params }: RecipePageProps) {
           </h1>
         </div>
 
-        <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden relative">
-          {/* Download Button - Top Right Corner */}
-          <div className="absolute top-4 right-4 z-10 no-print">
-            <DownloadRecipeButton recipe={recipe} />
-          </div>
-          <div className="p-8 md:p-12">
-            {/* Method Label */}
-            {recipe.methodLabel && (
-              <div className="mb-6">
-                <h2 className="text-2xl font-serif text-black">{recipe.methodLabel}</h2>
-              </div>
-            )}
-
-            {/* Short Description */}
-            {recipe.shortDescription && (
-              <SanitizedHTML 
-                html={recipe.shortDescription}
-                className="mb-8 text-gray-700 leading-relaxed"
-              />
-            )}
-
-            {/* Two Column Layout for Equipment and Ingredients */}
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              {/* Equipment */}
-              {recipe.equipment && recipe.equipment.length > 0 && (
-                <div>
-                  <h2 className="text-2xl font-serif font-bold text-black mb-4">Equipment</h2>
-                  <ul className="space-y-2 text-gray-700">
-                    {recipe.equipment.map((item: any, index: number) => (
-                      <li key={index}>{typeof item === 'string' ? item : item.equipment_item || item.equipmentItem}</li>
-                    ))}
-                  </ul>
+        <RecipeContentGate>
+          <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden relative">
+            {/* Download Button - Top Right Corner */}
+            <div className="absolute top-4 right-4 z-10 no-print">
+              <DownloadRecipeButton recipe={recipe} />
+            </div>
+            <div className="p-8 md:p-12">
+              {/* Method Label */}
+              {recipe.methodLabel && (
+                <div className="mb-6">
+                  <h2 className="text-2xl font-serif text-black">{recipe.methodLabel}</h2>
                 </div>
               )}
 
-              {/* Ingredients */}
-              {recipe.ingredients && recipe.ingredients.length > 0 && (
-                <div>
-                  <h2 className="text-2xl font-serif font-bold text-black mb-4">Ingredients</h2>
-                  {Array.isArray(recipe.ingredients) ? (
+              {/* Short Description */}
+              {recipe.shortDescription && (
+                <SanitizedHTML 
+                  html={recipe.shortDescription}
+                  className="mb-8 text-gray-700 leading-relaxed"
+                />
+              )}
+
+              {/* Two Column Layout for Equipment and Ingredients */}
+              <div className="grid md:grid-cols-2 gap-8 mb-8">
+                {/* Equipment */}
+                {recipe.equipment && recipe.equipment.length > 0 && (
+                  <div>
+                    <h2 className="text-2xl font-serif font-bold text-black mb-4">Equipment</h2>
                     <ul className="space-y-2 text-gray-700">
-                      {recipe.ingredients.map((item: any, index: number) => (
-                        <li key={index}>
-                          <InlineHTML html={typeof item === 'string' ? item : item.ingredients_item || item.ingredientsItem} />
-                        </li>
+                      {recipe.equipment.map((item: any, index: number) => (
+                        <li key={index}>{typeof item === 'string' ? item : item.equipment_item || item.equipmentItem}</li>
                       ))}
                     </ul>
+                  </div>
+                )}
+
+                {/* Ingredients */}
+                {recipe.ingredients && recipe.ingredients.length > 0 && (
+                  <div>
+                    <h2 className="text-2xl font-serif font-bold text-black mb-4">Ingredients</h2>
+                    {Array.isArray(recipe.ingredients) ? (
+                      <ul className="space-y-2 text-gray-700">
+                        {recipe.ingredients.map((item: any, index: number) => (
+                          <li key={index}>
+                            <InlineHTML html={typeof item === 'string' ? item : item.ingredients_item || item.ingredientsItem} />
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <SanitizedHTML
+                        html={recipe.ingredients}
+                        className="prose prose-gray max-w-none"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Directions (using important field) */}
+              {recipe.important && recipe.important.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-serif font-bold text-black mb-4">Directions</h2>
+                  <ol className="list-decimal list-inside space-y-3 text-gray-700">
+                    {recipe.important.map((item: any, index: number) => (
+                      <li key={index} className="pl-2">
+                        <InlineHTML html={typeof item === 'string' ? item : item.important_items || item.importantItems} />
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+
+              {/* Instructions (if separate from important) */}
+              {recipe.instructions && (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-serif font-bold text-black mb-4">Instructions</h2>
+                  {Array.isArray(recipe.instructions) ? (
+                    <ol className="list-decimal list-inside space-y-3 text-gray-700">
+                      {recipe.instructions.map((item: any, index: number) => (
+                        <li key={index} className="pl-2">
+                          <InlineHTML html={typeof item === 'string' ? item : item.instruction} />
+                        </li>
+                      ))}
+                    </ol>
                   ) : (
                     <SanitizedHTML
-                      html={recipe.ingredients}
+                      html={recipe.instructions}
                       className="prose prose-gray max-w-none"
                     />
                   )}
                 </div>
               )}
-            </div>
 
-            {/* Directions (using important field) */}
-            {recipe.important && recipe.important.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-serif font-bold text-black mb-4">Directions</h2>
-                <ol className="list-decimal list-inside space-y-3 text-gray-700">
-                  {recipe.important.map((item: any, index: number) => (
-                    <li key={index} className="pl-2">
-                      <InlineHTML html={typeof item === 'string' ? item : item.important_items || item.importantItems} />
-                    </li>
-                  ))}
-                </ol>
-              </div>
-            )}
-
-            {/* Instructions (if separate from important) */}
-            {recipe.instructions && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-serif font-bold text-black mb-4">Instructions</h2>
-                {Array.isArray(recipe.instructions) ? (
+              {/* Notes */}
+              {recipe.notes && recipe.notes.length > 0 && (
+                <div className="mb-8">
+                  <h2 className="text-2xl font-serif font-bold text-black mb-4">Notes</h2>
                   <ol className="list-decimal list-inside space-y-3 text-gray-700">
-                    {recipe.instructions.map((item: any, index: number) => (
+                    {recipe.notes.map((item: any, index: number) => (
                       <li key={index} className="pl-2">
-                        <InlineHTML html={typeof item === 'string' ? item : item.instruction} />
+                        <InlineHTML html={typeof item === 'string' ? item : item.note_item || item.noteItem} />
                       </li>
                     ))}
                   </ol>
-                ) : (
+                </div>
+              )}
+
+              {/* Notice */}
+              {recipe.notice && (
+                <div className="mb-8 bg-pink-50 border-l-4 border-pink-500 p-6 rounded">
+                  <SanitizedHTML 
+                    html={recipe.notice}
+                    className="text-gray-700"
+                  />
+                </div>
+              )}
+
+              {/* Full Content */}
+              {recipe.content && (
+                <div className="mb-8">
                   <SanitizedHTML
-                    html={recipe.instructions}
+                    html={recipe.content}
                     className="prose prose-gray max-w-none"
                   />
-                )}
-              </div>
-            )}
+                </div>
+              )}
 
-            {/* Notes */}
-            {recipe.notes && recipe.notes.length > 0 && (
-              <div className="mb-8">
-                <h2 className="text-2xl font-serif font-bold text-black mb-4">Notes</h2>
-                <ol className="list-decimal list-inside space-y-3 text-gray-700">
-                  {recipe.notes.map((item: any, index: number) => (
-                    <li key={index} className="pl-2">
-                      <InlineHTML html={typeof item === 'string' ? item : item.note_item || item.noteItem} />
-                    </li>
-                  ))}
-                </ol>
+              {/* Published Date */}
+              <div className="pt-6 border-t border-gray-200 text-sm text-gray-500">
+                Published on {new Date(recipe.publishedAt).toLocaleDateString('en-US', { 
+                  month: 'long', 
+                  day: 'numeric', 
+                  year: 'numeric' 
+                })}
               </div>
-            )}
-
-            {/* Notice */}
-            {recipe.notice && (
-              <div className="mb-8 bg-pink-50 border-l-4 border-pink-500 p-6 rounded">
-                <SanitizedHTML 
-                  html={recipe.notice}
-                  className="text-gray-700"
-                />
-              </div>
-            )}
-
-            {/* Full Content */}
-            {recipe.content && (
-              <div className="mb-8">
-                <SanitizedHTML
-                  html={recipe.content}
-                  className="prose prose-gray max-w-none"
-                />
-              </div>
-            )}
-
-            {/* Published Date */}
-            <div className="pt-6 border-t border-gray-200 text-sm text-gray-500">
-              Published on {new Date(recipe.publishedAt).toLocaleDateString('en-US', { 
-                month: 'long', 
-                day: 'numeric', 
-                year: 'numeric' 
-              })}
             </div>
           </div>
-        </div>
+        </RecipeContentGate>
 
         {/* Next/Previous Navigation */}
         {(prev || next) && (
