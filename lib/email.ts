@@ -161,7 +161,7 @@ export async function sendSubscriptionTrialEmail(
                     <p style="margin: 0 0 15px; font-size: 16px; color: #ffffff; font-weight: 600; font-family: 'sofia-pro', sans-serif;">
                       Join our community of bakers on our Facebook page!
                     </p>
-                    <a href="https://www.facebook.com/dpipedreams/" 
+                    <a href="https://www.facebook.com/share/g/1BkoEge94n/" 
                        style="display: inline-block; background-color: #ffffff; color: #1877f2; text-decoration: none; padding: 12px 32px; border-radius: 50px; font-weight: 600; font-size: 15px; font-family: 'sofia-pro', sans-serif;">
                       Join Our Facebook Community
                     </a>
@@ -186,7 +186,7 @@ export async function sendSubscriptionTrialEmail(
               </p>
               <p style="margin: 0; font-size: 12px; color: #9ca3af; font-family: 'sofia-pro', sans-serif;">
                 <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://thepipedpeony.com'}/my-account" style="color: #000000; text-decoration: none;">My Account</a> | 
-                <a href="https://www.facebook.com/dpipedreams/" style="color: #1877f2; text-decoration: none;">Facebook</a> | 
+                <a href="https://www.facebook.com/share/g/1BkoEge94n/" style="color: #1877f2; text-decoration: none;">Facebook</a> | 
                 <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://thepipedpeony.com'}/contact" style="color: #000000; text-decoration: none;">Contact Us</a>
               </p>
             </td>

@@ -89,15 +89,15 @@ export default function ContactPage() {
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">Facebook</h4>
                   <Link 
-                    href="https://www.facebook.com/dpipedreams/" 
+                    href="https://www.facebook.com/share/g/1BkoEge94n/" 
                     target="_blank" 
                     rel="noopener noreferrer"
                     className="text-[#D4A771] hover:text-[#C19660] transition-colors"
                   >
-                    @dpipedreams
+                    The Piped Peony Academy Group
                   </Link>
                   <p className="text-sm text-gray-600 mt-1">
-                    Follow us for updates and inspiration
+                    Join our community of bakers
                   </p>
                 </div>
               </div>
