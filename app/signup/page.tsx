@@ -188,19 +188,6 @@ export default function SignupPage() {
             showTitle={false}
           />
 
-          <div className="text-center mt-8">
-            <Button
-              variant="outline"
-              onClick={handleSkipSubscription}
-              disabled={isLoading}
-            >
-              Skip for now - Browse as Customer
-            </Button>
-            <p className="text-sm text-gray-500 mt-2">
-              You can upgrade to a subscription plan anytime from your account settings.
-            </p>
-          </div>
-
           <div className="login-footer">
             <Link href="/" className="login-back-home">
               ← Go to The Piped Peony

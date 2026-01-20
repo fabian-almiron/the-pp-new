@@ -57,32 +57,18 @@ export async function POST(request: NextRequest) {
   const eventType = evt.type;
   console.log(`📨 Clerk webhook received: ${eventType}`);
 
-  // When a new user is created, set their default role to "customer"
+  // When a new user is created - NO longer auto-assigning role
+  // Users must select a subscription plan to get a role assigned
   if (eventType === 'user.created') {
     const userId = evt.data.id;
     const email = evt.data.email_addresses?.[0]?.email_address;
     
     console.log(`👤 New user created: ${userId} (${email})`);
-
-    try {
-      // Check if the user already has a role (in case it was set during signup)
-      const user = await clerkClient().users.getUser(userId);
-      
-      if (!user.publicMetadata?.role) {
-        // Set default role to "customer"
-        await clerkClient().users.updateUserMetadata(userId, {
-          publicMetadata: {
-            role: 'customer',
-          },
-        });
-        console.log(`✅ Set default role "customer" for user: ${userId}`);
-      } else {
-        console.log(`ℹ️ User ${userId} already has role: ${user.publicMetadata.role}`);
-      }
-    } catch (error) {
-      console.error(`❌ Error setting default role for user ${userId}:`, error);
-      // Don't fail the webhook if we can't set the role
-    }
+    console.log(`ℹ️ User will receive role after subscription selection`);
+    
+    // Note: Role will be set when user:
+    // - Completes subscription checkout (set to "subscriber" via Stripe webhook)
+    // - Or explicitly skips (would be set to "customer" but skip button removed)
   }
 
   // When a user session is created (sign in), sync name from Stripe if available
