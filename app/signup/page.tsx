@@ -6,14 +6,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useSignUp, useUser } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
-import SubscriptionPlans from "@/components/subscription-plans";
 import { useSubscription } from "@/hooks/use-subscription";
 
 export default function SignupPage() {
-  const [currentStep, setCurrentStep] = useState<'signup' | 'subscription'>('signup');
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -28,16 +26,16 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   
   const { signUp, isLoaded, setActive } = useSignUp();
-  const { createSubscriptionCheckout } = useSubscription();
+  const { availableSubscriptions, createSubscriptionCheckout } = useSubscription();
   const { isSignedIn, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
-  // Redirect signed-in users to video library (but not if they're on subscription step)
+  // Redirect signed-in users to video library
   useEffect(() => {
-    if (userLoaded && isSignedIn && currentStep === 'signup') {
+    if (userLoaded && isSignedIn) {
       router.push('/video-library');
     }
-  }, [userLoaded, isSignedIn, currentStep, router]);
+  }, [userLoaded, isSignedIn, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -91,15 +89,34 @@ export default function SignupPage() {
 
       if (signUpAttempt.status === 'complete') {
         await setActive({ session: signUpAttempt.createdSessionId });
-        // Move to subscription selection step
-        setCurrentStep('subscription');
+        
+        // Wait for subscriptions to load
+        if (availableSubscriptions.length === 0) {
+          // Wait a bit and try to redirect anyway
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        
+        // Automatically redirect to Stripe checkout for the default subscription
+        const defaultSubscription = availableSubscriptions[0]; // Get the first/default subscription
+        if (defaultSubscription) {
+          try {
+            const checkoutUrl = await createSubscriptionCheckout(defaultSubscription.documentId);
+            window.location.href = checkoutUrl;
+          } catch (checkoutError) {
+            setError('Failed to start subscription process. Please try again.');
+            setIsLoading(false);
+          }
+        } else {
+          setError('Subscription not available. Please contact support.');
+          setIsLoading(false);
+        }
       } else {
         // If email verification is required, handle it
         setError("Please check your email to verify your account.");
+        setIsLoading(false);
       }
     } catch (err: any) {
       setError(err?.errors?.[0]?.message || "Signup failed. Please try again.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -111,92 +128,13 @@ export default function SignupPage() {
       await signUp.authenticateWithRedirect({
         strategy,
         redirectUrl: '/sso-callback',
-        redirectUrlComplete: '/video-library',
+        redirectUrlComplete: '/signup-subscription',
       });
     } catch (err: any) {
       setError(err?.errors?.[0]?.message || "OAuth sign up failed. Please try again.");
     }
   };
 
-  const handleSubscriptionSelect = async (subscriptionId: number) => {
-    try {
-      setIsLoading(true);
-      const checkoutUrl = await createSubscriptionCheckout(subscriptionId);
-      window.location.href = checkoutUrl;
-    } catch (error) {
-      setError('Failed to start subscription process. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSkipSubscription = async () => {
-    try {
-      setIsLoading(true);
-      // Set the user's role to "customer" in Clerk metadata
-      const response = await fetch('/api/set-user-role', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ role: 'customer' }),
-      });
-
-      if (!response.ok) {
-        console.error('Failed to set user role');
-      }
-    } catch (error) {
-      console.error('Error setting user role:', error);
-    } finally {
-      setIsLoading(false);
-      // Force a hard navigation to ensure session is picked up
-      window.location.href = '/video-library';
-    }
-  };
-
-  if (currentStep === 'subscription') {
-    return (
-      <div className="login-page">
-        <div className="login-background-left"></div>
-        <div className="login-background-right"></div>
-        
-        <div className="signup-container max-w-4xl">
-          <div className="flex items-center justify-center mb-6">
-            <Button
-              variant="ghost"
-              onClick={() => setCurrentStep('signup')}
-              className="mr-4"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-            <h2 className="signup-title">Choose Your Plan</h2>
-          </div>
-          
-          <p className="signup-subtitle mb-8">
-            Welcome! Now select a subscription plan to unlock premium content and courses.
-          </p>
-
-          {error && (
-            <div className="login-error mb-6">
-              {error}
-            </div>
-          )}
-
-          <SubscriptionPlans 
-            onSubscriptionSelect={handleSubscriptionSelect}
-            showTitle={false}
-          />
-
-          <div className="login-footer">
-            <Link href="/" className="login-back-home">
-              ← Go to The Piped Peony
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="login-page">
@@ -205,12 +143,15 @@ export default function SignupPage() {
       
       <div className="signup-container">
         {/* Trial & Pricing Information */}
-        <div className="bg-[#f6f5f3]   rounded-lg p-6 mb-6 text-center">
+        <div className="bg-[#f6f5f3] rounded-lg p-6 mb-6 text-center">
           <p className="text-2xl font-serif font-bold text-gray-900 mb-2">
             Get started with a 7-day free trial!
           </p>
-          <p className="text-gray-700 pb-0 mb-0">
+          <p className="text-gray-700 pb-0 mb-2">
             No contract membership for only $15 a month.
+          </p>
+          <p className="text-sm text-gray-600 italic">
+            Credit card required to start trial. Cancel anytime before trial ends to avoid charges.
           </p>
         </div>
 
@@ -344,7 +285,7 @@ export default function SignupPage() {
               className="login-submit-button"
               disabled={isLoading || !isLoaded}
             >
-              {isLoading ? "CREATING ACCOUNT..." : "CREATE ACCOUNT"}
+              {isLoading ? "CREATING ACCOUNT..." : "START FREE TRIAL"}
             </Button>
           </div>
         </form>
