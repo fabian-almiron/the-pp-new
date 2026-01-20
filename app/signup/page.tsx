@@ -24,18 +24,19 @@ export default function SignupPage() {
   const [agreeToTerms, setAgreeToTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [isProcessingSignup, setIsProcessingSignup] = useState(false);
   
   const { signUp, isLoaded, setActive } = useSignUp();
   const { availableSubscriptions, createSubscriptionCheckout } = useSubscription();
   const { isSignedIn, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
-  // Redirect signed-in users to video library
+  // Redirect signed-in users to video library (but not if they just signed up and are being redirected to checkout)
   useEffect(() => {
-    if (userLoaded && isSignedIn) {
+    if (userLoaded && isSignedIn && !isProcessingSignup) {
       router.push('/video-library');
     }
-  }, [userLoaded, isSignedIn, router]);
+  }, [userLoaded, isSignedIn, isProcessingSignup, router]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -80,6 +81,9 @@ export default function SignupPage() {
     }
 
     try {
+      // Set flag to prevent redirect to video library
+      setIsProcessingSignup(true);
+      
       const signUpAttempt = await signUp.create({
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
@@ -88,36 +92,58 @@ export default function SignupPage() {
       });
 
       if (signUpAttempt.status === 'complete') {
+        console.log('✅ Signup complete, activating session...');
         await setActive({ session: signUpAttempt.createdSessionId });
         
-        // Wait for subscriptions to load
-        if (availableSubscriptions.length === 0) {
-          // Wait a bit and try to redirect anyway
+        console.log('⏳ Waiting for session to be established...');
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        console.log('📋 Available subscriptions:', availableSubscriptions.length);
+        
+        // Wait for subscriptions to load if needed
+        let retries = 0;
+        while (availableSubscriptions.length === 0 && retries < 5) {
+          console.log(`⏳ Waiting for subscriptions to load (attempt ${retries + 1}/5)...`);
           await new Promise(resolve => setTimeout(resolve, 500));
+          retries++;
         }
         
         // Automatically redirect to Stripe checkout for the default subscription
-        const defaultSubscription = availableSubscriptions[0]; // Get the first/default subscription
+        const defaultSubscription = availableSubscriptions[0];
+        console.log('🎫 Default subscription:', defaultSubscription);
+        
         if (defaultSubscription) {
           try {
+            console.log('💳 Creating checkout session...');
             const checkoutUrl = await createSubscriptionCheckout(defaultSubscription.documentId);
+            console.log('✅ Checkout URL created:', checkoutUrl);
+            // Redirect to Stripe
             window.location.href = checkoutUrl;
+            // Keep loading state while redirecting
+            return;
           } catch (checkoutError) {
+            console.error('❌ Checkout error:', checkoutError);
             setError('Failed to start subscription process. Please try again.');
             setIsLoading(false);
+            setIsProcessingSignup(false);
           }
         } else {
+          console.error('❌ No subscription available');
           setError('Subscription not available. Please contact support.');
           setIsLoading(false);
+          setIsProcessingSignup(false);
         }
       } else {
         // If email verification is required, handle it
         setError("Please check your email to verify your account.");
         setIsLoading(false);
+        setIsProcessingSignup(false);
       }
     } catch (err: any) {
+      console.error('Signup error:', err);
       setError(err?.errors?.[0]?.message || "Signup failed. Please try again.");
       setIsLoading(false);
+      setIsProcessingSignup(false);
     }
   };
 
