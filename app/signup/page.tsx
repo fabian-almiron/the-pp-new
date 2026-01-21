@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useSignUp, useUser } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
-import { useSubscription } from "@/hooks/use-subscription";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -27,7 +25,6 @@ export default function SignupPage() {
   const [isProcessingSignup, setIsProcessingSignup] = useState(false);
   
   const { signUp, isLoaded, setActive } = useSignUp();
-  const { availableSubscriptions, createSubscriptionCheckout } = useSubscription();
   const { isSignedIn, isLoaded: userLoaded } = useUser();
   const router = useRouter();
 
@@ -95,41 +92,60 @@ export default function SignupPage() {
         console.log('✅ Signup complete, activating session...');
         await setActive({ session: signUpAttempt.createdSessionId });
         
-        console.log('⏳ Waiting for session to be established...');
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Get user info from the signup attempt
+        const userId = signUpAttempt.createdUserId;
+        const userEmail = formData.email.toLowerCase().trim();
         
-        console.log('📋 Available subscriptions:', availableSubscriptions.length);
+        console.log('⏳ Fetching subscriptions...');
         
-        // Wait for subscriptions to load if needed
-        let retries = 0;
-        while (availableSubscriptions.length === 0 && retries < 5) {
-          console.log(`⏳ Waiting for subscriptions to load (attempt ${retries + 1}/5)...`);
-          await new Promise(resolve => setTimeout(resolve, 500));
-          retries++;
-        }
-        
-        // Automatically redirect to Stripe checkout for the default subscription
-        const defaultSubscription = availableSubscriptions[0];
-        console.log('🎫 Default subscription:', defaultSubscription);
-        
-        if (defaultSubscription) {
-          try {
+        try {
+          // Fetch subscriptions directly
+          const response = await fetch('/api/subscriptions-list');
+          if (!response.ok) {
+            throw new Error('Failed to fetch subscriptions');
+          }
+          
+          const data = await response.json();
+          const subscriptions = data.subscriptions || [];
+          
+          console.log('📋 Available subscriptions:', subscriptions.length);
+          
+          if (subscriptions.length > 0) {
             console.log('💳 Creating checkout session...');
-            const checkoutUrl = await createSubscriptionCheckout(defaultSubscription.documentId);
-            console.log('✅ Checkout URL created:', checkoutUrl);
+            
+            // Call the subscription checkout API directly with user info from signup
+            const checkoutResponse = await fetch('/api/subscription-checkout', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                subscriptionId: subscriptions[0].documentId,
+                userId: userId,
+                userEmail: userEmail,
+              }),
+            });
+
+            if (!checkoutResponse.ok) {
+              const error = await checkoutResponse.json();
+              throw new Error(error.error || 'Failed to create checkout session');
+            }
+
+            const { url } = await checkoutResponse.json();
+            console.log('✅ Checkout URL created:', url);
             // Redirect to Stripe
-            window.location.href = checkoutUrl;
+            window.location.href = url;
             // Keep loading state while redirecting
             return;
-          } catch (checkoutError) {
-            console.error('❌ Checkout error:', checkoutError);
-            setError('Failed to start subscription process. Please try again.');
+          } else {
+            console.error('❌ No subscriptions available');
+            setError('No subscription plans available. Please contact support.');
             setIsLoading(false);
             setIsProcessingSignup(false);
           }
-        } else {
-          console.error('❌ No subscription available');
-          setError('Subscription not available. Please contact support.');
+        } catch (checkoutError: any) {
+          console.error('❌ Checkout error:', checkoutError);
+          setError('Failed to start subscription process. Please try again.');
           setIsLoading(false);
           setIsProcessingSignup(false);
         }

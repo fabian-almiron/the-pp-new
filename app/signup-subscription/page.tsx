@@ -9,7 +9,7 @@ import { PeonyLoader } from "@/components/ui/peony-loader";
 export default function SignupSubscriptionPage() {
   const [error, setError] = useState("");
   const { user, isLoaded: userLoaded, isSignedIn } = useUser();
-  const { availableSubscriptions, createSubscriptionCheckout, isSubscriber } = useSubscription();
+  const { isSubscriber } = useSubscription();
   const router = useRouter();
 
   useEffect(() => {
@@ -31,30 +31,51 @@ export default function SignupSubscriptionPage() {
         return;
       }
 
-      // Wait for subscriptions to load
-      if (availableSubscriptions.length === 0) {
-        // Give it a moment to load
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }
-
-      // Get the default subscription (first one)
-      const defaultSubscription = availableSubscriptions[0];
-      
-      if (defaultSubscription) {
-        try {
-          const checkoutUrl = await createSubscriptionCheckout(defaultSubscription.documentId);
-          window.location.href = checkoutUrl;
-        } catch (err) {
-          console.error('Failed to create checkout session:', err);
-          setError('Failed to start subscription process. Please try again or contact support.');
+      try {
+        // Fetch subscriptions directly
+        const response = await fetch('/api/subscriptions-list');
+        if (!response.ok) {
+          throw new Error('Failed to fetch subscriptions');
         }
-      } else {
-        setError('Subscription not available. Please contact support.');
+        
+        const data = await response.json();
+        const subscriptions = data.subscriptions || [];
+        
+        if (subscriptions.length > 0) {
+          console.log('Creating checkout for subscription:', subscriptions[0].documentId);
+          
+          // Call the subscription checkout API directly
+          const checkoutResponse = await fetch('/api/subscription-checkout', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              subscriptionId: subscriptions[0].documentId,
+              userId: user.id,
+              userEmail: user.emailAddresses[0]?.emailAddress,
+            }),
+          });
+
+          if (!checkoutResponse.ok) {
+            const error = await checkoutResponse.json();
+            throw new Error(error.error || 'Failed to create checkout session');
+          }
+
+          const { url } = await checkoutResponse.json();
+          console.log('Redirecting to checkout:', url);
+          window.location.href = url;
+        } else {
+          setError('Subscription not available. Please contact support.');
+        }
+      } catch (err: any) {
+        console.error('Failed to create checkout session:', err);
+        setError('Failed to start subscription process. Please try again or contact support.');
       }
     };
 
     redirectToCheckout();
-  }, [userLoaded, user, isSignedIn, availableSubscriptions, createSubscriptionCheckout, isSubscriber, router]);
+  }, [userLoaded, user, isSignedIn, isSubscriber, router]);
 
   if (error) {
     return (
