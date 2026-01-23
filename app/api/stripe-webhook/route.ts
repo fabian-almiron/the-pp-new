@@ -142,6 +142,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           clerkUserId = newUser.id;
           console.log('✅ Created Clerk user:', clerkUserId);
           
+          // Create a sign-in token so user can be automatically logged in
+          console.log('🎫 Creating sign-in token for auto-login...');
+          const signInToken = await clerkClient.signInTokens.createSignInToken({
+            userId: clerkUserId,
+            expiresInSeconds: 600, // 10 minutes
+          });
+          console.log('✅ Created sign-in token:', signInToken.id);
+          
           // Update Stripe customer with Clerk user ID and proper name
           // (Customer was auto-created by Stripe, so now we add our metadata)
           await stripe.customers.update(stripeCustomerId, {
@@ -153,16 +161,17 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           });
           console.log('✅ Updated Stripe customer with name and Clerk user ID');
           
-          // Update subscription with Clerk user ID
+          // Update subscription with Clerk user ID and sign-in token
           await stripe.subscriptions.update(subscription.id, {
             metadata: {
               clerkUserId: clerkUserId,
               subscriptionName: session.metadata?.subscriptionName || 'Membership',
               pendingSignup: 'false', // Mark as completed
+              signInToken: signInToken.token, // Store token for auto-login
             },
           });
           
-          console.log('✅ Updated Stripe subscription with Clerk user ID');
+          console.log('✅ Updated Stripe subscription with Clerk user ID and sign-in token');
         } catch (error) {
           console.error('❌ Failed to create Clerk account:', error);
           // If account creation fails, we should notify the customer
