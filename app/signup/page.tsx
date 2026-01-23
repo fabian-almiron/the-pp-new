@@ -89,56 +89,56 @@ export default function SignupPage() {
     try {
       // Set flag to prevent redirect to video library
       setIsProcessingSignup(true);
-      
-      console.log('⏳ Fetching subscriptions...');
-      
+        
+        console.log('⏳ Fetching subscriptions...');
+        
       // NEW APPROACH: Create checkout session BEFORE creating Clerk account
       // This prevents orphaned accounts if users abandon checkout
       
-      // Fetch subscriptions directly
-      const response = await fetch('/api/subscriptions-list');
-      if (!response.ok) {
-        throw new Error('Failed to fetch subscriptions');
-      }
-      
-      const data = await response.json();
-      const subscriptions = data.subscriptions || [];
-      
-      console.log('📋 Available subscriptions:', subscriptions.length);
-      
-      if (subscriptions.length > 0) {
+          // Fetch subscriptions directly
+          const response = await fetch('/api/subscriptions-list');
+          if (!response.ok) {
+            throw new Error('Failed to fetch subscriptions');
+          }
+          
+          const data = await response.json();
+          const subscriptions = data.subscriptions || [];
+          
+          console.log('📋 Available subscriptions:', subscriptions.length);
+          
+          if (subscriptions.length > 0) {
         console.log('💳 Creating checkout session (no account created yet)...');
-        
+            
         // Call the NEW guest checkout API that will create Clerk account AFTER payment
         const checkoutResponse = await fetch('/api/guest-checkout', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            subscriptionId: subscriptions[0].documentId,
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                subscriptionId: subscriptions[0].documentId,
             firstName: formData.firstName.trim(),
             lastName: formData.lastName.trim(),
             email: formData.email.toLowerCase().trim(),
             password: formData.password, // Will be used to create account after payment
-          }),
-        });
+              }),
+            });
 
-        if (!checkoutResponse.ok) {
-          const error = await checkoutResponse.json();
-          throw new Error(error.error || 'Failed to create checkout session');
-        }
+            if (!checkoutResponse.ok) {
+              const error = await checkoutResponse.json();
+              throw new Error(error.error || 'Failed to create checkout session');
+            }
 
-        const { url } = await checkoutResponse.json();
-        console.log('✅ Checkout URL created:', url);
+            const { url } = await checkoutResponse.json();
+            console.log('✅ Checkout URL created:', url);
         console.log('ℹ️  Account will be created after successful payment');
-        // Redirect to Stripe
-        window.location.href = url;
-        // Keep loading state while redirecting
-        return;
-      } else {
-        console.error('❌ No subscriptions available');
-        setError('No subscription plans available. Please contact support.');
+            // Redirect to Stripe
+            window.location.href = url;
+            // Keep loading state while redirecting
+            return;
+          } else {
+            console.error('❌ No subscriptions available');
+            setError('No subscription plans available. Please contact support.');
         setIsLoading(false);
         setIsProcessingSignup(false);
       }

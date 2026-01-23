@@ -13,7 +13,7 @@ function SubscriptionSuccessContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { isLoaded: signInLoaded, signIn, setActive } = useSignIn();
-  const { isSignedIn, user } = useUser();
+  const { isSignedIn } = useUser();
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
@@ -23,133 +23,143 @@ function SubscriptionSuccessContent() {
       return;
     }
 
-    // If already signed in, redirect to video library
-    if (isSignedIn && user) {
+    // If already signed in (OAuth flow), redirect to video library
+    if (isSignedIn) {
       console.log('✅ User already signed in, redirecting to video library...');
       router.push('/video-library');
       return;
     }
 
-    // If not signed in, get the sign-in token and authenticate
+    // Wait for Clerk to load
     if (!signInLoaded) {
-      return; // Wait for Clerk to load
+      return;
     }
 
     const authenticateUser = async () => {
       try {
-        console.log('🔐 Attempting to sign in user after successful payment...');
-        console.log('📋 Session ID:', sessionId);
+        console.log('🔐 Starting auto-signin process...');
         
-        // Poll for sign-in token (webhook might take a moment)
+        // Poll for the account to be created by webhook (up to 30 seconds)
         let attempts = 0;
-        const maxAttempts = 15; // Try for 30 seconds
+        const maxAttempts = 15;
         
         while (attempts < maxAttempts) {
           try {
-            console.log(`🔍 Attempt ${attempts + 1}/${maxAttempts}: Fetching sign-in token...`);
+            console.log(`🔍 Attempt ${attempts + 1}/${maxAttempts}: Checking if account is ready...`);
             
-            const response = await fetch('/api/get-signin-token', {
+            const response = await fetch('/api/auto-signin', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ sessionId }),
             });
 
             if (response.ok) {
-              const { signInToken } = await response.json();
+              const { token } = await response.json();
               console.log('✅ Got sign-in token, authenticating...');
               
               // Sign in using the token
               const signInAttempt = await signIn.create({
                 strategy: 'ticket',
-                ticket: signInToken,
+                ticket: token,
               });
 
               if (signInAttempt.status === 'complete') {
-                console.log('✅ Sign-in successful, setting active session...');
+                console.log('✅ Sign-in successful, activating session...');
                 await setActive({ session: signInAttempt.createdSessionId });
-                console.log('✅ Session activated, redirecting to video library...');
+                console.log('✅ Redirecting to video library...');
                 
-                // Redirect to video library
-                router.push('/video-library');
+                // Small delay to ensure session is fully activated
+                setTimeout(() => {
+                  router.push('/video-library');
+                }, 500);
                 return;
-              } else {
-                throw new Error('Sign-in not complete');
               }
             }
             
-            // Token not ready yet, wait and retry
-            console.log('⏳ Token not ready yet, waiting 2 seconds...');
+            // Not ready yet, wait and retry
+            console.log('⏳ Account not ready yet, waiting 2 seconds...');
             await new Promise(resolve => setTimeout(resolve, 2000));
             attempts++;
             
           } catch (fetchError: any) {
-            console.error('Fetch attempt failed:', fetchError);
+            console.error('Attempt failed:', fetchError);
             await new Promise(resolve => setTimeout(resolve, 2000));
             attempts++;
           }
         }
         
-        // If we get here, token retrieval timed out
-        console.error('❌ Timed out waiting for sign-in token');
-        setError('Account created successfully, but automatic login failed. Please sign in manually.');
+        // Timeout - show manual sign-in option
+        console.error('❌ Timeout waiting for account creation');
+        setError('Account is being created. Please sign in manually.');
         setIsLoading(false);
         
       } catch (err: any) {
         console.error('❌ Authentication error:', err);
-        setError('Account created successfully, but automatic login failed. Please sign in manually.');
+        setError('Please sign in manually to access your account.');
         setIsLoading(false);
       }
     };
 
     authenticateUser();
-  }, [sessionId, signInLoaded, signIn, setActive, isSignedIn, user, router]);
+  }, [sessionId, signInLoaded, signIn, setActive, isSignedIn, router]);
 
   if (error) {
+    // Show error state with manual sign-in option
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <div className="text-amber-500 mb-4">
+          <div className="text-green-500 mb-4">
             <CheckCircle className="h-12 w-12 mx-auto" />
           </div>
           <h2 className="text-xl font-semibold text-gray-900 mb-2">
             Payment Successful!
           </h2>
           <p className="text-gray-600 mb-6">{error}</p>
-          <div className="space-y-3">
-            <Button
-              onClick={() => router.push('/login')}
-              className="w-full !bg-[#D4A771] !text-white hover:!bg-[#C69963]"
-            >
-              Sign In Manually
-            </Button>
-            <Link href="/" className="block text-sm text-[#D4A771] hover:underline">
-              Return to Home
-            </Link>
-          </div>
+          <Button
+            onClick={() => router.push('/login')}
+            className="w-full !bg-[#D4A771] !text-white hover:!bg-[#C69963]"
+          >
+            Sign In
+          </Button>
         </div>
       </div>
     );
   }
 
-  // Loading state - user will be automatically redirected
+  // Loading state - automatically signing in
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="text-center">
-        <Loader2 className="h-12 w-12 animate-spin mx-auto mb-4 text-[#D4A771]" />
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+      <div className="text-center max-w-md mx-auto px-4">
+        <Loader2 className="h-12 w-12 animate-spin mx-auto mb-6 text-[#D4A771]" />
+        <h2 className="text-2xl font-semibold text-gray-900 mb-3">
           Welcome to The Piped Peony!
         </h2>
-        <p className="text-gray-600 mb-4">
-          Setting up your account and signing you in...
+        <p className="text-gray-600 mb-6">
+          Setting up your account and signing you in automatically...
         </p>
-        <div className="bg-[#FBF9F6] border border-[#D4A771] rounded-lg p-4 max-w-md mx-auto">
-          <p className="text-sm text-gray-700">
-            ✓ Payment successful<br />
-            ✓ Creating your account<br />
-            ✓ Activating subscription<br />
-            ⏳ Signing you in...
-          </p>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="space-y-2 text-left">
+            <div className="flex items-center text-green-600">
+              <CheckCircle className="h-5 w-5 mr-2" />
+              <span className="text-sm">Payment successful</span>
+            </div>
+            <div className="flex items-center text-green-600">
+              <CheckCircle className="h-5 w-5 mr-2" />
+              <span className="text-sm">Creating your account</span>
+            </div>
+            <div className="flex items-center text-green-600">
+              <CheckCircle className="h-5 w-5 mr-2" />
+              <span className="text-sm">Activating subscription</span>
+            </div>
+            <div className="flex items-center text-[#D4A771]">
+              <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+              <span className="text-sm">Signing you in...</span>
+            </div>
+          </div>
         </div>
+        <p className="text-xs text-gray-500 mt-4">
+          This usually takes just a few seconds
+        </p>
       </div>
     </div>
   );
