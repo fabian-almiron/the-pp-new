@@ -82,12 +82,12 @@ export async function POST(request: NextRequest) {
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
     // Create Checkout Session WITHOUT creating a customer first
-    // Stripe will automatically create the customer when payment succeeds
+    // For subscription mode, Stripe automatically creates customer when payment is submitted
+    // (customer_creation parameter is only for payment mode, not subscription mode)
     console.log('🛒 Creating Stripe checkout session (no customer/account created yet)...');
     
     const session = await stripe.checkout.sessions.create({
-      // Don't specify customer - let Stripe create it when payment succeeds
-      customer_creation: 'always', // Stripe creates customer only when payment is submitted
+      // Don't specify customer - Stripe auto-creates it when payment succeeds in subscription mode
       customer_email: email.toLowerCase().trim(), // Pre-fill email in checkout form
       payment_method_types: ['card'],
       line_items: [
