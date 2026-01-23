@@ -109,6 +109,8 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     
     if (isPendingSignup && !clerkUserId) {
       console.log('🆕 Pending signup detected - creating Clerk account now...');
+      console.log('📋 Session customer:', session.customer);
+      console.log('📋 Customer type:', typeof session.customer);
       
       // Extract signup data from metadata
       const firstName = session.metadata?.firstName;
@@ -120,6 +122,9 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         try {
           console.log('👤 Creating Clerk user:', email);
           
+          // Customer was created by Stripe during checkout, so we have the customer ID
+          const stripeCustomerId = session.customer as string;
+          
           // Create the Clerk user NOW that payment succeeded
           const newUser = await clerkClient.users.createUser({
             firstName: firstName,
@@ -130,29 +135,34 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
               role: 'subscriber', // Immediately assign subscriber role
             },
             privateMetadata: {
-              stripeCustomerId: session.customer as string,
+              stripeCustomerId: stripeCustomerId,
             },
           });
           
           clerkUserId = newUser.id;
           console.log('✅ Created Clerk user:', clerkUserId);
           
-          // Update Stripe customer with Clerk user ID
-          await stripe.customers.update(session.customer as string, {
+          // Update Stripe customer with Clerk user ID and proper name
+          // (Customer was auto-created by Stripe, so now we add our metadata)
+          await stripe.customers.update(stripeCustomerId, {
+            name: `${firstName} ${lastName}`,
             metadata: {
               clerkUserId: clerkUserId,
+              pendingSignup: 'false', // Mark as completed
             },
           });
+          console.log('✅ Updated Stripe customer with name and Clerk user ID');
           
           // Update subscription with Clerk user ID
           await stripe.subscriptions.update(subscription.id, {
             metadata: {
               clerkUserId: clerkUserId,
               subscriptionName: session.metadata?.subscriptionName || 'Membership',
+              pendingSignup: 'false', // Mark as completed
             },
           });
           
-          console.log('✅ Updated Stripe records with Clerk user ID');
+          console.log('✅ Updated Stripe subscription with Clerk user ID');
         } catch (error) {
           console.error('❌ Failed to create Clerk account:', error);
           // If account creation fails, we should notify the customer

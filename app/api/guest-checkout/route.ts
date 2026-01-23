@@ -81,26 +81,14 @@ export async function POST(request: NextRequest) {
     // Get the origin from the request
     const origin = request.headers.get('origin') || 'http://localhost:3000';
 
-    // Create Stripe customer with user details (but NO Clerk account yet)
-    console.log('➕ Creating new Stripe customer for:', email);
-    const customer = await stripe.customers.create({
-      email: email.toLowerCase().trim(),
-      name: `${firstName.trim()} ${lastName.trim()}`,
-      metadata: {
-        // Store user signup info to create Clerk account after payment
-        pendingSignup: 'true',
-        firstName: firstName.trim(),
-        lastName: lastName.trim(),
-        password: password, // We'll need this to create the Clerk account
-      },
-    });
-    console.log('✅ Created Stripe customer:', customer.id);
-
-    // Create Checkout Session for subscription
-    console.log('🛒 Creating Stripe checkout session...');
+    // Create Checkout Session WITHOUT creating a customer first
+    // Stripe will automatically create the customer when payment succeeds
+    console.log('🛒 Creating Stripe checkout session (no customer/account created yet)...');
     
     const session = await stripe.checkout.sessions.create({
-      customer: customer.id,
+      // Don't specify customer - let Stripe create it when payment succeeds
+      customer_creation: 'always', // Stripe creates customer only when payment is submitted
+      customer_email: email.toLowerCase().trim(), // Pre-fill email in checkout form
       payment_method_types: ['card'],
       line_items: [
         {
