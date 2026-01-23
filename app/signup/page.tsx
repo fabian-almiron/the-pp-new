@@ -23,10 +23,19 @@ export default function SignupPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [isProcessingSignup, setIsProcessingSignup] = useState(false);
+  const [showCancelledMessage, setShowCancelledMessage] = useState(false);
   
   const { signUp, isLoaded, setActive } = useSignUp();
   const { isSignedIn, isLoaded: userLoaded } = useUser();
   const router = useRouter();
+
+  // Check for cancelled checkout in URL params
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('cancelled') === 'true') {
+      setShowCancelledMessage(true);
+    }
+  }, []);
 
   // Redirect signed-in users to video library (but not if they just signed up and are being redirected to checkout)
   useEffect(() => {
@@ -81,83 +90,61 @@ export default function SignupPage() {
       // Set flag to prevent redirect to video library
       setIsProcessingSignup(true);
       
-      const signUpAttempt = await signUp.create({
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        emailAddress: formData.email.toLowerCase().trim(),
-        password: formData.password,
-      });
-
-      if (signUpAttempt.status === 'complete') {
-        console.log('✅ Signup complete, activating session...');
-        await setActive({ session: signUpAttempt.createdSessionId });
+      console.log('⏳ Fetching subscriptions...');
+      
+      // NEW APPROACH: Create checkout session BEFORE creating Clerk account
+      // This prevents orphaned accounts if users abandon checkout
+      
+      // Fetch subscriptions directly
+      const response = await fetch('/api/subscriptions-list');
+      if (!response.ok) {
+        throw new Error('Failed to fetch subscriptions');
+      }
+      
+      const data = await response.json();
+      const subscriptions = data.subscriptions || [];
+      
+      console.log('📋 Available subscriptions:', subscriptions.length);
+      
+      if (subscriptions.length > 0) {
+        console.log('💳 Creating checkout session (no account created yet)...');
         
-        // Get user info from the signup attempt
-        const userId = signUpAttempt.createdUserId;
-        const userEmail = formData.email.toLowerCase().trim();
-        
-        console.log('⏳ Fetching subscriptions...');
-        
-        try {
-          // Fetch subscriptions directly
-          const response = await fetch('/api/subscriptions-list');
-          if (!response.ok) {
-            throw new Error('Failed to fetch subscriptions');
-          }
-          
-          const data = await response.json();
-          const subscriptions = data.subscriptions || [];
-          
-          console.log('📋 Available subscriptions:', subscriptions.length);
-          
-          if (subscriptions.length > 0) {
-            console.log('💳 Creating checkout session...');
-            
-            // Call the subscription checkout API directly with user info from signup
-            const checkoutResponse = await fetch('/api/subscription-checkout', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                subscriptionId: subscriptions[0].documentId,
-                userId: userId,
-                userEmail: userEmail,
-              }),
-            });
+        // Call the NEW guest checkout API that will create Clerk account AFTER payment
+        const checkoutResponse = await fetch('/api/guest-checkout', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            subscriptionId: subscriptions[0].documentId,
+            firstName: formData.firstName.trim(),
+            lastName: formData.lastName.trim(),
+            email: formData.email.toLowerCase().trim(),
+            password: formData.password, // Will be used to create account after payment
+          }),
+        });
 
-            if (!checkoutResponse.ok) {
-              const error = await checkoutResponse.json();
-              throw new Error(error.error || 'Failed to create checkout session');
-            }
-
-            const { url } = await checkoutResponse.json();
-            console.log('✅ Checkout URL created:', url);
-            // Redirect to Stripe
-            window.location.href = url;
-            // Keep loading state while redirecting
-            return;
-          } else {
-            console.error('❌ No subscriptions available');
-            setError('No subscription plans available. Please contact support.');
-            setIsLoading(false);
-            setIsProcessingSignup(false);
-          }
-        } catch (checkoutError: any) {
-          console.error('❌ Checkout error:', checkoutError);
-          setError('Failed to start subscription process. Please try again.');
-          setIsLoading(false);
-          setIsProcessingSignup(false);
+        if (!checkoutResponse.ok) {
+          const error = await checkoutResponse.json();
+          throw new Error(error.error || 'Failed to create checkout session');
         }
+
+        const { url } = await checkoutResponse.json();
+        console.log('✅ Checkout URL created:', url);
+        console.log('ℹ️  Account will be created after successful payment');
+        // Redirect to Stripe
+        window.location.href = url;
+        // Keep loading state while redirecting
+        return;
       } else {
-        // If email verification is required, handle it
-        setError("Please check your email to verify your account.");
+        console.error('❌ No subscriptions available');
+        setError('No subscription plans available. Please contact support.');
         setIsLoading(false);
         setIsProcessingSignup(false);
       }
     } catch (err: any) {
       console.error('Signup error:', err);
-      setError(err?.errors?.[0]?.message || "Signup failed. Please try again.");
+      setError(err?.message || "Signup failed. Please try again.");
       setIsLoading(false);
       setIsProcessingSignup(false);
     }
@@ -167,6 +154,9 @@ export default function SignupPage() {
     if (!isLoaded) return;
     
     try {
+      // Note: OAuth signup creates a Clerk account immediately (controlled by Clerk)
+      // If users abandon checkout after OAuth, they'll have an account but won't be subscribers
+      // This is acceptable behavior since they've already authorized with their social provider
       await signUp.authenticateWithRedirect({
         strategy,
         redirectUrl: '/sso-callback',
@@ -196,6 +186,15 @@ export default function SignupPage() {
             Credit card required to start trial. Cancel anytime before trial ends to avoid charges.
           </p>
         </div>
+
+        {/* Show message if user cancelled checkout */}
+        {showCancelledMessage && (
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+            <p className="text-amber-800 text-sm">
+              <strong>Checkout cancelled.</strong> No account was created. Please complete the signup process to access your free trial.
+            </p>
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="grid grid-cols-2 gap-3">

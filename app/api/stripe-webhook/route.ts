@@ -103,46 +103,114 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     console.log('  - Status:', subscription.status);
     console.log('  - Metadata:', JSON.stringify(subscription.metadata, null, 2));
     
-    // Update Clerk user role to Subscriber (works for both 'active' and 'trialing')
-    const clerkUserId = session.metadata?.clerkUserId;
-    console.log('👤 Clerk User ID from metadata:', clerkUserId);
+    // NEW: Check if this is a pending signup (no Clerk account exists yet)
+    const isPendingSignup = session.metadata?.pendingSignup === 'true';
+    let clerkUserId = session.metadata?.clerkUserId;
+    
+    if (isPendingSignup && !clerkUserId) {
+      console.log('🆕 Pending signup detected - creating Clerk account now...');
+      
+      // Extract signup data from metadata
+      const firstName = session.metadata?.firstName;
+      const lastName = session.metadata?.lastName;
+      const email = session.metadata?.email;
+      const password = session.metadata?.password;
+      
+      if (firstName && lastName && email && password) {
+        try {
+          console.log('👤 Creating Clerk user:', email);
+          
+          // Create the Clerk user NOW that payment succeeded
+          const newUser = await clerkClient.users.createUser({
+            firstName: firstName,
+            lastName: lastName,
+            emailAddress: [email],
+            password: password,
+            publicMetadata: {
+              role: 'subscriber', // Immediately assign subscriber role
+            },
+            privateMetadata: {
+              stripeCustomerId: session.customer as string,
+            },
+          });
+          
+          clerkUserId = newUser.id;
+          console.log('✅ Created Clerk user:', clerkUserId);
+          
+          // Update Stripe customer with Clerk user ID
+          await stripe.customers.update(session.customer as string, {
+            metadata: {
+              clerkUserId: clerkUserId,
+            },
+          });
+          
+          // Update subscription with Clerk user ID
+          await stripe.subscriptions.update(subscription.id, {
+            metadata: {
+              clerkUserId: clerkUserId,
+              subscriptionName: session.metadata?.subscriptionName || 'Membership',
+            },
+          });
+          
+          console.log('✅ Updated Stripe records with Clerk user ID');
+        } catch (error) {
+          console.error('❌ Failed to create Clerk account:', error);
+          // If account creation fails, we should notify the customer
+          // The Stripe customer and subscription exist, but no Clerk account
+          throw error;
+        }
+      } else {
+        console.error('❌ Missing signup data in metadata:', {
+          firstName: !!firstName,
+          lastName: !!lastName,
+          email: !!email,
+          password: !!password,
+        });
+        throw new Error('Missing required signup data in session metadata');
+      }
+    }
+    
+    console.log('👤 Clerk User ID:', clerkUserId);
     
     if (clerkUserId) {
-      console.log('🔄 Updating user role to Subscriber in Clerk...');
-      console.log('  - User ID:', clerkUserId);
-      console.log('  - New Role: Subscriber');
-      
-      try {
-        await updateClerkUserRole(clerkUserId, 'subscriber');
-        console.log('✅ Clerk user role update completed successfully');
+      // If the account already existed (not a pending signup), update role
+      if (!isPendingSignup) {
+        console.log('🔄 Updating existing user role to Subscriber in Clerk...');
+        console.log('  - User ID:', clerkUserId);
+        console.log('  - New Role: Subscriber');
         
-        // Send welcome email for subscription signups
-        // Use customer_details.email as fallback since customer_email can be null
-        const customerEmail = session.customer_email || session.customer_details?.email;
-        
-        if (customerEmail) {
-          console.log('📧 Sending subscription trial email to:', customerEmail);
-          
-          // Determine trial days
-          const trialDays = subscription.trial_end ? 
-            Math.ceil((subscription.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
-          
-          const subscriptionName = subscription.metadata?.subscriptionName || 'Membership';
-          
-          await sendSubscriptionTrialEmail(
-            customerEmail,
-            subscriptionName,
-            trialDays
-          );
-        } else {
-          console.log('⚠️ No customer email found, skipping email');
+        try {
+          await updateClerkUserRole(clerkUserId, 'subscriber');
+          console.log('✅ Clerk user role update completed successfully');
+        } catch (error) {
+          console.error('❌ Failed to update Clerk user role:', error);
+          throw error;
         }
-      } catch (error) {
-        console.error('❌ Failed to update Clerk user role:', error);
-        throw error;
+      }
+      
+      // Send welcome email for subscription signups
+      // Use customer_details.email as fallback since customer_email can be null
+      const customerEmail = session.customer_email || session.customer_details?.email || session.metadata?.email;
+      
+      if (customerEmail) {
+        console.log('📧 Sending subscription trial email to:', customerEmail);
+        
+        // Determine trial days
+        const trialDays = subscription.trial_end ? 
+          Math.ceil((subscription.trial_end * 1000 - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+        
+        const subscriptionName = subscription.metadata?.subscriptionName || session.metadata?.subscriptionName || 'Membership';
+        
+        await sendSubscriptionTrialEmail(
+          customerEmail,
+          subscriptionName,
+          trialDays
+        );
+      } else {
+        console.log('⚠️ No customer email found, skipping email');
       }
     } else {
-      console.error('❌ No clerkUserId found in session metadata');
+      console.error('❌ No clerkUserId available after processing');
       console.error('Available metadata keys:', Object.keys(session.metadata || {}));
     }
   } else {
