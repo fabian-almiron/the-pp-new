@@ -100,6 +100,25 @@ export async function POST(request: NextRequest) {
         customer = customers.data[0];
         console.log('✅ Found existing Stripe customer:', customer.id);
         
+        // Check if this customer already has an active subscription
+        const existingSubscriptions = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: 'all',
+          limit: 10,
+        });
+
+        const activeSubscription = existingSubscriptions.data.find(sub => 
+          ['active', 'trialing', 'past_due'].includes(sub.status)
+        );
+
+        if (activeSubscription) {
+          console.log('❌ Customer already has an active subscription:', activeSubscription.id);
+          return NextResponse.json(
+            { error: 'You already have an active subscription. Please manage your existing subscription from your account page.' },
+            { status: 409 }
+          );
+        }
+        
         // Update metadata if clerkUserId is not set
         if (!customer.metadata?.clerkUserId) {
           await stripe.customers.update(customer.id, {

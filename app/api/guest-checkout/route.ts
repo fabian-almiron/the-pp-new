@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { createClerkClient } from '@clerk/nextjs/server';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
+});
+
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY!,
 });
 
 export async function POST(request: NextRequest) {
@@ -21,6 +26,66 @@ export async function POST(request: NextRequest) {
         { error: 'Missing required fields: subscriptionId, firstName, lastName, email, password' },
         { status: 400 }
       );
+    }
+
+    // Normalize email
+    const normalizedEmail = email.toLowerCase().trim();
+
+    // Check if email is already registered in Clerk
+    console.log('🔍 Checking if email is already registered:', normalizedEmail);
+    try {
+      const existingUsers = await clerkClient.users.getUserList({
+        emailAddress: [normalizedEmail],
+      });
+
+      if (existingUsers.data.length > 0) {
+        console.log('❌ Email already registered:', normalizedEmail);
+        return NextResponse.json(
+          { error: 'An account with this email already exists. Please sign in instead.' },
+          { status: 409 } // 409 Conflict
+        );
+      }
+      console.log('✅ Email is available');
+    } catch (clerkError) {
+      console.error('⚠️  Error checking Clerk users:', clerkError);
+      // Continue anyway - we'll catch duplicates later
+    }
+
+    // Check if email already has a Stripe customer with an active subscription
+    console.log('🔍 Checking for existing Stripe subscriptions:', normalizedEmail);
+    try {
+      const existingCustomers = await stripe.customers.list({
+        email: normalizedEmail,
+        limit: 1,
+      });
+
+      if (existingCustomers.data.length > 0) {
+        const customer = existingCustomers.data[0];
+        console.log('🔍 Found existing Stripe customer:', customer.id);
+
+        // Check if this customer has any active subscriptions
+        const subscriptions = await stripe.subscriptions.list({
+          customer: customer.id,
+          status: 'all',
+          limit: 10,
+        });
+
+        const activeSubscription = subscriptions.data.find(sub => 
+          ['active', 'trialing', 'past_due'].includes(sub.status)
+        );
+
+        if (activeSubscription) {
+          console.log('❌ Email already has an active subscription:', normalizedEmail);
+          return NextResponse.json(
+            { error: 'This email is already associated with an active subscription. Please sign in to manage your account.' },
+            { status: 409 }
+          );
+        }
+        console.log('✅ No active subscriptions found');
+      }
+    } catch (stripeError) {
+      console.error('⚠️  Error checking Stripe customers:', stripeError);
+      // Continue anyway
     }
 
     // Fetch subscription details from Strapi (to get Stripe Price ID)
@@ -88,7 +153,7 @@ export async function POST(request: NextRequest) {
     
     const session = await stripe.checkout.sessions.create({
       // Don't specify customer - Stripe auto-creates it when payment succeeds in subscription mode
-      customer_email: email.toLowerCase().trim(), // Pre-fill email in checkout form
+      customer_email: normalizedEmail, // Pre-fill email in checkout form
       payment_method_types: ['card'],
       line_items: [
         {
@@ -110,7 +175,7 @@ export async function POST(request: NextRequest) {
         pendingSignup: 'true',
         firstName: firstName.trim(),
         lastName: lastName.trim(),
-        email: email.toLowerCase().trim(),
+        email: normalizedEmail,
         password: password, // Store password to create Clerk account after payment
         subscriptionName: subscription.name,
       },

@@ -125,22 +125,45 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           // Customer was created by Stripe during checkout, so we have the customer ID
           const stripeCustomerId = session.customer as string;
           
-          // Create the Clerk user NOW that payment succeeded
-          const newUser = await clerkClient.users.createUser({
-            firstName: firstName,
-            lastName: lastName,
+          // Check if user already exists (in case of duplicate signups that slipped through)
+          const existingUsers = await clerkClient.users.getUserList({
             emailAddress: [email],
-            password: password,
-            publicMetadata: {
-              role: 'subscriber', // Immediately assign subscriber role
-            },
-            privateMetadata: {
-              stripeCustomerId: stripeCustomerId,
-            },
           });
           
-          clerkUserId = newUser.id;
-          console.log('✅ Created Clerk user:', clerkUserId);
+          if (existingUsers.data.length > 0) {
+            // User already exists - link the Stripe customer to the existing account
+            const existingUser = existingUsers.data[0];
+            clerkUserId = existingUser.id;
+            console.log('⚠️  User already exists, linking to existing account:', clerkUserId);
+            
+            // Update existing user with Stripe customer ID and subscriber role
+            await clerkClient.users.updateUserMetadata(clerkUserId, {
+              publicMetadata: {
+                role: 'subscriber',
+              },
+              privateMetadata: {
+                stripeCustomerId: stripeCustomerId,
+              },
+            });
+            console.log('✅ Updated existing user with subscription');
+          } else {
+            // Create the Clerk user NOW that payment succeeded
+            const newUser = await clerkClient.users.createUser({
+              firstName: firstName,
+              lastName: lastName,
+              emailAddress: [email],
+              password: password,
+              publicMetadata: {
+                role: 'subscriber', // Immediately assign subscriber role
+              },
+              privateMetadata: {
+                stripeCustomerId: stripeCustomerId,
+              },
+            });
+            
+            clerkUserId = newUser.id;
+            console.log('✅ Created Clerk user:', clerkUserId);
+          }
           
           // Update Stripe customer with Clerk user ID and proper name
           // (Customer was auto-created by Stripe, so now we add our metadata)
@@ -163,10 +186,66 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
           });
           
           console.log('✅ Updated Stripe subscription with Clerk user ID');
-        } catch (error) {
-          console.error('❌ Failed to create Clerk account:', error);
-          // If account creation fails, we should notify the customer
-          // The Stripe customer and subscription exist, but no Clerk account
+        } catch (error: any) {
+          console.error('❌ Failed to create/update Clerk account:', error);
+          console.error('Error details:', {
+            message: error.message,
+            errors: error.errors,
+            clerkError: error.clerkError,
+          });
+          
+          // If it's a duplicate email error, try to find and link the existing user
+          if (error.message?.includes('email') || error.message?.includes('duplicate')) {
+            console.log('🔍 Attempting to recover from duplicate email error...');
+            try {
+              const existingUsers = await clerkClient.users.getUserList({
+                emailAddress: [email],
+              });
+              
+              if (existingUsers.data.length > 0) {
+                const existingUser = existingUsers.data[0];
+                clerkUserId = existingUser.id;
+                console.log('✅ Found existing user, linking subscription:', clerkUserId);
+                
+                const stripeCustomerId = session.customer as string;
+                
+                // Update existing user
+                await clerkClient.users.updateUserMetadata(clerkUserId, {
+                  publicMetadata: {
+                    role: 'subscriber',
+                  },
+                  privateMetadata: {
+                    stripeCustomerId: stripeCustomerId,
+                  },
+                });
+                
+                // Update Stripe records
+                await stripe.customers.update(stripeCustomerId, {
+                  name: `${firstName} ${lastName}`,
+                  metadata: {
+                    clerkUserId: clerkUserId,
+                    pendingSignup: 'false',
+                  },
+                });
+                
+                await stripe.subscriptions.update(subscription.id, {
+                  metadata: {
+                    clerkUserId: clerkUserId,
+                    subscriptionName: session.metadata?.subscriptionName || 'Membership',
+                    pendingSignup: 'false',
+                  },
+                });
+                
+                console.log('✅ Successfully recovered from duplicate email error');
+                // Don't throw - we recovered successfully
+                return;
+              }
+            } catch (recoveryError) {
+              console.error('❌ Failed to recover from duplicate email error:', recoveryError);
+            }
+          }
+          
+          // If we couldn't recover, throw the error
           throw error;
         }
       } else {

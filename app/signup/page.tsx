@@ -126,6 +126,12 @@ export default function SignupPage() {
 
             if (!checkoutResponse.ok) {
               const error = await checkoutResponse.json();
+              
+              // Handle duplicate email specifically with a helpful message
+              if (checkoutResponse.status === 409) {
+                throw new Error(error.error || 'This email is already registered.');
+              }
+              
               throw new Error(error.error || 'Failed to create checkout session');
             }
 
