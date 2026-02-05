@@ -100,23 +100,76 @@ export async function POST(request: NextRequest) {
         customer = customers.data[0];
         console.log('✅ Found existing Stripe customer:', customer.id);
         
-        // Check if this customer already has an active subscription
+        // Check if this customer already has an existing subscription
         const existingSubscriptions = await stripe.subscriptions.list({
           customer: customer.id,
           status: 'all',
           limit: 10,
         });
 
+        // Check for truly active subscriptions (active or trialing)
         const activeSubscription = existingSubscriptions.data.find(sub => 
-          ['active', 'trialing', 'past_due'].includes(sub.status)
+          ['active', 'trialing'].includes(sub.status)
         );
 
         if (activeSubscription) {
           console.log('❌ Customer already has an active subscription:', activeSubscription.id);
           return NextResponse.json(
-            { error: 'You already have an active subscription. Please manage your existing subscription from your account page.' },
+            { 
+              error: 'You already have an active subscription. Please manage your existing subscription from your account page.',
+              subscriptionStatus: activeSubscription.status,
+              redirectTo: '/my-account'
+            },
             { status: 409 }
           );
+        }
+
+        // Check for past_due subscriptions (payment failed)
+        const pastDueSubscription = existingSubscriptions.data.find(sub => 
+          sub.status === 'past_due'
+        );
+
+        if (pastDueSubscription) {
+          console.log('⚠️ Customer has past_due subscription:', pastDueSubscription.id);
+          return NextResponse.json(
+            { 
+              error: 'Your subscription payment failed. Please update your payment method to restore access.',
+              subscriptionStatus: 'past_due',
+              subscriptionId: pastDueSubscription.id,
+              redirectTo: '/my-account',
+              actionRequired: 'update_payment'
+            },
+            { status: 409 }
+          );
+        }
+
+        // Check for incomplete subscriptions
+        const incompleteSubscription = existingSubscriptions.data.find(sub => 
+          ['incomplete', 'incomplete_expired'].includes(sub.status)
+        );
+
+        if (incompleteSubscription) {
+          console.log('⚠️ Customer has incomplete subscription:', incompleteSubscription.id);
+          return NextResponse.json(
+            { 
+              error: 'Your previous subscription setup was not completed. Please try again or contact support.',
+              subscriptionStatus: incompleteSubscription.status,
+              subscriptionId: incompleteSubscription.id,
+              redirectTo: '/my-account',
+              actionRequired: 'retry_signup'
+            },
+            { status: 409 }
+          );
+        }
+
+        // Check for canceled/unpaid subscriptions
+        const canceledSubscription = existingSubscriptions.data.find(sub => 
+          ['canceled', 'unpaid'].includes(sub.status)
+        );
+
+        if (canceledSubscription) {
+          console.log('ℹ️ Customer has canceled/unpaid subscription - allowing new signup');
+          // Allow them to create a new subscription
         }
         
         // Update metadata if clerkUserId is not set

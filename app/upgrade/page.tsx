@@ -15,6 +15,7 @@ function UpgradeContent() {
   const { isSubscriber } = useRole()
   const { user } = useUser()
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [errorDetails, setErrorDetails] = useState<any>(null)
   const [isRedirecting, setIsRedirecting] = useState(false)
 
   // Automatically redirect to Stripe checkout
@@ -54,8 +55,9 @@ function UpgradeContent() {
           if (!checkoutResponse.ok) {
             const error = await checkoutResponse.json();
             console.error('Checkout error:', error);
-            // Show error message instead of staying stuck
+            // Show error message with details
             setCheckoutError(error.error || 'Failed to create checkout session');
+            setErrorDetails(error);
             setIsRedirecting(false);
             return;
           }
@@ -96,21 +98,49 @@ function UpgradeContent() {
 
   // Show error state if checkout creation failed
   if (checkoutError) {
+    // Determine error type and appropriate message
+    const actionRequired = errorDetails?.actionRequired;
+    const subscriptionStatus = errorDetails?.subscriptionStatus;
+    
+    let title = 'Unable to Create Checkout';
+    let subtitle = checkoutError;
+    let helpText = 'Please contact support for assistance.';
+    let primaryButtonText = 'Go to My Account';
+    let primaryButtonHref = '/my-account';
+    
+    // Customize message based on subscription status
+    if (actionRequired === 'update_payment' || subscriptionStatus === 'past_due') {
+      title = 'Payment Failed';
+      subtitle = 'Your last payment didn\'t go through, so your subscription is on hold.';
+      helpText = 'Please update your payment method in your account to restore access to all content.';
+      primaryButtonText = 'Update Payment Method';
+      primaryButtonHref = '/my-account';
+    } else if (actionRequired === 'retry_signup' || subscriptionStatus === 'incomplete') {
+      title = 'Signup Not Completed';
+      subtitle = 'Your previous signup wasn\'t finished.';
+      helpText = 'You can try signing up again, or contact support if you need help.';
+      primaryButtonText = 'Try Again';
+      primaryButtonHref = '/signup';
+    } else if (subscriptionStatus === 'active' || subscriptionStatus === 'trialing') {
+      title = 'Already Subscribed';
+      subtitle = 'You already have an active subscription.';
+      helpText = 'Manage your subscription or contact support if you think this is an error.';
+      primaryButtonText = 'Manage Subscription';
+      primaryButtonHref = '/my-account';
+    }
+    
     return (
-      <div className="min-h-screen bg-[#FBF9F6] flex items-center justify-center">
+      <div className="min-h-screen bg-[#FBF9F6] flex items-center justify-center px-4">
         <div className="max-w-md mx-auto text-center p-8 bg-white rounded-lg shadow-lg">
-          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <h1 className="text-2xl font-serif text-gray-900 mb-4">Unable to Create Checkout</h1>
-          <p className="text-gray-600 mb-2">{checkoutError}</p>
-          <p className="text-sm text-gray-500 mb-6">
-            {checkoutError.includes('already has an active subscription') 
-              ? 'Please manage your subscription from your account page.'
-              : 'Please contact support for assistance.'}
-          </p>
+          <AlertCircle className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-serif text-gray-900 mb-4">{title}</h1>
+          <p className="text-gray-900 font-medium mb-2">{subtitle}</p>
+          <p className="text-sm text-gray-600 mb-6">{helpText}</p>
+          
           <div className="space-y-3">
-            <Link href="/my-account">
+            <Link href={primaryButtonHref}>
               <Button className="w-full !bg-[#D4A771] !text-white hover:!bg-[#C69963]">
-                Go to My Account
+                {primaryButtonText}
               </Button>
             </Link>
             <Link href="/">
@@ -118,6 +148,11 @@ function UpgradeContent() {
                 Go Home
               </Button>
             </Link>
+            {(actionRequired === 'update_payment' || subscriptionStatus === 'past_due') && (
+              <p className="text-xs text-gray-500 mt-4">
+                Need help? <Link href="/contact" className="text-[#D4A771] hover:underline">Contact support</Link>
+              </p>
+            )}
           </div>
         </div>
       </div>

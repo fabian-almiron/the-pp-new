@@ -71,17 +71,39 @@ export async function POST(request: NextRequest) {
           limit: 10,
         });
 
+        // Check for truly active subscriptions
         const activeSubscription = subscriptions.data.find(sub => 
-          ['active', 'trialing', 'past_due'].includes(sub.status)
+          ['active', 'trialing'].includes(sub.status)
         );
 
         if (activeSubscription) {
           console.log('❌ Email already has an active subscription:', normalizedEmail);
           return NextResponse.json(
-            { error: 'This email is already associated with an active subscription. Please sign in to manage your account.' },
+            { 
+              error: 'This email is already associated with an active subscription. Please sign in to manage your account.',
+              subscriptionStatus: activeSubscription.status 
+            },
             { status: 409 }
           );
         }
+
+        // Check for past_due subscriptions (payment failed)
+        const pastDueSubscription = subscriptions.data.find(sub => 
+          sub.status === 'past_due'
+        );
+
+        if (pastDueSubscription) {
+          console.log('⚠️ Email has past_due subscription:', normalizedEmail);
+          return NextResponse.json(
+            { 
+              error: 'This email has a subscription with a failed payment. Please sign in and update your payment method.',
+              subscriptionStatus: 'past_due',
+              actionRequired: 'update_payment'
+            },
+            { status: 409 }
+          );
+        }
+        
         console.log('✅ No active subscriptions found');
       }
     } catch (stripeError) {
