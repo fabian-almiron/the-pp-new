@@ -2,10 +2,10 @@
 
 import { useSearchParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Crown } from "lucide-react"
+import { Crown, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useRole } from "@/hooks/use-role"
-import { Suspense, useEffect } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { PeonyLoader } from "@/components/ui/peony-loader"
 import { useUser } from "@clerk/nextjs"
 
@@ -14,12 +14,17 @@ function UpgradeContent() {
   const redirectPath = searchParams.get('redirect_url') || '/shop'
   const { isSubscriber } = useRole()
   const { user } = useUser()
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   // Automatically redirect to Stripe checkout
   useEffect(() => {
     const redirectToCheckout = async () => {
       if (isSubscriber) return; // Don't redirect if already subscribed
       if (!user) return; // Wait for user to load
+      if (isRedirecting) return; // Prevent duplicate attempts
+      
+      setIsRedirecting(true);
       
       try {
         // Fetch subscriptions
@@ -48,20 +53,29 @@ function UpgradeContent() {
 
           if (!checkoutResponse.ok) {
             const error = await checkoutResponse.json();
-            throw new Error(error.error || 'Failed to create checkout session');
+            console.error('Checkout error:', error);
+            // Show error message instead of staying stuck
+            setCheckoutError(error.error || 'Failed to create checkout session');
+            setIsRedirecting(false);
+            return;
           }
 
           const { url } = await checkoutResponse.json();
           console.log('Redirecting to checkout:', url);
           window.location.href = url;
+        } else {
+          setCheckoutError('No subscription plans available');
+          setIsRedirecting(false);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error redirecting to checkout:', error);
+        setCheckoutError(error.message || 'An error occurred');
+        setIsRedirecting(false);
       }
     };
 
     redirectToCheckout();
-  }, [isSubscriber, user]);
+  }, [isSubscriber, user, isRedirecting]);
 
   if (isSubscriber) {
     return (
@@ -75,6 +89,36 @@ function UpgradeContent() {
               Continue to Content
             </Button>
           </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state if checkout creation failed
+  if (checkoutError) {
+    return (
+      <div className="min-h-screen bg-[#FBF9F6] flex items-center justify-center">
+        <div className="max-w-md mx-auto text-center p-8 bg-white rounded-lg shadow-lg">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <h1 className="text-2xl font-serif text-gray-900 mb-4">Unable to Create Checkout</h1>
+          <p className="text-gray-600 mb-2">{checkoutError}</p>
+          <p className="text-sm text-gray-500 mb-6">
+            {checkoutError.includes('already has an active subscription') 
+              ? 'Please manage your subscription from your account page.'
+              : 'Please contact support for assistance.'}
+          </p>
+          <div className="space-y-3">
+            <Link href="/my-account">
+              <Button className="w-full !bg-[#D4A771] !text-white hover:!bg-[#C69963]">
+                Go to My Account
+              </Button>
+            </Link>
+            <Link href="/">
+              <Button variant="outline" className="w-full">
+                Go Home
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     )

@@ -8,7 +8,8 @@
     "lint": "next lint",
     "start": "next start",
     "check-subscriptions": "tsx scripts/check-subscription-health.ts",
-    "test-encryption": "tsx scripts/test-encryption.ts"
+    "test-encryption": "tsx scripts/test-encryption.ts",
+    "fix-guest-roles": "tsx scripts/fix-guest-role.ts"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.33.1",

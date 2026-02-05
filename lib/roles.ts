@@ -80,6 +80,11 @@ export function getUserRole(user: User | null): UserRole {
     return role;
   }
   
+  // Log warning if user has invalid/unknown role
+  if (role && role !== "customer" && role !== "subscriber") {
+    console.warn(`⚠️ User ${user.id} has invalid role: "${role}". Defaulting to "customer". This should be fixed in Clerk dashboard.`);
+  }
+  
   return "customer";
 }
 
