@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/nextjs/server';
+import { encrypt } from '@/lib/crypto';
 
 // Initialize Stripe with your secret key
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -151,6 +152,11 @@ export async function POST(request: NextRequest) {
     // (customer_creation parameter is only for payment mode, not subscription mode)
     console.log('🛒 Creating Stripe checkout session (no customer/account created yet)...');
     
+    // 🔒 SECURITY: Encrypt password before storing in Stripe metadata
+    // This prevents plain-text passwords from being visible in Stripe dashboard
+    console.log('🔒 Encrypting password for secure storage...');
+    const encryptedPassword = encrypt(password);
+    
     const session = await stripe.checkout.sessions.create({
       // Don't specify customer - Stripe auto-creates it when payment succeeds in subscription mode
       customer_email: normalizedEmail, // Pre-fill email in checkout form
@@ -176,7 +182,7 @@ export async function POST(request: NextRequest) {
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: normalizedEmail,
-        password: password, // Store password to create Clerk account after payment
+        password: encryptedPassword, // 🔒 Encrypted password (secure storage)
         subscriptionName: subscription.name,
       },
     });

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClerkClient } from '@clerk/nextjs/server';
 import { sendSubscriptionTrialEmail, sendPurchaseReceiptEmail, sendInvoiceCopyToOwner } from '@/lib/email';
+import { decrypt, isEncrypted } from '@/lib/crypto';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-09-30.clover',
@@ -12,6 +13,10 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY!,
 });
+
+// Track processed events to prevent duplicate processing (in-memory for now)
+// In production, use Redis or database
+const processedEvents = new Set<string>();
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -26,7 +31,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Webhook signature verification failed' }, { status: 400 });
   }
 
-  console.log('🔔 Stripe webhook received:', event.type);
+  console.log('🔔 Stripe webhook received:', event.type, 'ID:', event.id);
+  
+  // Idempotency check: Have we already processed this event?
+  if (processedEvents.has(event.id)) {
+    console.log('⚠️  Event already processed, skipping:', event.id);
+    return NextResponse.json({ received: true, note: 'already_processed' });
+  }
   
   try {
     switch (event.type) {
@@ -80,10 +91,26 @@ export async function POST(request: NextRequest) {
         console.log(`Unhandled event type: ${event.type}`);
     }
 
+    // Mark event as processed
+    processedEvents.add(event.id);
+    
+    // IMPORTANT: Always return 200 to Stripe, even if handler had issues
+    // This prevents retry loops for events that partially succeeded
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook handler error:', error);
-    return NextResponse.json({ error: 'Webhook handler failed' }, { status: 500 });
+    console.error('❌❌❌ CRITICAL: Webhook handler error for event', event.id);
+    console.error('Error:', error);
+    console.error('Event type:', event.type);
+    console.error('Event data:', JSON.stringify(event.data.object, null, 2));
+    
+    // STILL return 200 to prevent Stripe from retrying
+    // Log the error so you can manually fix it later
+    // TODO: Send to error tracking service (Sentry, etc.)
+    return NextResponse.json({ 
+      received: true, 
+      error: 'Handler failed but accepted to prevent retries',
+      eventId: event.id 
+    });
   }
 }
 
@@ -109,6 +136,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     
     if (isPendingSignup && !clerkUserId) {
       console.log('🆕 Pending signup detected - creating Clerk account now...');
+      console.log('📋 Session ID:', session.id);
       console.log('📋 Session customer:', session.customer);
       console.log('📋 Customer type:', typeof session.customer);
       
@@ -116,27 +144,68 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       const firstName = session.metadata?.firstName;
       const lastName = session.metadata?.lastName;
       const email = session.metadata?.email;
-      const password = session.metadata?.password;
+      const encryptedPassword = session.metadata?.password;
       
-      if (firstName && lastName && email && password) {
-        try {
-          console.log('👤 Creating Clerk user:', email);
+      if (!firstName || !lastName || !email || !encryptedPassword) {
+        console.error('❌❌❌ CRITICAL: Missing signup data in metadata!');
+        console.error('Session ID:', session.id);
+        console.error('Available metadata:', session.metadata);
+        console.error('Missing fields:', {
+          firstName: !firstName,
+          lastName: !lastName,
+          email: !email,
+          password: !encryptedPassword,
+        });
+        // Don't throw - just log the error and let Stripe know the payment succeeded
+        // We can manually create these accounts later
+        return;
+      }
+      
+      // 🔒 SECURITY: Decrypt password (it was encrypted before storing in Stripe)
+      let password: string;
+      try {
+        if (isEncrypted(encryptedPassword)) {
+          console.log('🔓 Decrypting password...');
+          password = decrypt(encryptedPassword);
+          console.log('✅ Password decrypted successfully');
+        } else {
+          // Backwards compatibility: if it's not encrypted (old data), use as-is
+          console.warn('⚠️  Password not encrypted (legacy data)');
+          password = encryptedPassword;
+        }
+      } catch (decryptError) {
+        console.error('❌❌❌ CRITICAL: Failed to decrypt password!');
+        console.error('Session ID:', session.id);
+        console.error('Error:', decryptError);
+        // Can't create account without password
+        return;
+      }
+      
+      const stripeCustomerId = session.customer as string;
+      
+      if (!stripeCustomerId) {
+        console.error('❌❌❌ CRITICAL: No Stripe customer ID in session!');
+        console.error('Session ID:', session.id);
+        return;
+      }
+      
+      try {
+        console.log('👤 Creating Clerk user:', email);
+        console.log('🔍 First checking if user already exists...');
+        
+        // Check if user already exists (in case of duplicate signups that slipped through)
+        const existingUsers = await clerkClient.users.getUserList({
+          emailAddress: [email],
+        });
+        
+        if (existingUsers.data.length > 0) {
+          // User already exists - link the Stripe customer to the existing account
+          const existingUser = existingUsers.data[0];
+          clerkUserId = existingUser.id;
+          console.log('⚠️  User already exists, linking to existing account:', clerkUserId);
           
-          // Customer was created by Stripe during checkout, so we have the customer ID
-          const stripeCustomerId = session.customer as string;
-          
-          // Check if user already exists (in case of duplicate signups that slipped through)
-          const existingUsers = await clerkClient.users.getUserList({
-            emailAddress: [email],
-          });
-          
-          if (existingUsers.data.length > 0) {
-            // User already exists - link the Stripe customer to the existing account
-            const existingUser = existingUsers.data[0];
-            clerkUserId = existingUser.id;
-            console.log('⚠️  User already exists, linking to existing account:', clerkUserId);
-            
-            // Update existing user with Stripe customer ID and subscriber role
+          // Update existing user with Stripe customer ID and subscriber role
+          try {
             await clerkClient.users.updateUserMetadata(clerkUserId, {
               publicMetadata: {
                 role: 'subscriber',
@@ -146,8 +215,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
               },
             });
             console.log('✅ Updated existing user with subscription');
-          } else {
-            // Create the Clerk user NOW that payment succeeded
+          } catch (updateError) {
+            console.error('❌ Failed to update existing user metadata:', updateError);
+            // Don't throw - user exists, just couldn't update metadata
+          }
+        } else {
+          // Create the Clerk user NOW that payment succeeded
+          console.log('➕ Creating new Clerk user...');
+          try {
             const newUser = await clerkClient.users.createUser({
               firstName: firstName,
               lastName: lastName,
@@ -163,99 +238,82 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
             
             clerkUserId = newUser.id;
             console.log('✅ Created Clerk user:', clerkUserId);
-          }
-          
-          // Update Stripe customer with Clerk user ID and proper name
-          // (Customer was auto-created by Stripe, so now we add our metadata)
-          await stripe.customers.update(stripeCustomerId, {
-            name: `${firstName} ${lastName}`,
-            metadata: {
-              clerkUserId: clerkUserId,
-              pendingSignup: 'false', // Mark as completed
-            },
-          });
-          console.log('✅ Updated Stripe customer with name and Clerk user ID');
-          
-          // Update subscription with Clerk user ID
-          await stripe.subscriptions.update(subscription.id, {
-            metadata: {
-              clerkUserId: clerkUserId,
-              subscriptionName: session.metadata?.subscriptionName || 'Membership',
-              pendingSignup: 'false', // Mark as completed
-            },
-          });
-          
-          console.log('✅ Updated Stripe subscription with Clerk user ID');
-        } catch (error: any) {
-          console.error('❌ Failed to create/update Clerk account:', error);
-          console.error('Error details:', {
-            message: error.message,
-            errors: error.errors,
-            clerkError: error.clerkError,
-          });
-          
-          // If it's a duplicate email error, try to find and link the existing user
-          if (error.message?.includes('email') || error.message?.includes('duplicate')) {
-            console.log('🔍 Attempting to recover from duplicate email error...');
+          } catch (createError: any) {
+            console.error('❌❌❌ CRITICAL: Failed to create Clerk user!');
+            console.error('Error:', createError);
+            console.error('Error message:', createError.message);
+            console.error('Error details:', createError.errors);
+            console.error('Session ID:', session.id);
+            console.error('Email:', email);
+            console.error('Stripe Customer ID:', stripeCustomerId);
+            
+            // Try one more time to check if user was created (race condition)
             try {
-              const existingUsers = await clerkClient.users.getUserList({
+              const retryUsers = await clerkClient.users.getUserList({
                 emailAddress: [email],
               });
-              
-              if (existingUsers.data.length > 0) {
-                const existingUser = existingUsers.data[0];
-                clerkUserId = existingUser.id;
-                console.log('✅ Found existing user, linking subscription:', clerkUserId);
-                
-                const stripeCustomerId = session.customer as string;
-                
-                // Update existing user
-                await clerkClient.users.updateUserMetadata(clerkUserId, {
-                  publicMetadata: {
-                    role: 'subscriber',
-                  },
-                  privateMetadata: {
-                    stripeCustomerId: stripeCustomerId,
-                  },
+              if (retryUsers.data.length > 0) {
+                clerkUserId = retryUsers.data[0].id;
+                console.log('✅ Found user on retry, they were created:', clerkUserId);
+              } else {
+                // User truly doesn't exist - this needs manual intervention
+                console.error('❌❌❌ USER NOT CREATED - MANUAL FIX REQUIRED');
+                console.error('Customer has Stripe subscription but no Clerk account');
+                console.error('Data for manual creation:', {
+                  email,
+                  firstName,
+                  lastName,
+                  stripeCustomerId,
+                  sessionId: session.id,
                 });
-                
-                // Update Stripe records
-                await stripe.customers.update(stripeCustomerId, {
-                  name: `${firstName} ${lastName}`,
-                  metadata: {
-                    clerkUserId: clerkUserId,
-                    pendingSignup: 'false',
-                  },
-                });
-                
-                await stripe.subscriptions.update(subscription.id, {
-                  metadata: {
-                    clerkUserId: clerkUserId,
-                    subscriptionName: session.metadata?.subscriptionName || 'Membership',
-                    pendingSignup: 'false',
-                  },
-                });
-                
-                console.log('✅ Successfully recovered from duplicate email error');
-                // Don't throw - we recovered successfully
+                // Don't throw - we want Stripe to think the webhook succeeded
                 return;
               }
-            } catch (recoveryError) {
-              console.error('❌ Failed to recover from duplicate email error:', recoveryError);
+            } catch (retryError) {
+              console.error('❌ Retry check also failed:', retryError);
+              return;
             }
           }
-          
-          // If we couldn't recover, throw the error
-          throw error;
         }
-      } else {
-        console.error('❌ Missing signup data in metadata:', {
-          firstName: !!firstName,
-          lastName: !!lastName,
-          email: !!email,
-          password: !!password,
-        });
-        throw new Error('Missing required signup data in session metadata');
+        
+        // Update Stripe customer with Clerk user ID and proper name
+        if (clerkUserId) {
+          try {
+            await stripe.customers.update(stripeCustomerId, {
+              name: `${firstName} ${lastName}`,
+              metadata: {
+                clerkUserId: clerkUserId,
+                pendingSignup: 'false', // Mark as completed
+              },
+            });
+            console.log('✅ Updated Stripe customer with name and Clerk user ID');
+          } catch (customerUpdateError) {
+            console.error('⚠️  Failed to update Stripe customer (non-critical):', customerUpdateError);
+            // Don't throw - the important part (Clerk user) succeeded
+          }
+          
+          // Update subscription with Clerk user ID
+          try {
+            await stripe.subscriptions.update(subscription.id, {
+              metadata: {
+                clerkUserId: clerkUserId,
+                subscriptionName: session.metadata?.subscriptionName || 'Membership',
+                pendingSignup: 'false', // Mark as completed
+              },
+            });
+            console.log('✅ Updated Stripe subscription with Clerk user ID');
+          } catch (subUpdateError) {
+            console.error('⚠️  Failed to update Stripe subscription (non-critical):', subUpdateError);
+            // Don't throw - the important part (Clerk user) succeeded
+          }
+        }
+      } catch (error: any) {
+        console.error('❌❌❌ CRITICAL: Unexpected error in user creation flow!');
+        console.error('Error:', error);
+        console.error('Session ID:', session.id);
+        console.error('Email:', email);
+        console.error('Stripe Customer ID:', stripeCustomerId);
+        // Don't throw - we want the webhook to succeed so Stripe doesn't retry
       }
     }
     
