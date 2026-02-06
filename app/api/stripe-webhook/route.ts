@@ -133,6 +133,7 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
     // NEW: Check if this is a pending signup (no Clerk account exists yet)
     const isPendingSignup = session.metadata?.pendingSignup === 'true';
     let clerkUserId = session.metadata?.clerkUserId;
+    let usedRandomPassword = false; // Track if we had to use random password due to breach
     
     if (isPendingSignup && !clerkUserId) {
       console.log('🆕 Pending signup detected - creating Clerk account now...');
@@ -243,35 +244,83 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
             console.error('Error:', createError);
             console.error('Error message:', createError.message);
             console.error('Error details:', createError.errors);
-            console.error('Session ID:', session.id);
-            console.error('Email:', email);
-            console.error('Stripe Customer ID:', stripeCustomerId);
             
-            // Try one more time to check if user was created (race condition)
-            try {
-              const retryUsers = await clerkClient.users.getUserList({
-                emailAddress: [email],
-              });
-              if (retryUsers.data.length > 0) {
-                clerkUserId = retryUsers.data[0].id;
-                console.log('✅ Found user on retry, they were created:', clerkUserId);
-              } else {
-                // User truly doesn't exist - this needs manual intervention
+            // Check if it's a password breach error (form_password_pwned)
+            const isPwnedPassword = createError.errors?.some((err: any) => 
+              err.code === 'form_password_pwned'
+            );
+            
+            if (isPwnedPassword) {
+              console.log('🔐 Password rejected by Clerk (found in data breach)');
+              console.log('🔄 Retrying with secure random password...');
+              
+              // Generate a secure random password
+              const { randomBytes } = await import('crypto');
+              const randomPassword = randomBytes(32).toString('hex');
+              
+              try {
+                const newUser = await clerkClient.users.createUser({
+                  firstName: firstName,
+                  lastName: lastName,
+                  emailAddress: [email],
+                  password: randomPassword, // Secure random password
+                  publicMetadata: {
+                    role: 'subscriber',
+                  },
+                  privateMetadata: {
+                    stripeCustomerId: stripeCustomerId,
+                  },
+                });
+                
+                clerkUserId = newUser.id;
+                usedRandomPassword = true; // Flag for email notification
+                console.log('✅ Created Clerk user with secure password:', clerkUserId);
+                console.log('📧 Customer will receive email to set their own password');
+              } catch (retryError: any) {
+                console.error('❌ Failed even with random password:', retryError);
+                // User truly can't be created - manual intervention needed
                 console.error('❌❌❌ USER NOT CREATED - MANUAL FIX REQUIRED');
-                console.error('Customer has Stripe subscription but no Clerk account');
                 console.error('Data for manual creation:', {
                   email,
                   firstName,
                   lastName,
                   stripeCustomerId,
                   sessionId: session.id,
+                  reason: 'Clerk rejected user creation even with secure password',
                 });
-                // Don't throw - we want Stripe to think the webhook succeeded
                 return;
               }
-            } catch (retryError) {
-              console.error('❌ Retry check also failed:', retryError);
-              return;
+            } else {
+              // Some other error - try to check if user was created anyway
+              console.error('Session ID:', session.id);
+              console.error('Email:', email);
+              console.error('Stripe Customer ID:', stripeCustomerId);
+              
+              try {
+                const retryUsers = await clerkClient.users.getUserList({
+                  emailAddress: [email],
+                });
+                if (retryUsers.data.length > 0) {
+                  clerkUserId = retryUsers.data[0].id;
+                  console.log('✅ Found user on retry, they were created:', clerkUserId);
+                } else {
+                  // User truly doesn't exist - this needs manual intervention
+                  console.error('❌❌❌ USER NOT CREATED - MANUAL FIX REQUIRED');
+                  console.error('Customer has Stripe subscription but no Clerk account');
+                  console.error('Data for manual creation:', {
+                    email,
+                    firstName,
+                    lastName,
+                    stripeCustomerId,
+                    sessionId: session.id,
+                  });
+                  // Don't throw - we want Stripe to think the webhook succeeded
+                  return;
+                }
+              } catch (retryError) {
+                console.error('❌ Retry check also failed:', retryError);
+                return;
+              }
             }
           }
         }
@@ -351,7 +400,8 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         await sendSubscriptionTrialEmail(
           customerEmail,
           subscriptionName,
-          trialDays
+          trialDays,
+          usedRandomPassword // Notify if they need to set password
         );
       } else {
         console.log('⚠️ No customer email found, skipping email');

@@ -86,9 +86,12 @@ export async function sendEmail({ to, subject, html, text, attachments }: SendEm
 export async function sendSubscriptionTrialEmail(
   email: string,
   subscriptionName: string,
-  trialDays: number
+  trialDays: number,
+  needsPasswordReset: boolean = false
 ): Promise<boolean> {
-  const subject = `Subscription Trial Activated`;
+  const subject = needsPasswordReset 
+    ? `Welcome to The Piped Peony Academy - Please Set Your Password`
+    : `Subscription Trial Activated`;
 
   const html = `
 <!DOCTYPE html>
@@ -119,8 +122,37 @@ export async function sendSubscriptionTrialEmail(
                 Thank you for subscribing to The Piped Peony Academy!
               </p>
               
+              ${needsPasswordReset ? `
+              <!-- Password Reset Notice -->
+              <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #fef3c7; border-radius: 12px; margin: 0 0 30px; border: 2px solid #f59e0b;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <p style="margin: 0 0 10px; font-size: 16px; color: #92400e; font-weight: 600; font-family: 'sofia-pro', sans-serif;">
+                      ⚠️ Action Required: Set Your Password
+                    </p>
+                    <p style="margin: 0 0 15px; font-size: 14px; line-height: 1.6; color: #78350f; font-family: 'sofia-pro', sans-serif;">
+                      For security reasons, we need you to set a new password for your account. Please click the button below to create a secure password:
+                    </p>
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td align="center">
+                          <a href="${process.env.NEXT_PUBLIC_SITE_URL || 'https://thepipedpeony.com'}/login" 
+                             style="display: inline-block; background-color: #f59e0b; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 50px; font-weight: 600; font-size: 15px; font-family: 'sofia-pro', sans-serif;">
+                            Set My Password
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="margin: 15px 0 0; font-size: 12px; line-height: 1.6; color: #78350f; font-family: 'sofia-pro', sans-serif;">
+                      Click "Forgot Password" and enter your email: ${email}
+                    </p>
+                  </td>
+                </tr>
+              </table>
+              ` : ''}
+              
               <p style="margin: 0 0 30px; font-size: 14px; line-height: 1.6; color: #374151; font-family: 'sofia-pro', sans-serif;">
-                You can access your account area to view orders, change your password, and more at:
+                You can access your account area to view orders, ${needsPasswordReset ? 'set your password,' : 'change your password,'} and more at:
               </p>
               
               <!-- Account Link Button -->
