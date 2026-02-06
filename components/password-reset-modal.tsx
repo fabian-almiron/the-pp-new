@@ -5,6 +5,7 @@ import { X, Eye, EyeOff } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useSignIn } from '@clerk/nextjs';
+import { PasswordStrengthMeter } from '@/components/password-strength-meter';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export default function PasswordResetModal({
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState<number>(0);
   
   const { signIn, isLoaded, setActive } = useSignIn();
 
@@ -134,6 +136,11 @@ export default function PasswordResetModal({
       setErrorMessage('Password must be at least 8 characters long.');
       return;
     }
+
+    if (passwordStrength < 4) {
+      setErrorMessage('Please use a strong password (green strength indicator) for your account security.');
+      return;
+    }
     
     if (newPassword !== confirmPassword) {
       setErrorMessage('Passwords do not match.');
@@ -181,6 +188,7 @@ export default function PasswordResetModal({
     setShowConfirmPassword(false);
     setErrorMessage('');
     setIsLoading(false);
+    setPasswordStrength(0);
   };
 
   const handleClose = () => {
@@ -383,6 +391,11 @@ export default function PasswordResetModal({
               <small className="password-reset-hint">
                 Must be at least 8 characters long
               </small>
+              <PasswordStrengthMeter 
+                password={newPassword}
+                email={email}
+                onStrengthChange={setPasswordStrength}
+              />
             </div>
 
             <div className="password-reset-form-group">
@@ -425,10 +438,15 @@ export default function PasswordResetModal({
                 type="submit"
                 variant="default"
                 className="password-reset-submit"
-                disabled={isLoading || !isLoaded}
+                disabled={isLoading || !isLoaded || (newPassword.length >= 8 && passwordStrength < 4)}
               >
                 {isLoading ? 'Resetting...' : 'Reset Password'}
               </Button>
+              {newPassword.length >= 8 && passwordStrength < 4 && (
+                <p className="text-sm text-red-600 mt-2 text-center">
+                  ⚠️ Password must be strong (green indicator) to continue
+                </p>
+              )}
               <button
                 type="button"
                 onClick={() => {

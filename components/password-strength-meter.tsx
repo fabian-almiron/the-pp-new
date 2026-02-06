@@ -8,6 +8,7 @@ interface PasswordStrengthMeterProps {
   email?: string;
   firstName?: string;
   lastName?: string;
+  onStrengthChange?: (score: StrengthLevel) => void;
 }
 
 type StrengthLevel = 0 | 1 | 2 | 3 | 4;
@@ -25,7 +26,8 @@ export function PasswordStrengthMeter({
   password, 
   email = '',
   firstName = '',
-  lastName = '' 
+  lastName = '',
+  onStrengthChange
 }: PasswordStrengthMeterProps) {
   const [strength, setStrength] = useState<StrengthResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +36,7 @@ export function PasswordStrengthMeter({
     // Don't calculate if password is too short
     if (password.length < 4) {
       setStrength(null);
+      onStrengthChange?.(0);
       return;
     }
 
@@ -50,8 +53,10 @@ export function PasswordStrengthMeter({
       
       const result = zxcvbn(password, userInputs);
       
+      const strengthScore = result.score as StrengthLevel;
+      
       setStrength({
-        score: result.score as StrengthLevel,
+        score: strengthScore,
         feedback: {
           warning: result.feedback.warning || '',
           suggestions: result.feedback.suggestions || [],
@@ -59,9 +64,12 @@ export function PasswordStrengthMeter({
         crackTimeDisplay: result.crack_times_display.offline_slow_hashing_1e4_per_second,
       });
       
+      // Notify parent component of strength change
+      onStrengthChange?.(strengthScore);
+      
       setIsLoading(false);
     });
-  }, [password, email, firstName, lastName]);
+  }, [password, email, firstName, lastName, onStrengthChange]);
 
   if (!password || password.length < 4) {
     return null;

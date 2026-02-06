@@ -25,6 +25,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [isProcessingSignup, setIsProcessingSignup] = useState(false);
   const [showCancelledMessage, setShowCancelledMessage] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState<number>(0);
   
   const { signUp, isLoaded, setActive } = useSignUp();
   const { isSignedIn, isLoaded: userLoaded } = useUser();
@@ -71,6 +72,12 @@ export default function SignupPage() {
 
     if (formData.password.length < 8) {
       setError("Password must be at least 8 characters long.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (passwordStrength < 4) {
+      setError("Please use a strong password (green strength indicator) for your account security.");
       setIsLoading(false);
       return;
     }
@@ -281,6 +288,7 @@ export default function SignupPage() {
               email={formData.email}
               firstName={formData.firstName}
               lastName={formData.lastName}
+              onStrengthChange={setPasswordStrength}
             />
           </div>
 
@@ -337,10 +345,15 @@ export default function SignupPage() {
               type="submit"
               variant="clean"
               className="login-submit-button"
-              disabled={isLoading || !isLoaded}
+              disabled={isLoading || !isLoaded || (formData.password.length >= 8 && passwordStrength < 4)}
             >
               {isLoading ? "CREATING ACCOUNT..." : "START FREE TRIAL"}
             </Button>
+            {formData.password.length >= 8 && passwordStrength < 4 && (
+              <p className="text-sm text-red-600 mt-2 text-center">
+                ⚠️ Password must be strong (green indicator) to continue
+              </p>
+            )}
           </div>
         </form>
 
