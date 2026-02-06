@@ -240,19 +240,17 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
             clerkUserId = newUser.id;
             console.log('✅ Created Clerk user:', clerkUserId);
           } catch (createError: any) {
-            console.error('❌❌❌ CRITICAL: Failed to create Clerk user!');
-            console.error('Error:', createError);
-            console.error('Error message:', createError.message);
-            console.error('Error details:', createError.errors);
-            
             // Check if it's a password breach error (form_password_pwned)
             const isPwnedPassword = createError.errors?.some((err: any) => 
               err.code === 'form_password_pwned'
             );
             
             if (isPwnedPassword) {
-              console.log('🔐 Password rejected by Clerk (found in data breach)');
-              console.log('🔄 Retrying with secure random password...');
+              // This is EXPECTED and will be handled automatically
+              console.log('⚠️  Password rejected by Clerk (found in data breach database)');
+              console.log('   Email:', email);
+              console.log('   Reason: Password has been compromised in a known breach');
+              console.log('🔄 Automatically retrying with secure random password...');
               
               // Generate a secure random password
               const { randomBytes } = await import('crypto');
@@ -274,23 +272,33 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
                 
                 clerkUserId = newUser.id;
                 usedRandomPassword = true; // Flag for email notification
-                console.log('✅ Created Clerk user with secure password:', clerkUserId);
-                console.log('📧 Customer will receive email to set their own password');
+                console.log('✅ Account created successfully with secure password:', clerkUserId);
+                console.log('📧 Customer will receive welcome email with password reset instructions');
+                console.log('💡 This is normal - customer will set their own secure password via email link');
               } catch (retryError: any) {
-                console.error('❌ Failed even with random password:', retryError);
-                // User truly can't be created - manual intervention needed
-                console.error('❌❌❌ USER NOT CREATED - MANUAL FIX REQUIRED');
-                console.error('Data for manual creation:', {
+                console.error('❌❌❌ CRITICAL: Failed to create user even with secure password!');
+                console.error('Email:', email);
+                console.error('Session ID:', session.id);
+                console.error('Retry error:', retryError.message);
+                console.error('Retry error details:', retryError.errors);
+                console.error('⚠️  USER NOT CREATED - MANUAL INTERVENTION REQUIRED');
+                console.error('📋 Data for manual creation:', {
                   email,
                   firstName,
                   lastName,
                   stripeCustomerId,
                   sessionId: session.id,
-                  reason: 'Clerk rejected user creation even with secure password',
+                  subscriptionId: subscription.id,
+                  reason: 'Clerk rejected user creation even with secure random password',
                 });
                 return;
               }
             } else {
+              // Some other error - not a pwned password
+              console.error('❌❌❌ CRITICAL: Failed to create Clerk user!');
+              console.error('Error:', createError);
+              console.error('Error message:', createError.message);
+              console.error('Error details:', createError.errors);
               // Some other error - try to check if user was created anyway
               console.error('Session ID:', session.id);
               console.error('Email:', email);
@@ -389,7 +397,14 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
       const customerEmail = session.customer_email || session.customer_details?.email || session.metadata?.email;
       
       if (customerEmail) {
-        console.log('📧 Sending subscription trial email to:', customerEmail);
+        console.log('📧 Preparing subscription welcome email');
+        console.log('   Recipient:', customerEmail);
+        if (usedRandomPassword) {
+          console.log('   Type: Welcome email WITH password reset instructions');
+          console.log('   Reason: Original password was found in data breach database');
+        } else {
+          console.log('   Type: Standard welcome email');
+        }
         
         // Determine trial days
         const trialDays = subscription.trial_end ? 
@@ -397,15 +412,35 @@ async function handleCheckoutSessionCompleted(session: Stripe.Checkout.Session) 
         
         const subscriptionName = subscription.metadata?.subscriptionName || session.metadata?.subscriptionName || 'Membership';
         
-        await sendSubscriptionTrialEmail(
+        const emailSent = await sendSubscriptionTrialEmail(
           customerEmail,
           subscriptionName,
           trialDays,
           usedRandomPassword // Notify if they need to set password
         );
+        
+        if (emailSent) {
+          console.log('✅ Welcome email sent successfully');
+        } else {
+          console.error('❌ Failed to send welcome email');
+        }
       } else {
         console.log('⚠️ No customer email found, skipping email');
       }
+      
+      // Summary log
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+      console.log('✅ SUBSCRIPTION SIGNUP COMPLETE');
+      console.log('   Customer:', customerEmail);
+      console.log('   Clerk User ID:', clerkUserId);
+      console.log('   Subscription:', subscription.id);
+      console.log('   Status:', subscription.status);
+      if (usedRandomPassword) {
+        console.log('   Password: Secure random (customer will set their own)');
+      } else {
+        console.log('   Password: Customer\'s original password');
+      }
+      console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     } else {
       console.error('❌ No clerkUserId available after processing');
       console.error('Available metadata keys:', Object.keys(session.metadata || {}));
