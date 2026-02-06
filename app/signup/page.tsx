@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useSignUp, useUser } from "@clerk/nextjs";
 import { OAuthStrategy } from "@clerk/types";
+import { PasswordStrengthMeter } from "@/components/password-strength-meter";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -275,6 +276,12 @@ export default function SignupPage() {
             <small className="signup-password-hint">
               Must be at least 8 characters long
             </small>
+            <PasswordStrengthMeter 
+              password={formData.password}
+              email={formData.email}
+              firstName={formData.firstName}
+              lastName={formData.lastName}
+            />
           </div>
 
           <div className="login-form-group">
