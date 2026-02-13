@@ -159,6 +159,22 @@ export default function PasswordResetModal({
       // If successful, set the session and show success
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
+        
+        // Clear migration flag if it exists (for WordPress migrated users)
+        // This ensures they won't be prompted to reset password on every login
+        try {
+          const response = await fetch('/api/clear-migration-flag', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+          });
+          if (response.ok) {
+            console.log('✅ Migration flag cleared');
+          }
+        } catch (error) {
+          console.error('Failed to clear migration flag:', error);
+          // Don't fail the whole flow if this fails
+        }
+        
         setStep('success');
         
         // Auto-close after 3 seconds
