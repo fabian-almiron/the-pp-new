@@ -17,7 +17,7 @@ function LoginContent() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
-  const [showMigrationNotice, setShowMigrationNotice] = useState(true);
+  const [showMigrationNotice, setShowMigrationNotice] = useState(false);
   const [showResetModal, setShowResetModal] = useState(false);
   const [resetModalEmail, setResetModalEmail] = useState("");
   const [showResetMigrationMessage, setShowResetMigrationMessage] = useState(false);
