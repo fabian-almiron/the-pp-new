@@ -7,8 +7,15 @@
  * Run with: npx tsx scripts/clear-migration-flags.ts
  */
 
-import { clerkClient } from '@clerk/nextjs/server';
-import 'dotenv/config';
+import { createClerkClient } from '@clerk/nextjs/server';
+import dotenv from 'dotenv';
+import path from 'path';
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+
+const clerk = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY!,
+});
 
 async function clearMigrationFlags() {
   console.log('🔍 Starting migration flag cleanup...\n');
@@ -22,7 +29,7 @@ async function clearMigrationFlags() {
     let totalCleared = 0;
 
     while (hasMore) {
-      const response = await clerkClient().users.getUserList({
+      const response = await clerk.users.getUserList({
         limit,
         offset,
       });
@@ -49,10 +56,12 @@ async function clearMigrationFlags() {
             console.log(`  ✅ Clearing flag for: ${email} (${user.id})`);
             
             // Remove the migration flag
-            const { migratedFromWordPress, ...restMetadata } = publicMetadata;
-            
-            await clerkClient().users.updateUserMetadata(user.id, {
-              publicMetadata: restMetadata,
+            // IMPORTANT: updateUserMetadata does a deep MERGE, so omitting a key does NOT delete it.
+            // You must explicitly set the key to null to remove it.
+            await clerk.users.updateUserMetadata(user.id, {
+              publicMetadata: {
+                migratedFromWordPress: null,
+              },
             });
             
             totalCleared++;

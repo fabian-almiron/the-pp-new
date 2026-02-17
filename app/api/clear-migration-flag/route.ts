@@ -22,11 +22,13 @@ export async function POST() {
     const currentPublicMetadata = user.publicMetadata || {};
 
     // Remove the migratedFromWordPress flag if it exists
+    // IMPORTANT: updateUserMetadata does a deep MERGE, so omitting a key does NOT delete it.
+    // You must explicitly set the key to null to remove it.
     if (currentPublicMetadata.migratedFromWordPress) {
-      const { migratedFromWordPress, ...restMetadata } = currentPublicMetadata;
-      
       await clerkClient().users.updateUserMetadata(userId, {
-        publicMetadata: restMetadata,
+        publicMetadata: {
+          migratedFromWordPress: null,
+        },
       });
       
       console.log(`✅ Cleared migration flag for user: ${userId}`);
