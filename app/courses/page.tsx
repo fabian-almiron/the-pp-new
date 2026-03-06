@@ -9,21 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { stripHtml } from "@/lib/utils";
-
-
-// Function to get Vimeo thumbnail URL
-function getVimeoThumbnail(videoId: string, size: 'small' | 'medium' | 'large' = 'large'): string {
-  if (!videoId) return '';
-  
-  // Vimeo thumbnail URL format
-  const sizeMap = {
-    small: '200x150',
-    medium: '640x480', 
-    large: '1280x720'
-  };
-  
-  return `https://vumbnail.com/${videoId}_${sizeMap[size]}.jpg`;
-}
+import { VimeoThumbnail } from "@/components/vimeo-thumbnail";
 
 export default function AllCoursesPage() {
   const [courses, setCourses] = useState<any[]>([]);
@@ -224,10 +210,9 @@ function CoursesContent({ courses, error, loading }: { courses: any[], error: st
                             className="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         ) : course.videoId ? (
-                          <Image
-                            src={getVimeoThumbnail(course.videoId)}
+                          <VimeoThumbnail
+                            videoId={course.videoId}
                             alt={course.title}
-                            fill
                             className="object-cover group-hover:scale-110 transition-transform duration-500"
                           />
                         ) : (
@@ -421,10 +406,9 @@ function CoursesContent({ courses, error, loading }: { courses: any[], error: st
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : course.videoId ? (
-                          <Image
-                            src={getVimeoThumbnail(course.videoId)}
+                          <VimeoThumbnail
+                            videoId={course.videoId}
                             alt={course.title}
-                            fill
                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         ) : (
