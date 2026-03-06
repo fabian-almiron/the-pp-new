@@ -130,6 +130,13 @@ export default function RootLayout({
           <Analytics />
           <SpeedInsights />
           
+          {/* Klaviyo - Email marketing & forms */}
+          <Script
+            id="klaviyo-script"
+            src={`https://static.klaviyo.com/onsite/js/klaviyo.js?company_id=${process.env.NEXT_PUBLIC_KLAVIYO_COMPANY_ID}`}
+            strategy="afterInteractive"
+          />
+
           {/* accessiBe - Loaded during idle time for minimal performance impact */}
           <Script
             id="accessibe-script"
