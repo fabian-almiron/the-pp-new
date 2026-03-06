@@ -2800,6 +2800,9 @@ html {
   z-index: 101;
   width: 90%;
   max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
   animation: slideIn 0.3s ease-out;
 }
 
@@ -2833,6 +2836,15 @@ html {
   border: 2px solid #d4c5b9;
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.password-reset-body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
 }
 
 .password-reset-header {
@@ -2867,10 +2879,6 @@ html {
 .password-reset-close:hover {
   background: rgba(0, 0, 0, 0.05);
   color: #000000;
-}
-
-.password-reset-body {
-  padding: 1.5rem;
 }
 
 .password-reset-description {

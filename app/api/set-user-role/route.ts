@@ -29,7 +29,8 @@ export async function POST(request: NextRequest) {
     console.log(`🔄 Setting user ${userId} role to: ${normalizedRole}`);
 
     // Update user metadata in Clerk
-    await clerkClient().users.updateUserMetadata(userId, {
+    const clerk = await clerkClient();
+    await clerk.users.updateUserMetadata(userId, {
       publicMetadata: {
         role: normalizedRole,
       },

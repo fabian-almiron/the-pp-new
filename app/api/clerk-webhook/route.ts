@@ -78,7 +78,8 @@ export async function POST(request: NextRequest) {
     console.log(`🔐 User session created: ${userId}`);
 
     try {
-      const user = await clerkClient().users.getUser(userId);
+      const clerk = await clerkClient();
+      const user = await clerk.users.getUser(userId);
       const email = user.emailAddresses?.[0]?.emailAddress;
       
       if (email) {
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
             console.log(`   Old name: ${user.firstName || '(none)'} ${user.lastName || '(none)'}`);
             console.log(`   New name: ${stripeFirstName} ${stripeLastName}`);
             
-            await clerkClient().users.updateUser(userId, {
+            await clerk.users.updateUser(userId, {
               firstName: stripeFirstName,
               lastName: stripeLastName,
             });
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
           
           // Also save Stripe customer ID to Clerk metadata if not already saved
           if (!user.privateMetadata?.stripeCustomerId) {
-            await clerkClient().users.updateUserMetadata(userId, {
+            await clerk.users.updateUserMetadata(userId, {
               privateMetadata: {
                 stripeCustomerId: stripeCustomer.id,
               },
