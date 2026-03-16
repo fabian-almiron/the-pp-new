@@ -111,8 +111,8 @@ export function ContentCarousel({ items, title = "Continue the Series" }: Conten
           
           {/* Navigation buttons centered below carousel */}
           <div className="flex items-center justify-center gap-4 mt-6">
-            <CarouselPrevious className="static translate-x-0 translate-y-0" />
-            <CarouselNext className="static translate-x-0 translate-y-0" />
+            <CarouselPrevious className="static translate-x-0 translate-y-0 bg-black border-black text-white hover:bg-black/80 hover:text-white" />
+            <CarouselNext className="static translate-x-0 translate-y-0 bg-black border-black text-white hover:bg-black/80 hover:text-white" />
           </div>
         </Carousel>
       </div>
