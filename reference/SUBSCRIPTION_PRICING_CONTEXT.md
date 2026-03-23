@@ -41,6 +41,7 @@ This document captures how memberships, Stripe, Strapi, and pricing changes work
 | Role hook | `hooks/use-role.tsx` |
 | Signup → checkout | `app/signup/page.tsx` |
 | Upgrade → checkout | `app/upgrade/page.tsx`, `app/signup-subscription/page.tsx` |
+| Legacy notice eligibility (Stripe Price check) | `app/api/subscriber-legacy-pricing-notice-eligible/route.ts` |
 
 ---
 
@@ -70,23 +71,34 @@ This document captures how memberships, Stripe, Strapi, and pricing changes work
 
 ### Purpose
 
-Inform **current subscribers** (grandfathered at $15 until migration) about **$15 → $20** effective **April 22, 2026**, with copy about automatic update on first billing cycle after that date and unchanged access.
+Inform **legacy-price subscribers** (still on the old $15 Stripe Price until migration) about **$15 → $20** effective **April 22, 2026**. **New** signups on the **new** Stripe Price do **not** see this banner.
 
 ### Implementation
 
 - **Component:** `components/subscriber-pricing-notice.tsx`
-- **Mounted in:** `app/layout.tsx` immediately below `<SiteHeader />` (site-wide for eligible users).
-- **Visibility rules:**
-  - User is signed in and **`useRole().isSubscriber`** is true (exact Clerk role **`subscriber`**).
+- **API:** `GET /api/subscriber-legacy-pricing-notice-eligible` — resolves Stripe customer (Clerk `privateMetadata.stripeCustomerId` or email), lists subscriptions (`active` / `trialing`), returns **`{ eligible: true }`** only if any line item’s Price ID is listed in **`LEGACY_SUBSCRIPTION_STRIPE_PRICE_IDS`**.
+- **Mounted in:** `app/layout.tsx` immediately below `<SiteHeader />`.
+- **Visibility rules (all required):**
+  - Signed in, Clerk role **`subscriber`**, and **`user.id`** available.
+  - **`GET /api/subscriber-legacy-pricing-notice-eligible`** returns **`eligible: true`** (legacy Stripe Price on an active/trialing subscription).
   - Current date is **before** local **April 23, 2026** (`NOTICE_END = new Date(2026, 3, 23)`).
-  - User has not dismissed: **`localStorage`** key **`pipedPeonySubscriberPricingNoticeDismissed`** !== `"1"`.
-- **Dismiss:** **“I understand”** sets localStorage and hides the banner in **that browser** until storage is cleared or the end date passes.
-- **Styling:** Background **`rgb(255 228 195)`**, black text, link to **`/terms-subscription`**. No separate X button (removed); dismiss via button only.
+  - Not dismissed: **`localStorage`** key **`pipedPeonySubscriberPricingNoticeDismissed:<clerkUserId>`** !== `"1"` (per user on shared devices).
+- **Dismiss:** Top-right **X** sets the per-user localStorage key above.
+- **Styling:** Background **`rgb(255 228 195)`**, black text, link to **`/terms-subscription`**.
+
+### Required environment variable
+
+```env
+# Comma-separated Stripe Price ID(s) for the OLD plan (e.g. $15). New $20 price must NOT be listed.
+LEGACY_SUBSCRIPTION_STRIPE_PRICE_IDS=price_xxxxxxxx
+```
+
+If this variable is **empty or unset**, **no one** sees the banner (safe default).
 
 ### Caveats
 
-- Dismiss state is **per browser**, not per Clerk user.
-- **Trialing** users who still have role **`customer`** in Clerk will **not** see this banner until they are **`subscriber`** (verify real-world webhook behavior if needed).
+- Dismiss state is **per browser + Clerk user id**.
+- Requires **`STRIPE_SECRET_KEY`** and correct **legacy** Price ID(s) after you create the new $20 Price in Stripe.
 
 ---
 
@@ -116,6 +128,7 @@ The in-app notice still states an increase **from $15 to $20** starting **April 
 - [ ] Strapi **`subscriptionPrice`** → **20**
 - [ ] Confirm hardcoded marketing pages match (signup, academy-details).
 - [ ] Confirm terms match counsel-approved language.
+- [ ] Set **`LEGACY_SUBSCRIPTION_STRIPE_PRICE_IDS`** to the **old** `price_…` (Vercel + `.env.local`).
 - [ ] After April 2026 migration: consider removing or editing **`SubscriberPricingNotice`** end date and copy; redeploy if needed.
 
 ---

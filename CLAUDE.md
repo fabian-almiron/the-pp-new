@@ -85,6 +85,8 @@ CLERK_SECRET_KEY=
 # Stripe (Payments)
 STRIPE_SECRET_KEY=
 STRIPE_WEBHOOK_SECRET=
+# Legacy $15 Price ID(s), comma-separated — used only for in-app price-increase banner (see reference/SUBSCRIPTION_PRICING_CONTEXT.md)
+LEGACY_SUBSCRIPTION_STRIPE_PRICE_IDS=
 
 # Strapi (CMS)
 NEXT_PUBLIC_STRAPI_URL=http://localhost:1337  # or Strapi Cloud URL

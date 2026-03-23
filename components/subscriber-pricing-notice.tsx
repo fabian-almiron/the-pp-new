@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
+import { useUser } from "@clerk/nextjs";
 import { useRole } from "@/hooks/use-role";
 
-const STORAGE_KEY = "pipedPeonySubscriberPricingNoticeDismissed";
+const STORAGE_KEY_PREFIX = "pipedPeonySubscriberPricingNoticeDismissed";
 /** Hide the banner after this instant (local): April 23, 2026 00:00 */
 const NOTICE_END = new Date(2026, 3, 23);
 
@@ -13,21 +14,65 @@ function isNoticePeriodActive(): boolean {
   return Date.now() < NOTICE_END.getTime();
 }
 
+function dismissStorageKey(userId: string) {
+  return `${STORAGE_KEY_PREFIX}:${userId}`;
+}
+
 export function SubscriberPricingNotice() {
+  const { user } = useUser();
   const { isSubscriber, isLoaded, isSignedIn } = useRole();
   const [dismissed, setDismissed] = useState(false);
+  /** null = still checking Stripe; true = on legacy price; false = new price or ineligible */
+  const [legacyEligible, setLegacyEligible] = useState<boolean | null>(null);
 
   useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
     try {
-      if (localStorage.getItem(STORAGE_KEY) === "1") {
+      if (localStorage.getItem(dismissStorageKey(user.id)) === "1") {
         setDismissed(true);
       }
     } catch {
       /* ignore */
     }
-  }, []);
+  }, [user?.id]);
 
-  if (!isLoaded || !isSignedIn || !isSubscriber) {
+  useEffect(() => {
+    if (
+      !isLoaded ||
+      !isSignedIn ||
+      !isSubscriber ||
+      !user?.id ||
+      !isNoticePeriodActive()
+    ) {
+      setLegacyEligible(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch("/api/subscriber-legacy-pricing-notice-eligible");
+        if (cancelled) return;
+        if (!res.ok) {
+          setLegacyEligible(false);
+          return;
+        }
+        const data = (await res.json()) as { eligible?: boolean };
+        setLegacyEligible(data.eligible === true);
+      } catch {
+        if (!cancelled) setLegacyEligible(false);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn, isSubscriber, user?.id]);
+
+  if (!isLoaded || !isSignedIn || !isSubscriber || !user?.id) {
     return null;
   }
 
@@ -35,9 +80,13 @@ export function SubscriberPricingNotice() {
     return null;
   }
 
+  if (legacyEligible !== true) {
+    return null;
+  }
+
   const handleDismiss = () => {
     try {
-      localStorage.setItem(STORAGE_KEY, "1");
+      localStorage.setItem(dismissStorageKey(user.id), "1");
     } catch {
       /* ignore */
     }
