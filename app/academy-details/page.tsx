@@ -39,7 +39,7 @@ function HeroAcademySection() {
           <h1 className="hero-academy-title">ACADEMY</h1>
           <div className="hero-academy-body">
             <p className="hero-academy-subtitle">Get started with a 7-day free trial!</p>
-            <p className="hero-academy-pricing">No contract membership for only $15 a month.</p>
+            <p className="hero-academy-pricing">Then $20/month — no contract. Cancel anytime.</p>
             <div className="hero-academy-cta-wrapper">
               <Link href="/signup">
                 <Button variant="cta">

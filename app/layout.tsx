@@ -12,6 +12,7 @@ import { ShopShadowBorders } from "@/components/shop-shadow-borders";
 import { ClerkProvider } from '@clerk/nextjs';
 import { CookieConsentBanner } from "@/components/cookie-consent-banner";
 import { SubscriptionStatusChecker } from "@/components/subscription-status-checker";
+import { SubscriberPricingNotice } from "@/components/subscriber-pricing-notice";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
@@ -122,6 +123,7 @@ export default function RootLayout({
               <HomePageLines />
               <ShopShadowBorders />
               <SiteHeader />
+              <SubscriberPricingNotice />
               <main id="main-content" className="flex-1">{children}</main>
               <SiteFooter />
             </CartProvider>

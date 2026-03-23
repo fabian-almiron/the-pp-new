@@ -321,6 +321,7 @@ All routes live in `app/api/`. Use Next.js Route Handlers (`route.ts`).
 ## Reference Documentation
 
 Additional architectural guides in the repo root:
+- `reference/SUBSCRIPTION_PRICING_CONTEXT.md` — Strapi/Stripe subscription flow, price changes (new vs existing), subscriber banner, $20 rollout checklist
 - `WEBHOOK_RELIABILITY_GUIDE.md` — Stripe webhook patterns
 - `WEBHOOK_PASSWORD_HANDLING.md` — Security for webhook data
 - `SUBSCRIPTION_SYNC_FIX.md` — Subscription sync troubleshooting

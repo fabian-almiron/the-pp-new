@@ -177,10 +177,10 @@ export default function SignupPage() {
             Get started with a 7-day free trial!
           </p>
           <p className="text-gray-700 pb-0 mb-2">
-            No contract membership for only $15 a month.
+            Then $20/month — no contract. Cancel anytime.
           </p>
           <p className="text-sm text-gray-600 italic">
-            Credit card required to start trial. Cancel anytime before trial ends to avoid charges.
+            Credit card required to start trial. Cancel anytime before your trial ends to avoid being charged.
           </p>
         </div>
 
