@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useSignUp, useUser } from "@clerk/nextjs";
 import { PasswordStrengthMeter } from "@/components/password-strength-meter";
+import { MIN_PASSWORD_STRENGTH_SCORE } from "@/lib/password-strength";
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -75,8 +76,10 @@ export default function SignupPage() {
       return;
     }
 
-    if (passwordStrength < 4) {
-      setError("Please use a strong password (green strength indicator) for your account security.");
+    if (passwordStrength < MIN_PASSWORD_STRENGTH_SCORE) {
+      setError(
+        "Please strengthen your password until the meter shows at least Good (lime) or Strong (green)."
+      );
       setIsLoading(false);
       return;
     }
@@ -264,7 +267,7 @@ export default function SignupPage() {
               </button>
             </div>
             <small className="signup-password-hint">
-              Must be at least 8 characters long
+              At least 8 characters, and at least &quot;Good&quot; on the strength meter (passwords known from data breaches are blocked)
             </small>
             <PasswordStrengthMeter 
               password={formData.password}
@@ -328,13 +331,17 @@ export default function SignupPage() {
               type="submit"
               variant="clean"
               className="login-submit-button"
-              disabled={isLoading || !isLoaded || (formData.password.length >= 8 && passwordStrength < 4)}
+              disabled={
+                isLoading ||
+                !isLoaded ||
+                (formData.password.length >= 8 && passwordStrength < MIN_PASSWORD_STRENGTH_SCORE)
+              }
             >
               {isLoading ? "CREATING ACCOUNT..." : "START FREE TRIAL"}
             </Button>
-            {formData.password.length >= 8 && passwordStrength < 4 && (
+            {formData.password.length >= 8 && passwordStrength < MIN_PASSWORD_STRENGTH_SCORE && (
               <p className="text-sm text-red-600 mt-2 text-center">
-                ⚠️ Password must be strong (green indicator) to continue
+                ⚠️ Use at least &quot;Good&quot; strength on the meter (or stronger) to continue
               </p>
             )}
           </div>

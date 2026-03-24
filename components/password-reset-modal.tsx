@@ -6,6 +6,10 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useSignIn } from '@clerk/nextjs';
 import { PasswordStrengthMeter } from '@/components/password-strength-meter';
+import {
+  MIN_PASSWORD_STRENGTH_SCORE,
+  clerkPasswordErrorMessage,
+} from '@/lib/password-strength';
 
 interface PasswordResetModalProps {
   isOpen: boolean;
@@ -14,27 +18,6 @@ interface PasswordResetModalProps {
   prefilledEmail?: string;
   /** Same-origin path after successful reset (e.g. from login redirect_url) */
   redirectAfterReset?: string;
-}
-
-/** Minimum zxcvbn score before submit — aligned with PasswordStrengthMeter "Good" tier (3) and typical Clerk acceptance */
-const MIN_PASSWORD_STRENGTH_SCORE = 3;
-
-function clerkPasswordErrorMessage(err: unknown): string {
-  const e = err as { errors?: Array<{ code?: string; message?: string }> };
-  const first = e?.errors?.[0];
-  const code = first?.code || "";
-  const message = first?.message || "";
-
-  if (code === "form_password_pwned" || message.toLowerCase().includes("data breach")) {
-    return "That password appears in known data breaches and cannot be used. Choose a unique password you do not use on other sites.";
-  }
-  if (code === "form_password_length_too_short" || message.toLowerCase().includes("too short")) {
-    return "That password is too short for your account settings. Try a longer one.";
-  }
-  if (code === "form_password_validation_failed" || message.toLowerCase().includes("password")) {
-    return message || "Password did not meet security requirements. Try a longer mix of letters, numbers, and symbols.";
-  }
-  return message || "Unable to reset password. Please try again.";
 }
 
 type ResetStep = 'email' | 'code' | 'password' | 'success';
