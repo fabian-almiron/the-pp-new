@@ -12,15 +12,62 @@ interface PasswordResetModalProps {
   onClose: () => void;
   showMigrationMessage?: boolean;
   prefilledEmail?: string;
+  /** Same-origin path after successful reset (e.g. from login redirect_url) */
+  redirectAfterReset?: string;
+}
+
+/** Minimum zxcvbn score before submit — aligned with PasswordStrengthMeter "Good" tier (3) and typical Clerk acceptance */
+const MIN_PASSWORD_STRENGTH_SCORE = 3;
+
+function clerkPasswordErrorMessage(err: unknown): string {
+  const e = err as { errors?: Array<{ code?: string; message?: string }> };
+  const first = e?.errors?.[0];
+  const code = first?.code || "";
+  const message = first?.message || "";
+
+  if (code === "form_password_pwned" || message.toLowerCase().includes("data breach")) {
+    return "That password appears in known data breaches and cannot be used. Choose a unique password you do not use on other sites.";
+  }
+  if (code === "form_password_length_too_short" || message.toLowerCase().includes("too short")) {
+    return "That password is too short for your account settings. Try a longer one.";
+  }
+  if (code === "form_password_validation_failed" || message.toLowerCase().includes("password")) {
+    return message || "Password did not meet security requirements. Try a longer mix of letters, numbers, and symbols.";
+  }
+  return message || "Unable to reset password. Please try again.";
 }
 
 type ResetStep = 'email' | 'code' | 'password' | 'success';
+
+async function clearMigrationFlagWithRetry(maxAttempts = 5) {
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (attempt > 0) {
+      await new Promise((r) => setTimeout(r, 450));
+    }
+    try {
+      const response = await fetch("/api/clear-migration-flag", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.ok) {
+        return true;
+      }
+      if (response.status !== 401) {
+        return false;
+      }
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
 
 export default function PasswordResetModal({ 
   isOpen, 
   onClose, 
   showMigrationMessage = false,
-  prefilledEmail = ''
+  prefilledEmail = '',
+  redirectAfterReset = '/video-library',
 }: PasswordResetModalProps) {
   const [step, setStep] = useState<ResetStep>('email');
   const [email, setEmail] = useState(prefilledEmail);
@@ -105,7 +152,9 @@ export default function PasswordResetModal({
       if (result.status === 'needs_new_password') {
         setStep('password');
       } else {
-        setErrorMessage('Invalid code. Please try again.');
+        setErrorMessage(
+          `Could not verify the code (status: ${result.status}). Request a new code or try again.`
+        );
       }
       
     } catch (err: any) {
@@ -137,8 +186,10 @@ export default function PasswordResetModal({
       return;
     }
 
-    if (passwordStrength < 4) {
-      setErrorMessage('Please use a strong password (green strength indicator) for your account security.');
+    if (passwordStrength < MIN_PASSWORD_STRENGTH_SCORE) {
+      setErrorMessage(
+        "Please strengthen your password until the meter shows at least Good (lime) or Strong (green)."
+      );
       return;
     }
     
@@ -151,44 +202,41 @@ export default function PasswordResetModal({
     setErrorMessage('');
 
     try {
-      // Reset the password
       const result = await signIn.resetPassword({
         password: newPassword,
       });
 
-      // If successful, set the session and show success
-      if (result.status === 'complete') {
-        await setActive({ session: result.createdSessionId });
-        
-        // Clear migration flag if it exists (for WordPress migrated users)
-        // This ensures they won't be prompted to reset password on every login
-        try {
-          const response = await fetch('/api/clear-migration-flag', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-          });
-          if (response.ok) {
-            console.log('✅ Migration flag cleared');
-          }
-        } catch (error) {
-          console.error('Failed to clear migration flag:', error);
-          // Don't fail the whole flow if this fails
-        }
-        
-        setStep('success');
-        
-        // Auto-close after 3 seconds
-        setTimeout(() => {
-          onClose();
-          resetForm();
-          // Redirect to video library or home
-          window.location.href = '/video-library';
-        }, 3000);
+      if (result.status !== "complete" || !result.createdSessionId) {
+        setErrorMessage(
+          result.status !== "complete"
+            ? `Reset could not finish (status: ${result.status}). Close this form and try signing in with your new password, or request a new code.`
+            : "Session was not created after reset. Try signing in with your new password."
+        );
+        return;
       }
-      
-    } catch (err: any) {
-      const clerkError = err?.errors?.[0]?.message || '';
-      setErrorMessage(clerkError || 'Unable to reset password. Please try again.');
+
+      await setActive({ session: result.createdSessionId });
+      await new Promise((r) => setTimeout(r, 400));
+
+      const cleared = await clearMigrationFlagWithRetry();
+      if (!cleared) {
+        console.warn("Migration flag may still be set — clear-migration-flag did not succeed after retries");
+      }
+
+      setStep("success");
+
+      const safeRedirect =
+        redirectAfterReset.startsWith("/") && !redirectAfterReset.startsWith("//")
+          ? redirectAfterReset
+          : "/video-library";
+
+      setTimeout(() => {
+        onClose();
+        resetForm();
+        window.location.href = safeRedirect;
+      }, 3000);
+    } catch (err: unknown) {
+      setErrorMessage(clerkPasswordErrorMessage(err));
     } finally {
       setIsLoading(false);
     }
@@ -405,7 +453,7 @@ export default function PasswordResetModal({
                 </button>
               </div>
               <small className="password-reset-hint">
-                Must be at least 8 characters long
+                At least 8 characters, and at least &quot;Good&quot; on the strength meter (Clerk also blocks common breached passwords)
               </small>
               <PasswordStrengthMeter 
                 password={newPassword}
@@ -454,13 +502,17 @@ export default function PasswordResetModal({
                 type="submit"
                 variant="default"
                 className="password-reset-submit"
-                disabled={isLoading || !isLoaded || (newPassword.length >= 8 && passwordStrength < 4)}
+                disabled={
+                  isLoading ||
+                  !isLoaded ||
+                  (newPassword.length >= 8 && passwordStrength < MIN_PASSWORD_STRENGTH_SCORE)
+                }
               >
                 {isLoading ? 'Resetting...' : 'Reset Password'}
               </Button>
-              {newPassword.length >= 8 && passwordStrength < 4 && (
+              {newPassword.length >= 8 && passwordStrength < MIN_PASSWORD_STRENGTH_SCORE && (
                 <p className="text-sm text-red-600 mt-2 text-center">
-                  ⚠️ Password must be strong (green indicator) to continue
+                  ⚠️ Use at least &quot;Good&quot; strength on the meter (or stronger) to continue
                 </p>
               )}
               <button

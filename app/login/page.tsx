@@ -3,7 +3,7 @@
 import { useState, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
@@ -23,9 +23,12 @@ function LoginContent() {
   const [showResetMigrationMessage, setShowResetMigrationMessage] = useState(false);
   
   const { signIn, isLoaded, setActive } = useSignIn();
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectUrl = searchParams.get('redirect_url') || '/video-library';
+  const rawRedirect = searchParams.get("redirect_url") || "/video-library";
+  const redirectUrl =
+    rawRedirect.startsWith("/") && !rawRedirect.startsWith("//")
+      ? rawRedirect
+      : "/video-library";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -250,6 +253,7 @@ function LoginContent() {
         }}
         prefilledEmail={resetModalEmail}
         showMigrationMessage={showResetMigrationMessage}
+        redirectAfterReset={redirectUrl}
       />
     </div>
   );
