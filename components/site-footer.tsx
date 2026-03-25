@@ -29,7 +29,7 @@ export function SiteFooter() {
           
           {/* FAQ - order 4 on mobile, hidden on desktop (shown in contact section) */}
           <div className="footer-nav-section order-4 md:hidden">
-            <Link href="#" className="footer-nav-link">FAQs</Link>
+            <Link href="/academy-details#faq" className="footer-nav-link">FAQs</Link>
           </div>
           <div className="footer-center-section order-1 md:order-2">
             <Link href="/" className="flex items-center justify-center">

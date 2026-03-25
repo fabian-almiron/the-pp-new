@@ -123,9 +123,11 @@ function WhyPipedPeonySection() {
             <Image
               src="/dara-about.jpeg"
               alt="Dara working on cake decoration"
-              width={400}
-              height={500}
+              width={780}
+              height={797}
               className="why-piped-peony-img"
+              quality={90}
+              sizes="(max-width: 768px) 100vw, 400px"
             />
           </div>
         </div>
@@ -199,9 +201,11 @@ function RecipeSection() {
             <Image
               src="/blooming-pic.jpeg"
               alt="Blooming Buttercream flowers"
-              width={400}
-              height={400}
+              width={450}
+              height={574}
               className="recipe-img"
+              quality={100}
+              sizes="(max-width: 768px) 100vw, 450px"
             />
           </div>
         </div>
@@ -214,17 +218,19 @@ function VideoSeriesSection() {
   return (
     <section className="video-series-section">
       <div className="container container-small">
-        <div className="video-series-grid">
-          <div className="video-series-image">
+        <div className="academy-video-series-grid">
+          <div className="video-series-img-col">
             <Image
               src="/video-series-cutting-cake.webp"
               alt="Instructor cutting decorated cake"
               width={450}
               height={574}
               className="video-series-img"
+              quality={100}
+              sizes="(max-width: 768px) 100vw, 450px"
             />
           </div>
-          <div className="video-series-content">
+          <div className="academy-video-series-content">
             <h2 className="video-series-title" style={{ fontFamily: 'var(--font-playfair-display)', fontSize: '47px' }}>Video Series</h2>
             <p className="video-series-description">
               Follow along with our comprehensive video series that takes you step-by-step through each technique. From basic piping to advanced flower arrangements, our videos are designed to help you learn at your own pace.

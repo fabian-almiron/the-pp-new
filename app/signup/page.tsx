@@ -313,7 +313,10 @@ export default function SignupPage() {
                 onChange={(e) => setAgreeToTerms(e.target.checked)}
                 className="login-remember-input"
               />
-              I agree to the <Link href="/terms-subscription" className="signup-link">Terms of Service</Link> and <Link href="/privacy-policy" className="signup-link">Privacy Policy</Link>
+              <span>I agree to the</span>
+              <Link href="/terms-subscription" className="signup-link">Terms of Service</Link>
+              <span>and</span>
+              <Link href="/privacy-policy" className="signup-link">Privacy Policy</Link>
             </label>
           </div>
 
