@@ -47,7 +47,7 @@ export default async function HomePage() {
   // Fetch latest 3 courses
   const { data: latestCourses } = await fetchCourses({
     pageSize: 3,
-    sort: 'createdAt:desc'
+    sort: 'publishedAt:asc'
   });
 
   return (

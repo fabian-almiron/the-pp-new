@@ -10,7 +10,7 @@ export default async function VideoLibraryPage() {
   // Fetch most recent courses from Strapi
   const coursesResponse = await fetchCourses({ 
     pageSize: 12, 
-    sort: 'createdAt:desc' 
+    sort: 'publishedAt:asc' 
   });
   
   const courses = coursesResponse.data || [];
