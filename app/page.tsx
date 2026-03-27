@@ -44,10 +44,10 @@ export const metadata: Metadata = {
 };
 
 export default async function HomePage() {
-  // Fetch latest 3 courses
+  // Fetch latest 3 courses (newest published first)
   const { data: latestCourses } = await fetchCourses({
     pageSize: 3,
-    sort: 'publishedAt:asc'
+    sort: "publishedAt:desc",
   });
 
   return (

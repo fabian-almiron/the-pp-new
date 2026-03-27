@@ -8,9 +8,9 @@ import { NewestVideosCarousel } from "./newest-videos-carousel";
 
 export default async function VideoLibraryPage() {
   // Fetch most recent courses from Strapi
-  const coursesResponse = await fetchCourses({ 
-    pageSize: 12, 
-    sort: 'publishedAt:asc' 
+  const coursesResponse = await fetchCourses({
+    pageSize: 12,
+    sort: "publishedAt:desc",
   });
   
   const courses = coursesResponse.data || [];
